@@ -17,14 +17,14 @@ import java.util.logging.LogRecord;
  * Sistema SIGMA.
  * @author Juliano Felipe da Silva
  */
-public class SigmaConsoleFormatter extends Formatter{
+public class ConsoleFormatter extends Formatter{
     private final Locale locale; 
 
     /**
      * Constrói um formatador de loggers
      * no padrão SIGMA com locale PT-BR.
      */
-    public SigmaConsoleFormatter() {
+    public ConsoleFormatter() {
         this(new Locale("pt", "BR")); //Locale para o Brasil
     }
 
@@ -33,7 +33,7 @@ public class SigmaConsoleFormatter extends Formatter{
      * no padrão SIGMA com locale passado.
      * @param locale Usado na formatação.
      */
-    public SigmaConsoleFormatter(Locale locale) {
+    public ConsoleFormatter(Locale locale) {
         this.locale = locale;
     }
 
@@ -54,7 +54,7 @@ public class SigmaConsoleFormatter extends Formatter{
         
         String ret = formatter.format(date) + " - " + record.getSourceClassName() +
                " " + record.getSourceMethodName() + 
-              "\n" + record.getLevel() + ": " + record.getMessage() + "\n";
+              " - " + record.getLevel() + ": " + record.getMessage() + "\n";
         
         return ret;
     }

@@ -197,7 +197,8 @@ public class BufferedPaneOutputStream extends OutputStream {
     @Override
     public void flush() throws IOException {
         try {
-            doc.insertString(doc.getLength(), buffer.toString(encoding), attributes[flushSwitch]);
+            //doc.insertString(doc.getLength(), buffer.toString(encoding), attributes[flushSwitch]); //Insert at end
+            doc.insertString(0, buffer.toString(encoding), attributes[flushSwitch]); //Insert at beginning
         } catch (BadLocationException ex) {
             Logger.getLogger(BufferedPaneOutputStream.class.getName()).log(Level.SEVERE, null, ex);
         }

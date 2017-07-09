@@ -85,7 +85,7 @@ public class Vertice {
     
     @Override
     public String toString() {
-        return"V=("+x+";"+y+";"+w+")";
+        return "("+x+";"+y+")";
     }
     
     public String toString(String nome) {

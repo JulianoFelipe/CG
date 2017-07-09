@@ -17,14 +17,14 @@ import java.util.logging.LogRecord;
  * Sistema SIGMA.
  * @author Juliano Felipe da Silva
  */
-public class SigmaFileFormatter extends Formatter{
+public class FileFormatter extends Formatter{
     private final Locale locale; 
 
     /**
      * Constrói um formatador de loggers
      * no padrão SIGMA com locale PT-BR.
      */
-    public SigmaFileFormatter() {
+    public FileFormatter() {
         this(new Locale("pt", "BR")); //Locale para o Brasil
     }
 
@@ -33,7 +33,7 @@ public class SigmaFileFormatter extends Formatter{
      * no padrão SIGMA com locale passado.
      * @param locale Usado na formatação.
      */
-    public SigmaFileFormatter(Locale locale) {
+    public FileFormatter(Locale locale) {
         this.locale = locale;
     }
 

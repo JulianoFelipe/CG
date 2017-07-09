@@ -5,11 +5,14 @@
  */
 package View;
 
+import Model.poligonosEsp.Circunferencia;
 import Model.Poligono;
-import Model.QuadrilateroRegular;
+import Model.poligonosEsp.QuadrilateroRegular;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 /**
@@ -17,6 +20,7 @@ import javax.swing.JPanel;
  * @author JFPS
  */
 public class DrawablePanel extends JPanel {
+    private static final Logger LOG = Logger.getLogger("CG");
     private final List<Poligono> objetos;
     private final Graphics graphics;
 
@@ -35,6 +39,7 @@ public class DrawablePanel extends JPanel {
     }
     
     public void addPoligono(Poligono p){
+        LOG.info("Adicionado: " + p);
         objetos.add(p);
     }
     
@@ -61,6 +66,11 @@ public class DrawablePanel extends JPanel {
             if (temp instanceof QuadrilateroRegular){
                 QuadrilateroRegular quad = ((QuadrilateroRegular) temp);
                 g.drawRect((int)quad.getMinX(), (int)quad.getMinY(), (int)quad.getWidth(), (int)quad.getHeight());
+            } else if (temp instanceof Circunferencia){ 
+                Circunferencia circ = ((Circunferencia) temp);
+                g.drawOval((int) circ.getCentro().getX() - circ.getRadius(),
+                           (int) circ.getCentro().getY() - circ.getRadius(), 
+                           circ.getRadius()*2, circ.getRadius()*2);
             } else {
             
                 xs = objetos.get(i).getXpoints();
@@ -70,7 +80,6 @@ public class DrawablePanel extends JPanel {
                 g.drawPolygon(xs, ys, len);
             }
         }
-        System.out.println("AHHH");
     }
     
     public void paintPolygons(){

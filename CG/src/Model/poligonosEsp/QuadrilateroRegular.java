@@ -3,7 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model;
+package Model.poligonosEsp;
+
+import Model.Poligono;
+import Model.Vertice;
 
 /**
  *
@@ -55,6 +58,11 @@ public class QuadrilateroRegular extends Poligono{
     
     public float getHeight(){
         return getMaxY() - getMinY();
+    }
+
+    @Override
+    public String toString() {
+        return "Quadrilátero Regular {" + a + "; " + b + '}';
     }
     
     

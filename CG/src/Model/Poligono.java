@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import utils.VMath;
 
 /**
  *
@@ -179,4 +178,11 @@ public class Poligono {
         final Poligono other = (Poligono) obj;
         return this.ID == other.ID;
     }
+
+    @Override
+    public String toString() {
+        return "Polígono {" + vertices + '}';
+    }
+    
+    
 }

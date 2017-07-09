@@ -5,15 +5,21 @@
  */
 package View;
 
+import Logging.BufferedPaneOutputStream;
+import Logging.PaneHandler;
 import Model.Poligono;
-import Model.QuadrilateroRegular;
+import Model.poligonosEsp.QuadrilateroRegular;
 import Model.Vertice;
 import java.awt.Point;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 /**
  *
  * @author Anderson
  */
 public class MainV extends javax.swing.JFrame {
+    private static final Logger LOG = Logger.getLogger("CG");
+        
     private Poligono poligonoSelecinado;
     private Vertice vi;
     private Vertice vf;
@@ -55,11 +61,11 @@ public class MainV extends javax.swing.JFrame {
         addMouseListeners();
         //CPintura.setG1(vFrente.getGraphics());
 
-        //origemFrontal = vFrente.getLocation();
-        
-        panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)100., (float)100.), new Vertice((float)102., (float)102.)));
-        panelCp.paintPolygons();
-
+        consolePane.setEditable(false);
+        BufferedPaneOutputStream oStream = new BufferedPaneOutputStream(consolePane);
+        LOG.addHandler(new PaneHandler(oStream));
+        LOG.setLevel(Level.FINE);
+        LOG.log(Level.INFO, "Cena inicializada...");
     }
 
     /**
@@ -85,7 +91,7 @@ public class MainV extends javax.swing.JFrame {
         irregularPoligonBt = new javax.swing.JToggleButton();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTextPane1 = new javax.swing.JTextPane();
+        consolePane = new javax.swing.JTextPane();
         paneMs = new javax.swing.JScrollPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
@@ -212,7 +218,7 @@ public class MainV extends javax.swing.JFrame {
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Console"));
 
-        jScrollPane1.setViewportView(jTextPane1);
+        jScrollPane1.setViewportView(consolePane);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -335,6 +341,7 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JToggleButton circBt;
+    private javax.swing.JTextPane consolePane;
     private javax.swing.JToggleButton deleteBt;
     private javax.swing.JToggleButton irregularPoligonBt;
     private javax.swing.JLabel jLabel2;
@@ -344,7 +351,6 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextPane jTextPane1;
     private javax.swing.JTextField jtfLadosPrisma;
     private javax.swing.JMenuItem loadMenu;
     private javax.swing.JScrollPane paneMs;

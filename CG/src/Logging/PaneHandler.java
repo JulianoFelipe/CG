@@ -37,7 +37,7 @@ public class PaneHandler extends StreamHandler {
      */
     public PaneHandler(BufferedPaneOutputStream outStream) {
         //this(outStream, new SimpleFormatter());
-        this(outStream, new SigmaConsoleFormatter());
+        this(outStream, new ConsoleFormatter());
     }
 
     /**
