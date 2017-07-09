@@ -22,24 +22,40 @@ public class MainV extends javax.swing.JFrame {
     private Point origemFrontal;
     private DrawablePanel panelCp;
 
+    private void addMouseListeners(){
+        paneMs.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                Point point = evt.getPoint();
+                panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)point.x, (float)point.y), new Vertice((float)point.x+100, (float)point.y+100)));
+                panelCp.paintComponent(paneMs.getGraphics());
+                System.out.println("ÇLKAJFÇL");
+            }
+            
+            /*public void mouseReleased(java.awt.event.MouseEvent evt) {
+                vFrenteMouseReleased(evt);
+            }*/
+        });
+    }
+    
     /**
      * Creates new form Principal
      */
     public MainV() {
-        panelCp = new DrawablePanel();
-        
         //Dimension d = vFrente.getSize();
         //Rectangle r = vFrente.getBounds();
-        vFrente = panelCp;
         //vFrente.setBounds(r);
         
         initComponents();
+        panelCp = new DrawablePanel(paneMs.getGraphics());
+        paneMs.add(panelCp);
+        addMouseListeners();
         //CPintura.setG1(vFrente.getGraphics());
 
         //origemFrontal = vFrente.getLocation();
         
-        panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)1., (float)1.), new Vertice((float)2., (float)2.)));
-        panelCp.repaint();
+        panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)100., (float)100.), new Vertice((float)102., (float)102.)));
+        panelCp.paintPolygons();
+
     }
 
     /**
@@ -53,7 +69,6 @@ public class MainV extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
-        vFrente = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         selectBt = new javax.swing.JToggleButton();
         deleteBt = new javax.swing.JToggleButton();
@@ -67,43 +82,13 @@ public class MainV extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextPane1 = new javax.swing.JTextPane();
+        paneMs = new javax.swing.JScrollPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         saveMenu = new javax.swing.JMenuItem();
         loadMenu = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-
-        vFrente.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
-        vFrente.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
-            public void mouseDragged(java.awt.event.MouseEvent evt) {
-                vFrenteMouseDragged(evt);
-            }
-        });
-        vFrente.addMouseWheelListener(new java.awt.event.MouseWheelListener() {
-            public void mouseWheelMoved(java.awt.event.MouseWheelEvent evt) {
-                vFrenteMouseWheelMoved(evt);
-            }
-        });
-        vFrente.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                vFrenteMouseClicked(evt);
-            }
-            public void mouseReleased(java.awt.event.MouseEvent evt) {
-                vFrenteMouseReleased(evt);
-            }
-        });
-
-        javax.swing.GroupLayout vFrenteLayout = new javax.swing.GroupLayout(vFrente);
-        vFrente.setLayout(vFrenteLayout);
-        vFrenteLayout.setHorizontalGroup(
-            vFrenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 631, Short.MAX_VALUE)
-        );
-        vFrenteLayout.setVerticalGroup(
-            vFrenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 390, Short.MAX_VALUE)
-        );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Ferramentas"));
         jPanel2.setToolTipText("");
@@ -151,7 +136,7 @@ public class MainV extends javax.swing.JFrame {
         jtfLadosPrisma.setText("5");
         jtfLadosPrisma.setToolTipText("Quantidade de lados para um polígono irregular");
 
-        buttonGroup2.add(quadrilateroBt);
+        buttonGroup1.add(quadrilateroBt);
         quadrilateroBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Quadrado.jpg"))); // NOI18N
         quadrilateroBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -159,6 +144,7 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
+        buttonGroup1.add(circBt);
         circBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Circ.jpg"))); // NOI18N
         circBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -166,7 +152,7 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        buttonGroup2.add(trianguloBt);
+        buttonGroup1.add(trianguloBt);
         trianguloBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Triangulo.jpg"))); // NOI18N
         trianguloBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -174,7 +160,7 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        buttonGroup2.add(irregularPoligonBt);
+        buttonGroup1.add(irregularPoligonBt);
         irregularPoligonBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Irregular.jpg"))); // NOI18N
         irregularPoligonBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -256,7 +242,7 @@ public class MainV extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(vFrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(paneMs, javax.swing.GroupLayout.PREFERRED_SIZE, 633, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -267,12 +253,12 @@ public class MainV extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(vFrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(paneMs))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(27, Short.MAX_VALUE))
@@ -304,42 +290,6 @@ public class MainV extends javax.swing.JFrame {
     private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_deleteBtActionPerformed
-
-    private void vFrenteMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseReleased
-        vi = null;
-    }//GEN-LAST:event_vFrenteMouseReleased
-
-    private void vFrenteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseClicked
-        /*if (poligonoSelecinado != null) { // caso haja um poligono selecionado então tira o seu destaque.
-        CPintura.PintarBordasPoligono(poligonoSelecinado);
-        }
-        // pegando ponto do clique
-        Vertice v = new Vertice();
-        v.setX(evt.getPoint().x);
-        v.setY(evt.getPoint().y);
-        // pega o poligono q foi selecionado
-        poligonoSelecinado = CFuncoes.getPoligonoSelecionadoVistaFrontal(v);
-        // Destaca o poligono que foi selecionado
-        if (poligonoSelecinado != null) {
-        CPintura.PintarBordasPoligono(poligonoSelecinado);
-        }*/
-        Point point = evt.getPoint();
-        panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)point.x, (float)point.x), new Vertice((float)point.x+1, (float)point.x+1)));
-        vFrente = panelCp;
-        vFrente.repaint();
-        System.out.println("ÇLKAJFÇL");
-    }//GEN-LAST:event_vFrenteMouseClicked
-
-    private void vFrenteMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_vFrenteMouseWheelMoved
-        
-    }//GEN-LAST:event_vFrenteMouseWheelMoved
-
-    private void vFrenteMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseDragged
-        // Aperta e Arrasta
-        if (selectBt.isSelected() && poligonoSelecinado != null) {
-            
-        }
-    }//GEN-LAST:event_vFrenteMouseDragged
 
     /**
      * @param args the command line arguments
@@ -393,10 +343,46 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JTextPane jTextPane1;
     private javax.swing.JTextField jtfLadosPrisma;
     private javax.swing.JMenuItem loadMenu;
+    private javax.swing.JScrollPane paneMs;
     private javax.swing.JToggleButton quadrilateroBt;
     private javax.swing.JMenuItem saveMenu;
     private javax.swing.JToggleButton selectBt;
     private javax.swing.JToggleButton trianguloBt;
-    private javax.swing.JPanel vFrente;
     // End of variables declaration//GEN-END:variables
 }
+
+/*private void vFrenteMouseReleased(java.awt.event.MouseEvent evt) {                                      
+        vi = null;
+    }                                     
+
+    private void vFrenteMouseClicked(java.awt.event.MouseEvent evt) {                                     
+        /*if (poligonoSelecinado != null) { // caso haja um poligono selecionado então tira o seu destaque.
+        CPintura.PintarBordasPoligono(poligonoSelecinado);
+        }
+        // pegando ponto do clique
+        Vertice v = new Vertice();
+        v.setX(evt.getPoint().x);
+        v.setY(evt.getPoint().y);
+        // pega o poligono q foi selecionado
+        poligonoSelecinado = CFuncoes.getPoligonoSelecionadoVistaFrontal(v);
+        // Destaca o poligono que foi selecionado
+        if (poligonoSelecinado != null) {
+        CPintura.PintarBordasPoligono(poligonoSelecinado);
+        }*/
+        /*Point point = evt.getPoint();
+        panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)point.x, (float)point.x), new Vertice((float)point.x+1, (float)point.x+1)));
+        vFrente = panelCp;
+        vFrente.repaint();
+        System.out.println("ÇLKAJFÇL");
+    }                                    
+
+    private void vFrenteMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {                                        
+        
+    }                                       
+
+    private void vFrenteMouseDragged(java.awt.event.MouseEvent evt) {                                     
+        // Aperta e Arrasta
+        if (selectBt.isSelected() && poligonoSelecinado != null) {
+            
+        }
+    }*/
