@@ -6,6 +6,7 @@
 package View;
 
 import Model.Poligono;
+import Model.QuadrilateroRegular;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,14 +18,20 @@ import javax.swing.JPanel;
  */
 public class DrawablePanel extends JPanel {
     private final List<Poligono> objetos;
-    //private final Graphics2D graphics;
+    private final Graphics graphics;
 
     public DrawablePanel(List<Poligono> objetos) {
         this.objetos = objetos;
+        this.graphics = null;
     }
     
     public DrawablePanel(){
         this(new ArrayList<>());
+    }
+    
+    public DrawablePanel(Graphics g){
+        this.graphics = g;
+        objetos = new ArrayList();
     }
     
     public void addPoligono(Poligono p){
@@ -47,17 +54,27 @@ public class DrawablePanel extends JPanel {
     protected void paintComponent(Graphics g){
         int xs[], ys[];
         int len;
+        
+        Poligono temp;
         for (int i=0; i<objetos.size(); i++){
-            xs = objetos.get(i).getXpoints();
-            ys = objetos.get(i).getYpoints();
-            len = xs.length;
-            g.drawPolygon(xs, ys, len);
+            temp = objetos.get(i);
+            if (temp instanceof QuadrilateroRegular){
+                QuadrilateroRegular quad = ((QuadrilateroRegular) temp);
+                g.drawRect((int)quad.getMinX(), (int)quad.getMinY(), (int)quad.getWidth(), (int)quad.getHeight());
+            } else {
+            
+                xs = objetos.get(i).getXpoints();
+                ys = objetos.get(i).getYpoints();
+                len = xs.length;
+
+                g.drawPolygon(xs, ys, len);
+            }
         }
         System.out.println("AHHH");
     }
     
-    /*public void paintPolygons(){
+    public void paintPolygons(){
         paintComponent(graphics);
-    }*/
+    }
     
 }

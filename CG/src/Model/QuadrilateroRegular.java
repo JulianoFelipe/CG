@@ -18,7 +18,45 @@ public class QuadrilateroRegular extends Poligono{
         super.addVertice(a);
         super.addVertice(b);
         super.addVertice(new Vertice(a.getX(), b.getY()));
-        super.addVertice(new Vertice(a.getY(), b.getX()));
+        super.addVertice(new Vertice(b.getX(), a.getY()));
     }
+    
+    public float getMinX() {
+        if (a.getX()< b.getX())
+            return a.getX();
+        else
+            return b.getX();
+    }
+    
+    public float getMinY() {
+        if (a.getY()< b.getY())
+            return a.getY();
+        else
+            return b.getY();
+    }
+    
+    public float getMaxX(){
+        if (a.getX()> b.getX())
+            return a.getX();
+        else
+            return b.getX();
+    }
+    
+    public float getMaxY() {
+        if (a.getY()> b.getY())
+            return a.getY();
+        else
+            return b.getY();
+    }
+    
+    public float getWidth(){
+        return getMaxX() - getMinX();
+    }
+    
+    public float getHeight(){
+        return getMaxY() - getMinY();
+    }
+    
+    
     
 }

@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import utils.VMath;
@@ -87,6 +88,7 @@ public class Poligono {
         for(int i=0; i<vertices.size(); i++){
             xPts[i] = (int) vertices.get(i).getX();
         }
+        System.out.println(Arrays.toString(xPts));
         return xPts;
     }
     
@@ -95,6 +97,7 @@ public class Poligono {
         for(int i=0; i<vertices.size(); i++){
             yPts[i] = (int) vertices.get(i).getY();
         }
+        System.out.println(Arrays.toString(yPts));
         return yPts;
     }
     

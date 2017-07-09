@@ -25,10 +25,16 @@ public class MainV extends javax.swing.JFrame {
     private void addMouseListeners(){
         paneMs.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                Point point = evt.getPoint();
-                panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)point.x, (float)point.y), new Vertice((float)point.x+100, (float)point.y+100)));
+                System.out.println(evt.getX());
+                System.out.println(evt.getY());
+                Vertice a = new Vertice((float) evt.getX(), (float) evt.getY());
+                Vertice b = new Vertice((float) evt.getX()+10, (float) evt.getY()+10);
+                System.out.println(a);
+                System.out.println(b);
+                
+                panelCp.addPoligono(new QuadrilateroRegular(a, b));
+                System.out.println(panelCp.getPoligono(0));
                 panelCp.paintComponent(paneMs.getGraphics());
-                System.out.println("ÇLKAJFÇL");
             }
             
             /*public void mouseReleased(java.awt.event.MouseEvent evt) {
