@@ -19,12 +19,12 @@ public class MVMath {
      * @param m
      */
     public static void multiplicar(Vertice v, float[][] m) {
-        float x = (m[0][0] * v.getX()) + (m[0][1] * v.getY()) + (m[0][2] * v.getZ()) + (m[0][3] * v.getW());
-        float y = (m[1][0] * v.getX()) + (m[1][1] * v.getY()) + (m[1][2] * v.getZ()) + (m[1][3] * v.getW());
-        float z = (m[2][0] * v.getX()) + (m[2][1] * v.getY()) + (m[2][2] * v.getZ()) + (m[2][3] * v.getW());
-        float w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getZ()) + (m[3][3] * v.getW());
+        float x = (m[0][0] * v.getX()) + (m[0][1] * v.getY()) + (m[0][2] * v.getW());
+        float y = (m[1][0] * v.getX()) + (m[1][1] * v.getY()) + (m[1][2] * v.getW());
+        float z = (m[2][0] * v.getX()) + (m[2][1] * v.getY()) + (m[2][2] * v.getW());
+        float w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getW());
         
-        v.setAll(x, y, z, w);
+        v.setAll(x, y, w);
     }
     
     /**
@@ -34,12 +34,12 @@ public class MVMath {
      * @param m
      */
     public static void multiplicar(Vertice v, double[][] m) {
-        double x = (m[0][0] * v.getX()) + (m[0][1] * v.getY()) + (m[0][2] * v.getZ()) + (m[0][3] * v.getW());
-        double y = (m[1][0] * v.getX()) + (m[1][1] * v.getY()) + (m[1][2] * v.getZ()) + (m[1][3] * v.getW());
-        double z = (m[2][0] * v.getX()) + (m[2][1] * v.getY()) + (m[2][2] * v.getZ()) + (m[2][3] * v.getW());
-        double w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getZ()) + (m[3][3] * v.getW());
+        double x = (m[0][0] * v.getX()) + (m[0][1] * v.getY()) + (m[0][2] * v.getW());
+        double y = (m[1][0] * v.getX()) + (m[1][1] * v.getY()) + (m[1][2] * v.getW());
+        double z = (m[2][0] * v.getX()) + (m[2][1] * v.getY()) + (m[2][2] * v.getW());
+        double w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getW());
         
-        v.setAll((float)x,(float) y,(float) z,(float) w); /* MUCH PRECISÃO. VERY CASTING. WOW*/
+        v.setAll((float)x,(float) y,(float) w); /* MUCH PRECISÃO. VERY CASTING. WOW*/
     }
     
     /**
@@ -50,13 +50,13 @@ public class MVMath {
      * @return 
      */
     public static Vertice multiplicarR(Vertice v, float[][] m) {
-        float x = (m[0][0] * v.getX()) + (m[0][1] * v.getY()) + (m[0][2] * v.getZ()) + (m[0][3] * v.getW());
-        float y = (m[1][0] * v.getX()) + (m[1][1] * v.getY()) + (m[1][2] * v.getZ()) + (m[1][3] * v.getW());
-        float z = (m[2][0] * v.getX()) + (m[2][1] * v.getY()) + (m[2][2] * v.getZ()) + (m[2][3] * v.getW());
-        float w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getZ()) + (m[3][3] * v.getW());
+        float x = (m[0][0] * v.getX()) + (m[0][1] * v.getY()) + (m[0][2] * v.getW());
+        float y = (m[1][0] * v.getX()) + (m[1][1] * v.getY()) + (m[1][2] * v.getW());
+        float z = (m[2][0] * v.getX()) + (m[2][1] * v.getY()) + (m[2][2] * v.getW());
+        float w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getW());
         
         Vertice vertice = new Vertice();
-        vertice.setAll(x, y, z, w);
+        vertice.setAll(x, y, w);
         return vertice;
     }
 }

@@ -8,7 +8,7 @@ import utils.MVMath;
 
 /**
  *
- * @author Maycon
+ * @author Anderson
  */
 public class Controle {
     private static Cena cena = new Cena();

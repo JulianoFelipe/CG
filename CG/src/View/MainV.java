@@ -5,31 +5,18 @@
  */
 package View;
 
-import Control.CFuncoes;
-import Control.CPintura;
-import Control.Controle;
-import Model.Classificacao.Prismas;
 import Model.Poligono;
 import Model.Vertice;
 import Model.manipulation.CFuncoes;
 import Model.manipulation.CPintura;
 import Model.manipulation.Controle;
-import Model.transformacao.Escala;
-import Model.transformacao.Rotacao;
-import Model.visualizacao.Camera;
-import Model.visualizacao.Cena;
 import java.awt.Point;
-import javafx.scene.Camera;
-import javafx.scene.control.Control;
-
+import java.util.ArrayList;
 /**
  *
- * @author Maycon
+ * @author Anderson
  */
 public class MainV extends javax.swing.JFrame {
-
-    Cena cena = Controle.getCena();
-    
     Poligono poligonoSelecinado;
     Vertice vi;
     Vertice vf;
@@ -39,9 +26,13 @@ public class MainV extends javax.swing.JFrame {
      * Creates new form Principal
      */
     public MainV() {
+        //Dimension d = vFrente.getSize();
+        //Rectangle r = vFrente.getBounds();
+        vFrente = new DrawablePanel(new ArrayList());
+        //vFrente.setBounds(r);
+        
         initComponents();
         CPintura.setG1(vFrente.getGraphics());
-        Camera.getCamera().init();
 
         origemFrontal = vFrente.getLocation();
     }
@@ -56,19 +47,29 @@ public class MainV extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
+        buttonGroup2 = new javax.swing.ButtonGroup();
         vFrente = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
         jbMover = new javax.swing.JToggleButton();
         jbRedimensionar = new javax.swing.JToggleButton();
-        jbRotacionar = new javax.swing.JToggleButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jtfLadosPrisma = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
+        quadrilateroBt = new javax.swing.JToggleButton();
+        circBt = new javax.swing.JToggleButton();
+        trianguloBt = new javax.swing.JToggleButton();
+        irregularPoligonBt = new javax.swing.JToggleButton();
+        jPanel1 = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTextPane1 = new javax.swing.JTextPane();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        saveMenu = new javax.swing.JMenuItem();
+        loadMenu = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        vFrente.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Frente"));
+        vFrente.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
         vFrente.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             public void mouseDragged(java.awt.event.MouseEvent evt) {
                 vFrenteMouseDragged(evt);
@@ -96,20 +97,27 @@ public class MainV extends javax.swing.JFrame {
         );
         vFrenteLayout.setVerticalGroup(
             vFrenteLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
+            .addGap(0, 390, Short.MAX_VALUE)
         );
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Ferramentas"));
         jPanel2.setToolTipText("");
 
         buttonGroup1.add(jbMover);
-        jbMover.setText("Mover");
+        jbMover.setText("Selecionar");
+        jbMover.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbMoverActionPerformed(evt);
+            }
+        });
 
         buttonGroup1.add(jbRedimensionar);
-        jbRedimensionar.setText("Redimensionar");
-
-        buttonGroup1.add(jbRotacionar);
-        jbRotacionar.setText("Rotacionar");
+        jbRedimensionar.setText("Excluir");
+        jbRedimensionar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbRedimensionarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -118,31 +126,54 @@ public class MainV extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jbRedimensionar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 174, Short.MAX_VALUE)
-                    .addComponent(jbRotacionar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jbRedimensionar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jbMover, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jbMover)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jbRedimensionar)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jbRotacionar)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jbRedimensionar))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Objetos"));
 
         jLabel2.setText("Quantidade de lados");
 
-        jButton1.setText("Gerar prisma");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jtfLadosPrisma.setText("5");
+        jtfLadosPrisma.setToolTipText("Quantidade de lados para um polígono irregular");
+
+        buttonGroup2.add(quadrilateroBt);
+        quadrilateroBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Quadrado.jpg"))); // NOI18N
+        quadrilateroBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                quadrilateroBtActionPerformed(evt);
+            }
+        });
+
+        circBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Circ.jpg"))); // NOI18N
+        circBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                circBtActionPerformed(evt);
+            }
+        });
+
+        buttonGroup2.add(trianguloBt);
+        trianguloBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Triangulo.jpg"))); // NOI18N
+        trianguloBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                trianguloBtActionPerformed(evt);
+            }
+        });
+
+        buttonGroup2.add(irregularPoligonBt);
+        irregularPoligonBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Irregular.jpg"))); // NOI18N
+        irregularPoligonBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                irregularPoligonBtActionPerformed(evt);
             }
         });
 
@@ -151,27 +182,65 @@ public class MainV extends javax.swing.JFrame {
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jtfLadosPrisma)
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel2)
-                            .addComponent(jButton1))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addContainerGap())
+                        .addComponent(trianguloBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(quadrilateroBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(circBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addComponent(irregularPoligonBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jtfLadosPrisma))))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jtfLadosPrisma, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1)
-                .addContainerGap(127, Short.MAX_VALUE))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(quadrilateroBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(trianguloBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(circBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(irregularPoligonBt)
+                    .addGroup(jPanel3Layout.createSequentialGroup()
+                        .addGap(9, 9, 9)
+                        .addComponent(jLabel2)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jtfLadosPrisma, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(108, Short.MAX_VALUE))
         );
+
+        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Console"));
+
+        jScrollPane1.setViewportView(jTextPane1);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+        );
+
+        jMenu1.setText("File");
+
+        saveMenu.setText("Salvar");
+        jMenu1.add(saveMenu);
+
+        loadMenu.setText("Carregar");
+        jMenu1.add(loadMenu);
+
+        jMenuBar1.add(jMenu1);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -179,40 +248,67 @@ public class MainV extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(vFrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(vFrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(vFrente, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(vFrente, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(27, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        int A = Integer.parseInt(jtfLadosPrisma.getText());
+    private void circBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_circBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_circBtActionPerformed
 
-        Controle.addSolido( Prismas.porCodigo(A));
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void trianguloBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trianguloBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_trianguloBtActionPerformed
+
+    private void quadrilateroBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quadrilateroBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_quadrilateroBtActionPerformed
+
+    private void irregularPoligonBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_irregularPoligonBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_irregularPoligonBtActionPerformed
+
+    private void jbMoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbMoverActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jbMoverActionPerformed
+
+    private void jbRedimensionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbRedimensionarActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jbRedimensionarActionPerformed
+
+    private void vFrenteMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseReleased
+        vi = null;
+    }//GEN-LAST:event_vFrenteMouseReleased
 
     private void vFrenteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseClicked
         if (poligonoSelecinado != null) { // caso haja um poligono selecionado então tira o seu destaque.
             CPintura.PintarBordasPoligono(poligonoSelecinado);
         }
-        // pegando ponto do clique 
+        // pegando ponto do clique
         Vertice v = new Vertice();
         v.setX(evt.getPoint().x);
         v.setY(evt.getPoint().y);
@@ -224,9 +320,9 @@ public class MainV extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_vFrenteMouseClicked
 
-    private void vFrenteMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseReleased
-        vi = null;
-    }//GEN-LAST:event_vFrenteMouseReleased
+    private void vFrenteMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_vFrenteMouseWheelMoved
+        
+    }//GEN-LAST:event_vFrenteMouseWheelMoved
 
     private void vFrenteMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseDragged
         // Aperta e Arrasta
@@ -244,7 +340,7 @@ public class MainV extends javax.swing.JFrame {
 
                 CFuncoes.mover(poligonoSelecinado, vi, vf);
                 poligonoSelecinado.setAllScanlines(false);
-                
+
                 //Controle.PintarBordasPoligos();
                 //CPintura.PintarCena();
                 Controle.paintPolygons();
@@ -259,34 +355,19 @@ public class MainV extends javax.swing.JFrame {
             } else {
                 vf = new Vertice();
                 vf.setX(evt.getPoint().x);
-                
+
                 Rotacao r = new Rotacao(0.5, Rotacao.Orientacao.ROTACAOX);
                 if (vi.getX() < vf.getX()) {
                     CFuncoes.rotaciona(poligonoSelecinado, r.getMatrizRotacao());
                 } else {
                     CFuncoes.rotaciona(poligonoSelecinado, r.getMatrizRotacao());
                 }
-                
-                poligonoSelecinado.setAllScanlines(false);
+
                 Controle.paintPolygons();
                 vi = vf;
             }
         }
     }//GEN-LAST:event_vFrenteMouseDragged
-
-    private void vFrenteMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_vFrenteMouseWheelMoved
-        // Scroll do mouse
-        if (poligonoSelecinado != null) {
-            int voltas = evt.getWheelRotation();
-            //System.out.println("num voltas: "+ voltas);
-            float escalar = 1;
-            escalar += voltas * 0.1;
-
-            Escala e = new Escala(escalar, Escala.Tipo.EscalaXYZ);
-            CFuncoes.escala(poligonoSelecinado, e.getMatrizEscala()); //MATRIZ DE TRANSFORMACAO; TROCAR
-            Controle.paintPolygons();
-        }
-    }//GEN-LAST:event_vFrenteMouseWheelMoved
 
     /**
      * @param args the command line arguments
@@ -326,14 +407,24 @@ public class MainV extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
-    private javax.swing.JButton jButton1;
+    private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.JToggleButton circBt;
+    private javax.swing.JToggleButton irregularPoligonBt;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTextPane jTextPane1;
     private javax.swing.JToggleButton jbMover;
     private javax.swing.JToggleButton jbRedimensionar;
-    private javax.swing.JToggleButton jbRotacionar;
     private javax.swing.JTextField jtfLadosPrisma;
+    private javax.swing.JMenuItem loadMenu;
+    private javax.swing.JToggleButton quadrilateroBt;
+    private javax.swing.JMenuItem saveMenu;
+    private javax.swing.JToggleButton trianguloBt;
     private javax.swing.JPanel vFrente;
     // End of variables declaration//GEN-END:variables
 }

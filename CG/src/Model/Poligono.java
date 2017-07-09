@@ -7,7 +7,7 @@ import utils.VMath;
 
 /**
  *
- * @author Maycon
+ * @author 
  */
 public class Poligono {
     private static long INSTANCES;
@@ -82,6 +82,22 @@ public class Poligono {
     
 //</editor-fold>
  
+    public int[] getXpoints(){
+        int[] xPts = new int[vertices.size()];
+        for(int i=0; i<vertices.size(); i++){
+            xPts[i] = (int) vertices.get(i).getX();
+        }
+        return xPts;
+    }
+    
+    public int[] getYpoints(){
+        int[] yPts = new int[vertices.size()];
+        for(int i=0; i<vertices.size(); i++){
+            yPts[i] = (int) vertices.get(i).getY();
+        }
+        return yPts;
+    }
+    
     /**
      * Limpa lista de vertices
      * e adiciona todos segundo
@@ -112,8 +128,6 @@ public class Poligono {
         float xMax = Float.MIN_VALUE;
         float yMim = Float.MAX_VALUE;
         float yMax = Float.MIN_VALUE;
-        float zMim = Float.MAX_VALUE;
-        float zMax = Float.MIN_VALUE;
        
         for (Vertice vertice1 : vertices) {
             if (vertice1.getX() < xMim) {
@@ -128,18 +142,11 @@ public class Poligono {
             if (vertice1.getY() > yMax) {
                 yMax = vertice1.getY();
             }
-            if (vertice1.getZ() < zMim) {
-                zMim = vertice1.getZ();
-            }
-            if (vertice1.getZ() > zMax) {
-                zMax = vertice1.getZ();
-            }
         }
        
         float x = (xMax + xMim)/2;
         float y = (yMax + yMim)/2;
-        float z = (zMax + zMim)/2;
-        vertice = new Vertice(x, y, z);
+        vertice = new Vertice(x, y);
         return vertice;
     }
    
@@ -147,7 +154,6 @@ public class Poligono {
         Vertice v = calculaCentroide();
         v.setX(v.getX()*-1);
         v.setY(v.getY()*-1);
-        v.setZ(v.getZ()*-1);
        
         return v;
     }

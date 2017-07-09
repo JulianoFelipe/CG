@@ -5,7 +5,7 @@ import java.util.Objects;
 /**
  * Classe da estrutura e manipulacao de arestas
  *
- * @author Maycon
+ * @author Anderson
  */
 public class Aresta {
     private static long INSTANCES;
@@ -76,15 +76,7 @@ public class Aresta {
             return vFinal;
         }
     }
-    
-    public Vertice getVerticeMaxZ() {
-        if (vInicial.z > vFinal.z) {
-            return vInicial;
-        } else {
-            return vFinal;
-        }
-    }
-    
+      
     public Vertice getVerticeMinX() {
         if (vInicial.x < vFinal.x) {
             return vInicial;
@@ -95,14 +87,6 @@ public class Aresta {
     
     public Vertice getVerticeMinY() {
         if (vInicial.y < vFinal.y) {
-            return vInicial;
-        } else {
-            return vFinal;
-        }
-    }
-    
-    public Vertice getVerticeMinZ() {
-        if (vInicial.z < vFinal.z) {
             return vInicial;
         } else {
             return vFinal;

@@ -15,7 +15,7 @@ import utils.MVMath;
 
 /**
  *
- * @author Maycon
+ * @author Anderson
  */
 public class CPintura {
     private static Camera cam = Camera.getCamera();
