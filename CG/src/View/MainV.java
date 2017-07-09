@@ -8,8 +8,6 @@ package View;
 import Model.Poligono;
 import Model.QuadrilateroRegular;
 import Model.Vertice;
-import Model.manipulation.CFuncoes;
-import Model.manipulation.CPintura;
 import java.awt.Point;
 /**
  *
