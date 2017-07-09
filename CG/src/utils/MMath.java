@@ -16,7 +16,7 @@ public class MMath {
      * localidade referencial não são
      * atendidos de nenhuma maneira. :D
      * @param A Primeira matriz.
-     * @param B Seugnda matriz.
+     * @param B Segunda matriz.
      * @return  Produto das matrizes
      */
     public static double[][] multiplicar(double[][] A, double[][] B) {
