@@ -6,35 +6,40 @@
 package View;
 
 import Model.Poligono;
+import Model.QuadrilateroRegular;
 import Model.Vertice;
 import Model.manipulation.CFuncoes;
 import Model.manipulation.CPintura;
-import Model.manipulation.Controle;
 import java.awt.Point;
-import java.util.ArrayList;
 /**
  *
  * @author Anderson
  */
 public class MainV extends javax.swing.JFrame {
-    Poligono poligonoSelecinado;
-    Vertice vi;
-    Vertice vf;
-    Point origemLateral, origemTopo, origemPerspectiva, origemFrontal;
+    private Poligono poligonoSelecinado;
+    private Vertice vi;
+    private Vertice vf;
+    private Point origemFrontal;
+    private DrawablePanel panelCp;
 
     /**
      * Creates new form Principal
      */
     public MainV() {
+        panelCp = new DrawablePanel();
+        
         //Dimension d = vFrente.getSize();
         //Rectangle r = vFrente.getBounds();
-        vFrente = new DrawablePanel(new ArrayList());
+        vFrente = panelCp;
         //vFrente.setBounds(r);
         
         initComponents();
-        CPintura.setG1(vFrente.getGraphics());
+        //CPintura.setG1(vFrente.getGraphics());
 
-        origemFrontal = vFrente.getLocation();
+        //origemFrontal = vFrente.getLocation();
+        
+        panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)1., (float)1.), new Vertice((float)2., (float)2.)));
+        panelCp.repaint();
     }
 
     /**
@@ -50,8 +55,8 @@ public class MainV extends javax.swing.JFrame {
         buttonGroup2 = new javax.swing.ButtonGroup();
         vFrente = new javax.swing.JPanel();
         jPanel2 = new javax.swing.JPanel();
-        jbMover = new javax.swing.JToggleButton();
-        jbRedimensionar = new javax.swing.JToggleButton();
+        selectBt = new javax.swing.JToggleButton();
+        deleteBt = new javax.swing.JToggleButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jtfLadosPrisma = new javax.swing.JTextField();
@@ -103,19 +108,19 @@ public class MainV extends javax.swing.JFrame {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Ferramentas"));
         jPanel2.setToolTipText("");
 
-        buttonGroup1.add(jbMover);
-        jbMover.setText("Selecionar");
-        jbMover.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(selectBt);
+        selectBt.setText("Selecionar");
+        selectBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbMoverActionPerformed(evt);
+                selectBtActionPerformed(evt);
             }
         });
 
-        buttonGroup1.add(jbRedimensionar);
-        jbRedimensionar.setText("Excluir");
-        jbRedimensionar.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(deleteBt);
+        deleteBt.setText("Excluir");
+        deleteBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jbRedimensionarActionPerformed(evt);
+                deleteBtActionPerformed(evt);
             }
         });
 
@@ -126,17 +131,17 @@ public class MainV extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jbRedimensionar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jbMover, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(deleteBt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(selectBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jbMover)
+                .addComponent(selectBt)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jbRedimensionar))
+                .addComponent(deleteBt))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Objetos"));
@@ -292,21 +297,21 @@ public class MainV extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_irregularPoligonBtActionPerformed
 
-    private void jbMoverActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbMoverActionPerformed
+    private void selectBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBtActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jbMoverActionPerformed
+    }//GEN-LAST:event_selectBtActionPerformed
 
-    private void jbRedimensionarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbRedimensionarActionPerformed
+    private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_jbRedimensionarActionPerformed
+    }//GEN-LAST:event_deleteBtActionPerformed
 
     private void vFrenteMouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseReleased
         vi = null;
     }//GEN-LAST:event_vFrenteMouseReleased
 
     private void vFrenteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseClicked
-        if (poligonoSelecinado != null) { // caso haja um poligono selecionado então tira o seu destaque.
-            CPintura.PintarBordasPoligono(poligonoSelecinado);
+        /*if (poligonoSelecinado != null) { // caso haja um poligono selecionado então tira o seu destaque.
+        CPintura.PintarBordasPoligono(poligonoSelecinado);
         }
         // pegando ponto do clique
         Vertice v = new Vertice();
@@ -316,8 +321,13 @@ public class MainV extends javax.swing.JFrame {
         poligonoSelecinado = CFuncoes.getPoligonoSelecionadoVistaFrontal(v);
         // Destaca o poligono que foi selecionado
         if (poligonoSelecinado != null) {
-            CPintura.PintarBordasPoligono(poligonoSelecinado);
-        }
+        CPintura.PintarBordasPoligono(poligonoSelecinado);
+        }*/
+        Point point = evt.getPoint();
+        panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)point.x, (float)point.x), new Vertice((float)point.x+1, (float)point.x+1)));
+        vFrente = panelCp;
+        vFrente.repaint();
+        System.out.println("ÇLKAJFÇL");
     }//GEN-LAST:event_vFrenteMouseClicked
 
     private void vFrenteMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {//GEN-FIRST:event_vFrenteMouseWheelMoved
@@ -326,46 +336,8 @@ public class MainV extends javax.swing.JFrame {
 
     private void vFrenteMouseDragged(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vFrenteMouseDragged
         // Aperta e Arrasta
-        if (jbMover.isSelected() && poligonoSelecinado != null) {
-            if (vi == null) {
-                vi = new Vertice();
-                vi.setX(evt.getPoint().x);
-                vi.setY(evt.getPoint().y);
-                vi.setZ(0);
-            } else {
-                vf = new Vertice();
-                vf.setX(evt.getPoint().x);
-                vf.setY(evt.getPoint().y);
-                vf.setZ(0);
-
-                CFuncoes.mover(poligonoSelecinado, vi, vf);
-                poligonoSelecinado.setAllScanlines(false);
-
-                //Controle.PintarBordasPoligos();
-                //CPintura.PintarCena();
-                Controle.paintPolygons();
-
-                vi = vf;
-            }
-        }
-        if (jbRotacionar.isSelected() && poligonoSelecinado != null) {
-            if (vi == null) {
-                vi = new Vertice();
-                vi.setX(evt.getPoint().x);
-            } else {
-                vf = new Vertice();
-                vf.setX(evt.getPoint().x);
-
-                Rotacao r = new Rotacao(0.5, Rotacao.Orientacao.ROTACAOX);
-                if (vi.getX() < vf.getX()) {
-                    CFuncoes.rotaciona(poligonoSelecinado, r.getMatrizRotacao());
-                } else {
-                    CFuncoes.rotaciona(poligonoSelecinado, r.getMatrizRotacao());
-                }
-
-                Controle.paintPolygons();
-                vi = vf;
-            }
+        if (selectBt.isSelected() && poligonoSelecinado != null) {
+            
         }
     }//GEN-LAST:event_vFrenteMouseDragged
 
@@ -409,6 +381,7 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JToggleButton circBt;
+    private javax.swing.JToggleButton deleteBt;
     private javax.swing.JToggleButton irregularPoligonBt;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
@@ -418,12 +391,11 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextPane jTextPane1;
-    private javax.swing.JToggleButton jbMover;
-    private javax.swing.JToggleButton jbRedimensionar;
     private javax.swing.JTextField jtfLadosPrisma;
     private javax.swing.JMenuItem loadMenu;
     private javax.swing.JToggleButton quadrilateroBt;
     private javax.swing.JMenuItem saveMenu;
+    private javax.swing.JToggleButton selectBt;
     private javax.swing.JToggleButton trianguloBt;
     private javax.swing.JPanel vFrente;
     // End of variables declaration//GEN-END:variables

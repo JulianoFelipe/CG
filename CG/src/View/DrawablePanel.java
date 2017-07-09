@@ -7,6 +7,7 @@ package View;
 
 import Model.Poligono;
 import java.awt.Graphics;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JPanel;
 
@@ -22,6 +23,26 @@ public class DrawablePanel extends JPanel {
         this.objetos = objetos;
     }
     
+    public DrawablePanel(){
+        this(new ArrayList<>());
+    }
+    
+    public void addPoligono(Poligono p){
+        objetos.add(p);
+    }
+    
+    public void addAllPoligonos(List<Poligono> lista){
+        objetos.addAll(lista);
+    }
+    
+    public Poligono getPoligono(int i){
+        return objetos.get(i);
+    }
+    
+    public List<Poligono> getListaPoligonos(){
+        return new ArrayList<>(objetos);
+    }
+    
     @Override
     protected void paintComponent(Graphics g){
         int xs[], ys[];
@@ -32,6 +53,7 @@ public class DrawablePanel extends JPanel {
             len = xs.length;
             g.drawPolygon(xs, ys, len);
         }
+        System.out.println("AHHH");
     }
     
     /*public void paintPolygons(){
