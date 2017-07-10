@@ -487,6 +487,7 @@ public class MainV extends javax.swing.JFrame {
         List<Poligono> lista = panelCp.getListaPoligonos();
         paneMs.remove(panelCp);
         panelCp = new DrawablePanel(paneMs.getGraphics());
+        panelCp.setSize(paneMs.getSize());
         panelCp.addAllPoligonos(lista);
         paneMs.add(panelCp);
         panelCp.revalidate();
@@ -556,8 +557,8 @@ public class MainV extends javax.swing.JFrame {
             panelCp.setSize(new Dimension((int) max.getX(), (int) max.getY()));
             panelCp.addAllPoligonos(loaded);
             paneMs.add(panelCp);
-            /*panelCp.revalidate();
-            panelCp.repaint();*/
+            panelCp.revalidate();
+            panelCp.repaint();
             
             LOG.info("Cena carregada!");
         }
