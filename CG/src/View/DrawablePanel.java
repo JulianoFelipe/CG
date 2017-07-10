@@ -56,7 +56,9 @@ public class DrawablePanel extends JPanel {
     }
     
     @Override
-    protected void paintComponent(Graphics g){
+    protected void paintComponent(Graphics g){      
+        if (objetos == null) return;
+        
         int xs[], ys[];
         int len;
         
@@ -83,6 +85,11 @@ public class DrawablePanel extends JPanel {
     }
     
     public void paintPolygons(){
+        paintComponent(graphics);
+    }
+    
+    @Override
+    public void repaint(){
         paintComponent(graphics);
     }
     

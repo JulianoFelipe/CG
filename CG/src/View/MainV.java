@@ -8,27 +8,34 @@ package View;
 import Logging.BufferedPaneOutputStream;
 import Logging.PaneHandler;
 import Model.Poligono;
-import Model.poligonosEsp.QuadrilateroRegular;
 import Model.Vertice;
-import java.awt.Point;
+import Model.poligonosEsp.Circunferencia;
+import Model.poligonosEsp.QuadrilateroRegular;
+import Model.poligonosEsp.Triangulo;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import utils.VMath;
 /**
  *
  * @author Anderson
  */
 public class MainV extends javax.swing.JFrame {
+    private static final int SIDE_THRESHOLD = 30;
+    private static final int CIRCUMFERENCE_CODE = Integer.MAX_VALUE;
+    private static final int CIRCUMFERENCE_RADIUS_CODE = Integer.MAX_VALUE-1;
     private static final Logger LOG = Logger.getLogger("CG");
-        
-    private Poligono poligonoSelecinado;
-    private Vertice vi;
-    private Vertice vf;
-    private Point origemFrontal;
     private DrawablePanel panelCp;
 
+    private int noPointsToCreate = -2;
+    private boolean pendingCreating = false;
+    
+    private List<Vertice> temporaryList = new ArrayList();  
+    
     private void addMouseListeners(){
         paneMs.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            /*public void mouseClicked(java.awt.event.MouseEvent evt) {
                 System.out.println(evt.getX());
                 System.out.println(evt.getY());
                 Vertice a = new Vertice((float) evt.getX(), (float) evt.getY());
@@ -39,27 +46,72 @@ public class MainV extends javax.swing.JFrame {
                 panelCp.addPoligono(new QuadrilateroRegular(a, b));
                 System.out.println(panelCp.getPoligono(0));
                 panelCp.paintComponent(paneMs.getGraphics());
-            }
-            
-            /*public void mouseReleased(java.awt.event.MouseEvent evt) {
-                vFrenteMouseReleased(evt);
             }*/
+            
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                if(!pendingCreating){
+                    int noTyped = getNumberOfSidesFromBtSelected();
+                    if (noTyped == -1){
+                        LOG.warning("Selecione um tipo de polígono para desenhar.");
+                        return;
+                    } else {
+                        pendingCreating = true;
+                        noPointsToCreate = noTyped;
+                    }
+                }
+                
+                int x = evt.getX();
+                int y = evt.getY();
+                
+                if (noPointsToCreate == CIRCUMFERENCE_RADIUS_CODE){
+                    Vertice radiusPnt = new Vertice((float) x, (float)y);
+                    double dist = VMath.distancia(temporaryList.get(0), radiusPnt);
+                    panelCp.addPoligono(new Circunferencia(temporaryList.get(0), (int)Math.round(dist)));
+                } else if (noPointsToCreate == 1){
+                    temporaryList.add(new Vertice((float) x, (float)y));
+                    switch (temporaryList.size()) {
+                        case 2:
+                            panelCp.addPoligono(new QuadrilateroRegular(temporaryList.get(0), temporaryList.get(1)));
+                            break;
+                        case 3:
+                            panelCp.addPoligono(new Triangulo(temporaryList.get(0), temporaryList.get(1), temporaryList.get(2)));
+                            break;
+                        default:
+                            panelCp.addPoligono(new Poligono(temporaryList));
+                            break;
+                    }
+                    pendingCreating = false;
+                    noPointsToCreate = -1;
+                    
+                    unToggle();
+                    temporaryList = new ArrayList<>();
+                } else {
+                    temporaryList.add(new Vertice((float) x, (float)y));
+                    --noPointsToCreate;
+                    if (temporaryList.size() >= 2){
+                        int x1,y1,x2,y2;
+                        int size = temporaryList.size();
+                        x1 = (int)temporaryList.get(size-2).getX();
+                        y1 = (int)temporaryList.get(size-2).getY();
+                        x2 = (int)temporaryList.get(size-1).getX();
+                        y2 = (int)temporaryList.get(size-1).getY();
+                        panelCp.getGraphics().drawLine(x1, y1, x2, y2);
+                    }    
+                }
+                panelCp.paintComponent(paneMs.getGraphics());
+            }
         });
     }
     
     /**
      * Creates new form Principal
      */
-    public MainV() {
-        //Dimension d = vFrente.getSize();
-        //Rectangle r = vFrente.getBounds();
-        //vFrente.setBounds(r);
-        
+    public MainV() {       
         initComponents();
         panelCp = new DrawablePanel(paneMs.getGraphics());
         paneMs.add(panelCp);
         addMouseListeners();
-        //CPintura.setG1(vFrente.getGraphics());
 
         consolePane.setEditable(false);
         BufferedPaneOutputStream oStream = new BufferedPaneOutputStream(consolePane);
@@ -82,6 +134,7 @@ public class MainV extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         selectBt = new javax.swing.JToggleButton();
         deleteBt = new javax.swing.JToggleButton();
+        cancelBt = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         jtfLadosPrisma = new javax.swing.JTextField();
@@ -119,6 +172,13 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
+        cancelBt.setText("Cancelar");
+        cancelBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelBtActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -127,16 +187,20 @@ public class MainV extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(deleteBt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(selectBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(selectBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cancelBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap()
                 .addComponent(selectBt)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(deleteBt))
+                .addComponent(deleteBt)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cancelBt)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Objetos"));
@@ -213,7 +277,7 @@ public class MainV extends javax.swing.JFrame {
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jtfLadosPrisma, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(108, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Console"));
@@ -267,8 +331,8 @@ public class MainV extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(paneMs))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(paneMs, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(27, Short.MAX_VALUE))
@@ -278,19 +342,38 @@ public class MainV extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void circBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_circBtActionPerformed
-        // TODO add your handling code here:
+        LOG.info("Clique na região para o centro da circunferência.");
+        pendingCreating = true;
+        noPointsToCreate = CIRCUMFERENCE_CODE;
+        temporaryList = new ArrayList<>();
     }//GEN-LAST:event_circBtActionPerformed
 
     private void trianguloBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trianguloBtActionPerformed
-        // TODO add your handling code here:
+        LOG.info("Clique em três pontos para formar um triângulo.");
+        pendingCreating = true;
+        noPointsToCreate = 3;
+        temporaryList = new ArrayList<>();
     }//GEN-LAST:event_trianguloBtActionPerformed
 
     private void quadrilateroBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quadrilateroBtActionPerformed
-        // TODO add your handling code here:
+        LOG.info("Clique em dois pontos para formar um quadrilátero regular (Cantos).");
+        pendingCreating = true;
+        noPointsToCreate = 2;
+        temporaryList = new ArrayList<>();
     }//GEN-LAST:event_quadrilateroBtActionPerformed
 
     private void irregularPoligonBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_irregularPoligonBtActionPerformed
-        // TODO add your handling code here:
+        int noPointsTyped = getNumberOfSidesFromBtSelected();
+        if (noPointsTyped <= 1){
+            LOG.info("Só é possível criar polígonos com mais que 1 lado.");
+        } else if (noPointsTyped >= SIDE_THRESHOLD) {
+            LOG.info("Restrição estabelecida de lados é: " + SIDE_THRESHOLD + ".");
+        } else {
+            LOG.info("Clique em " + noPointsToCreate +  " pontos para formar um polígono.");
+            pendingCreating = true;
+            noPointsToCreate = noPointsTyped;
+            temporaryList = new ArrayList<>();
+        }
     }//GEN-LAST:event_irregularPoligonBtActionPerformed
 
     private void selectBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBtActionPerformed
@@ -300,6 +383,15 @@ public class MainV extends javax.swing.JFrame {
     private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_deleteBtActionPerformed
+
+    private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
+        pendingCreating = false;
+        noPointsToCreate = -2;
+        LOG.info("Criação cancelada");
+        unToggle();
+        if (temporaryList.size() > 0)
+            temporaryList = new ArrayList<>();
+    }//GEN-LAST:event_cancelBtActionPerformed
 
     /**
      * @param args the command line arguments
@@ -340,6 +432,7 @@ public class MainV extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.JButton cancelBt;
     private javax.swing.JToggleButton circBt;
     private javax.swing.JTextPane consolePane;
     private javax.swing.JToggleButton deleteBt;
@@ -359,6 +452,27 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JToggleButton selectBt;
     private javax.swing.JToggleButton trianguloBt;
     // End of variables declaration//GEN-END:variables
+    
+    private int getNumberOfSidesFromBtSelected(){
+        if (trianguloBt.isSelected()){
+            return 3;
+        } else if (quadrilateroBt.isSelected()) {
+            return 4;
+        } else if (irregularPoligonBt.isSelected()){
+            return Integer.parseInt( jtfLadosPrisma.getText() );
+        } else if (circBt.isSelected()){
+            return CIRCUMFERENCE_CODE;
+        } else {
+            return -1;
+        }
+    }
+
+    private void unToggle(){
+        trianguloBt.setSelected(false);
+        quadrilateroBt.setSelected(false);
+        irregularPoligonBt.setSelected(false);
+        circBt.setSelected(false);
+    }
 }
 
 /*private void vFrenteMouseReleased(java.awt.event.MouseEvent evt) {                                      

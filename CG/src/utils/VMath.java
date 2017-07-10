@@ -53,4 +53,11 @@ public class VMath {
 
         return new Vertice((float) x, (float) y);
     }
+    
+    public static double distancia(Vertice v1, Vertice v2){
+        double firstT = Math.pow((v1.getX() - v2.getX()),2);
+        double secndT = Math.pow((v1.getY() - v2.getY()),2);
+        
+        return Math.sqrt(firstT + secndT);
+    }
 }

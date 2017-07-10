@@ -27,6 +27,13 @@ public class Poligono {
         ID=INSTANCES;
         INSTANCES++;
     }
+    
+    public Poligono(List<Vertice> vertices){
+        this.vertices = new ArrayList(vertices);
+
+        ID=INSTANCES;
+        INSTANCES++;
+    }
 //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">
