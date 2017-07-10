@@ -39,7 +39,7 @@ public class PaneHandler extends StreamHandler {
         //this(outStream, new SimpleFormatter());
         this(outStream, new ConsoleFormatter());
     }
-
+    
     /**
      * Constrói um Handler usando a stream direcionada
      * à JTextPanes.

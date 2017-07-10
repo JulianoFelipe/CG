@@ -51,7 +51,7 @@ public class MainV extends javax.swing.JFrame {
             }*/
             
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {                
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
                 if(!pendingCreating){
                     int noTyped = getNumberOfSidesFromBtSelected();
                     if (noTyped == -1){
@@ -484,7 +484,7 @@ public class MainV extends javax.swing.JFrame {
         if (trianguloBt.isSelected()){
             return 3;
         } else if (quadrilateroBt.isSelected()) {
-            return 4;
+            return 2;
         } else if (irregularPoligonBt.isSelected()){
             return Integer.parseInt( jtfLadosPrisma.getText() );
         } else if (circBt.isSelected()){
