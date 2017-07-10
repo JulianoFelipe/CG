@@ -7,6 +7,9 @@ package ioScene;
 
 import Model.Poligono;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.List;
 
 /**
@@ -14,7 +17,16 @@ import java.util.List;
  * @author JFPS
  */
 public class InputScene {
-    public static void outputToFile(File arquivo, List<Poligono> lista){
+    //http://avajava.com/tutorials/lessons/how-do-i-write-an-object-to-a-file-and-read-it-back.html
+    public static List<Poligono> getListFromFile(File arquivo) throws IOException, ClassNotFoundException{
+        if (!arquivo.getName().endsWith(OutputScene.FILE_EXTENSION))
+            throw new IllegalArgumentException("Arquivo sem a extensão gerada pelo programa: " + arquivo.getName());
         
+        FileInputStream fis = new FileInputStream(arquivo);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        List<Poligono> result = (List<Poligono>) ois.readObject();
+        ois.close();
+        
+        return result;
     }
 }

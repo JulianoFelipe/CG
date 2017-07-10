@@ -1,10 +1,12 @@
 package Model;
 
+import java.io.Serializable;
+
 /**
  * Classe da estrutura e manipulacao de vertices
  * @author Anderson
  */
-public class Vertice {
+public class Vertice implements Serializable{
     private static long INSTANCES;
     private final long ID;
     

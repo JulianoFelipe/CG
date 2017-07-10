@@ -1,5 +1,6 @@
 package Model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
@@ -7,7 +8,7 @@ import java.util.Objects;
  *
  * @author Anderson
  */
-public class Aresta {
+public class Aresta implements Serializable{
     private static long INSTANCES;
     
     /**

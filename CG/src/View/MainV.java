@@ -14,12 +14,20 @@ import Model.poligonosEsp.Circunferencia;
 import Model.poligonosEsp.Nregular;
 import Model.poligonosEsp.QuadrilateroRegular;
 import Model.poligonosEsp.Triangulo;
+import ioScene.InputScene;
+import ioScene.OutputScene;
+import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JFileChooser;
 import utils.VMath;
+import utils.VProperties;
 /**
  *
  * @author Anderson
@@ -112,16 +120,18 @@ public class MainV extends javax.swing.JFrame {
                     if (regularSidedPolygon){
                         regularSidedLock = true;
                     }
+                    LOG.info("Ponto capturado.");
                 }
                 panelCp.repaint();
             }
         });
         
-        /*paneMs.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+        paneMs.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 if (temporaryList.size() < 1) return;
                 if (!pendingCreating) return;
+                //paneMs.repaint();
                 
                 int x = e.getX();
                 int y = e.getY();
@@ -130,16 +140,15 @@ public class MainV extends javax.swing.JFrame {
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
                     int radius = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
                     panelCp.setTempCirc(temporaryList.get(0), radius);
-                    panelCp.removeAll();
+                    //panelCp.removeAll();
                 } else {
-                    panelCp.cleanTempoLines();
+                    //panelCp.cleanTempoLines();
                     Vertice last = temporaryList.get(temporaryList.size()-1);
                     panelCp.setMovable(new Aresta(new Vertice((float) x, (float) y), last));
-                    
                 } 
                 panelCp.repaint();
             }
-        });*/
+        });
     }
     
     /**
@@ -373,9 +382,19 @@ public class MainV extends javax.swing.JFrame {
         jMenu1.setText("File");
 
         saveMenu.setText("Salvar");
+        saveMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                saveMenuActionPerformed(evt);
+            }
+        });
         jMenu1.add(saveMenu);
 
         loadMenu.setText("Carregar");
+        loadMenu.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                loadMenuActionPerformed(evt);
+            }
+        });
         jMenu1.add(loadMenu);
 
         jMenuBar1.add(jMenu1);
@@ -462,7 +481,6 @@ public class MainV extends javax.swing.JFrame {
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
         resetDrawingState();
         LOG.info("Criação cancelada");
-        panelCp.repaint();
     }//GEN-LAST:event_cancelBtActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
@@ -471,11 +489,9 @@ public class MainV extends javax.swing.JFrame {
         panelCp = new DrawablePanel(paneMs.getGraphics());
         panelCp.addAllPoligonos(lista);
         paneMs.add(panelCp);
-        panelCp.repaint();
-        paneMs.repaint();
+        panelCp.revalidate();
         panelCp.repaint();
         
-        //addMouseListeners();
         System.out.println("RESIZE");
     }//GEN-LAST:event_formComponentResized
 
@@ -493,6 +509,59 @@ public class MainV extends javax.swing.JFrame {
         }
         //regularSidedPolygon = regularNsided.isSelected();
     }//GEN-LAST:event_regularNsidedActionPerformed
+
+    private void saveMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setDialogTitle("Escolha um diretório para salvar");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            
+            List<Poligono> toSave = panelCp.getListaPoligonos();
+            System.out.println(toSave);
+            try {
+                OutputScene.outputToFile(toSave, selectedFile);
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
+            
+            LOG.info("Cena salva!");
+        }
+    }//GEN-LAST:event_saveMenuActionPerformed
+
+    private void loadMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadMenuActionPerformed
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
+        fileChooser.setDialogTitle("Escolha um arquivo ." + OutputScene.FILE_EXTENSION + " para abrir");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        int result = fileChooser.showOpenDialog(this);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            
+            List<Poligono> loaded = null;
+            try {
+                loaded = InputScene.getListFromFile(selectedFile);
+            } catch (IOException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                LOG.log(Level.SEVERE, null, ex);
+            }
+            
+            Vertice max = VProperties.getMaxVertex(loaded);
+            
+            paneMs.remove(panelCp);
+            panelCp = new DrawablePanel(paneMs.getGraphics());
+            panelCp.setSize(new Dimension((int) max.getX(), (int) max.getY()));
+            panelCp.addAllPoligonos(loaded);
+            paneMs.add(panelCp);
+            /*panelCp.revalidate();
+            panelCp.repaint();*/
+            
+            LOG.info("Cena carregada!");
+        }
+    }//GEN-LAST:event_loadMenuActionPerformed
 
     /**
      * @param args the command line arguments

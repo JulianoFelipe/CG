@@ -50,6 +50,6 @@ public class Triangulo extends Poligono{
     
     @Override
     public String toString() {
-        return "Triângulo {" + a + "; " + b + " ;" + c + '}';
+        return "Triângulo {" + a + "; " + b + "; " + c + '}';
     }
 }
