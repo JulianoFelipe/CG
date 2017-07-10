@@ -63,7 +63,8 @@ public class DrawablePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g){      
         if (objetos == null) return;
-        
+        super.paintComponent(g);
+
         int xs[], ys[];
         int len;
         
@@ -113,6 +114,8 @@ public class DrawablePanel extends JPanel {
     
     @Override
     public void repaint(){
+        if (graphics != null)
+            super.paintComponent(graphics);
         paintComponent(graphics);
     }
 
@@ -130,10 +133,12 @@ public class DrawablePanel extends JPanel {
     }
     
     public void setTempCirc(Vertice center, int radius){
+        super.paintComponent(graphics);
         tempCirc = new Circunferencia(center, radius);
     }
     
     public void cleanTempCirc(){
+        super.paintComponent(graphics);
         tempCirc = null;
     }
 }

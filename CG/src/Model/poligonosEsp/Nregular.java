@@ -19,11 +19,11 @@ public class Nregular extends Poligono {
     private int radius;
     private Vertice center;
 
-    private List<Vertice> buildNsided(){
+    private List<Vertice> buildNsided(double pos){
         List<Vertice> lista = new ArrayList();
         
         double x,y;
-        double angulo = 0.;
+        double angulo = pos;
         double increment = 2*Math.PI/ noLados;
         for (int i=0; i<noLados; i++, angulo += increment){
             x = center.getX() + ( radius * Math.cos(angulo));
@@ -37,11 +37,15 @@ public class Nregular extends Poligono {
     }
     
     public Nregular(int noLados, int radius, Vertice center) {
+        this(noLados, radius, center, 0.);
+    }
+    
+    public Nregular(int noLados, int radius, Vertice center, double pos){
         this.radius = radius;
         this.noLados = noLados;
         this.center = center;
         
-        super.addAllVertices(buildNsided());
+        super.addAllVertices(buildNsided(pos));
     }
     
     @Override

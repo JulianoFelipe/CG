@@ -14,7 +14,7 @@ import Model.poligonosEsp.Circunferencia;
 import Model.poligonosEsp.Nregular;
 import Model.poligonosEsp.QuadrilateroRegular;
 import Model.poligonosEsp.Triangulo;
-import java.awt.event.MouseEvent;
+import java.awt.Toolkit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -37,6 +37,14 @@ public class MainV extends javax.swing.JFrame {
     private boolean regularSidedLock = false;
     
     private List<Vertice> temporaryList = new ArrayList();  
+    
+    private void resetDrawingState(){
+        regularSidedLock = false;
+        pendingCreating = false;
+        noPointsToCreate = -1;
+        unToggle();
+        temporaryList = new ArrayList<>();
+    }
     
     private void addMouseListeners(){
         paneMs.addMouseListener(new java.awt.event.MouseAdapter() {           
@@ -62,14 +70,11 @@ public class MainV extends javax.swing.JFrame {
                 
                 if (regularSidedLock){   
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
+                    double pos = x - temporaryList.get(0).getX();
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.addPoligono(new Nregular(noPointsToCreate++, dist, temporaryList.get(0)));
+                    panelCp.addPoligono(new Nregular(++noPointsToCreate, dist, temporaryList.get(0), pos));
                    
-                    regularSidedLock = false;
-                    pendingCreating = false;
-                    noPointsToCreate = -1;
-                    unToggle();
-                    temporaryList = new ArrayList<>();
+                    resetDrawingState();
                     panelCp.repaint();
                     return ;
                 }
@@ -79,10 +84,7 @@ public class MainV extends javax.swing.JFrame {
                     double dist = VMath.distancia(temporaryList.get(0), radiusPnt);
                     panelCp.addPoligono(new Circunferencia(temporaryList.get(0), (int)Math.round(dist)));
                    
-                    pendingCreating = false;
-                    noPointsToCreate = -1;
-                    unToggle();
-                    temporaryList = new ArrayList<>();
+                    resetDrawingState();
                 } else if (noPointsToCreate == 1){
                     temporaryList.add(new Vertice((float) x, (float)y));
                     switch (temporaryList.size()) {
@@ -97,10 +99,7 @@ public class MainV extends javax.swing.JFrame {
                             break;
                     }
                     
-                    pendingCreating = false;
-                    noPointsToCreate = -1;
-                    unToggle();
-                    temporaryList = new ArrayList<>();
+                    resetDrawingState();
                     panelCp.cleanTempoLines();
                 } else {
                     temporaryList.add(new Vertice((float) x, (float)y));
@@ -131,6 +130,7 @@ public class MainV extends javax.swing.JFrame {
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
                     int radius = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
                     panelCp.setTempCirc(temporaryList.get(0), radius);
+                    panelCp.removeAll();
                 } else {
                     panelCp.cleanTempoLines();
                     Vertice last = temporaryList.get(temporaryList.size()-1);
@@ -145,7 +145,8 @@ public class MainV extends javax.swing.JFrame {
     /**
      * Creates new form Principal
      */
-    public MainV() {       
+    public MainV() {  
+        Toolkit.getDefaultToolkit().setDynamicLayout(false);
         initComponents();
         panelCp = new DrawablePanel(paneMs.getGraphics());
         paneMs.add(panelCp);
@@ -459,12 +460,9 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_deleteBtActionPerformed
 
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
-        pendingCreating = false;
-        noPointsToCreate = -2;
+        resetDrawingState();
         LOG.info("Criação cancelada");
-        unToggle();
-        if (temporaryList.size() > 0)
-            temporaryList = new ArrayList<>();
+        panelCp.repaint();
     }//GEN-LAST:event_cancelBtActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
@@ -474,8 +472,11 @@ public class MainV extends javax.swing.JFrame {
         panelCp.addAllPoligonos(lista);
         paneMs.add(panelCp);
         panelCp.repaint();
-        paneMs.revalidate();
+        paneMs.repaint();
+        panelCp.repaint();
+        
         //addMouseListeners();
+        System.out.println("RESIZE");
     }//GEN-LAST:event_formComponentResized
 
     private void regularNsidedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regularNsidedActionPerformed
