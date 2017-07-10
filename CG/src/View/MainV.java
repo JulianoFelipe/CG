@@ -7,11 +7,13 @@ package View;
 
 import Logging.BufferedPaneOutputStream;
 import Logging.PaneHandler;
+import Model.Aresta;
 import Model.Poligono;
 import Model.Vertice;
 import Model.poligonosEsp.Circunferencia;
 import Model.poligonosEsp.QuadrilateroRegular;
 import Model.poligonosEsp.Triangulo;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -49,7 +51,7 @@ public class MainV extends javax.swing.JFrame {
             }*/
             
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {                
                 if(!pendingCreating){
                     int noTyped = getNumberOfSidesFromBtSelected();
                     if (noTyped == -1){
@@ -68,6 +70,11 @@ public class MainV extends javax.swing.JFrame {
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
                     double dist = VMath.distancia(temporaryList.get(0), radiusPnt);
                     panelCp.addPoligono(new Circunferencia(temporaryList.get(0), (int)Math.round(dist)));
+                   
+                    pendingCreating = false;
+                    noPointsToCreate = -1;
+                    unToggle();
+                    temporaryList = new ArrayList<>();
                 } else if (noPointsToCreate == 1){
                     temporaryList.add(new Vertice((float) x, (float)y));
                     switch (temporaryList.size()) {
@@ -81,27 +88,46 @@ public class MainV extends javax.swing.JFrame {
                             panelCp.addPoligono(new Poligono(temporaryList));
                             break;
                     }
+                    
                     pendingCreating = false;
                     noPointsToCreate = -1;
-                    
                     unToggle();
                     temporaryList = new ArrayList<>();
+                    panelCp.cleanTempoLines();
                 } else {
                     temporaryList.add(new Vertice((float) x, (float)y));
                     --noPointsToCreate;
                     if (temporaryList.size() >= 2){
-                        int x1,y1,x2,y2;
                         int size = temporaryList.size();
-                        x1 = (int)temporaryList.get(size-2).getX();
-                        y1 = (int)temporaryList.get(size-2).getY();
-                        x2 = (int)temporaryList.get(size-1).getX();
-                        y2 = (int)temporaryList.get(size-1).getY();
-                        panelCp.getGraphics().drawLine(x1, y1, x2, y2);
+                        panelCp.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
                     }    
                 }
-                panelCp.paintComponent(paneMs.getGraphics());
+                panelCp.repaint();
             }
         });
+        
+        /*paneMs.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                if (temporaryList.size() < 1) return;
+                if (!pendingCreating) return;
+                
+                int x = e.getX();
+                int y = e.getY();
+                
+                if (noPointsToCreate == CIRCUMFERENCE_RADIUS_CODE){             
+                    Vertice radiusPnt = new Vertice((float) x, (float)y);
+                    int radius = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                    panelCp.setTempCirc(temporaryList.get(0), radius);
+                } else {
+                    panelCp.cleanTempoLines();
+                    Vertice last = temporaryList.get(temporaryList.size()-1);
+                    panelCp.setMovable(new Aresta(new Vertice((float) x, (float) y), last));
+                    
+                } 
+                panelCp.repaint();
+            }
+        });*/
     }
     
     /**
@@ -158,6 +184,7 @@ public class MainV extends javax.swing.JFrame {
 
         buttonGroup1.add(selectBt);
         selectBt.setText("Selecionar");
+        selectBt.setEnabled(false);
         selectBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 selectBtActionPerformed(evt);
@@ -187,7 +214,7 @@ public class MainV extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(deleteBt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(selectBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(selectBt, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
                     .addComponent(cancelBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -316,26 +343,26 @@ public class MainV extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(paneMs, javax.swing.GroupLayout.PREFERRED_SIZE, 633, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(paneMs, javax.swing.GroupLayout.DEFAULT_SIZE, 633, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addComponent(paneMs, javax.swing.GroupLayout.PREFERRED_SIZE, 392, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(paneMs, javax.swing.GroupLayout.DEFAULT_SIZE, 392, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addGap(27, 27, 27))
         );
 
         pack();

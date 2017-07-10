@@ -5,11 +5,12 @@
  */
 package View;
 
+import Model.Aresta;
 import Model.poligonosEsp.Circunferencia;
 import Model.Poligono;
+import Model.Vertice;
 import Model.poligonosEsp.QuadrilateroRegular;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -24,6 +25,10 @@ public class DrawablePanel extends JPanel {
     private final List<Poligono> objetos;
     private final Graphics graphics;
 
+    private List<Aresta> tempoLines = new ArrayList<>();
+    private Aresta movable = null;
+    private Circunferencia tempCirc = null;
+    
     public DrawablePanel(List<Poligono> objetos) {
         this.objetos = objetos;
         this.graphics = null;
@@ -82,6 +87,24 @@ public class DrawablePanel extends JPanel {
                 g.drawPolygon(xs, ys, len);
             }
         }
+        
+        for (Aresta a : tempoLines){
+            Vertice um = a.getvInicial();
+            Vertice dois = a.getvFinal();
+            g.drawLine((int)um.getX(), (int)um.getY(), (int)dois.getX(), (int)dois.getY());
+        }
+        
+        if (movable != null){
+            Vertice um = movable.getvInicial();
+            Vertice dois = movable.getvFinal();
+            g.drawLine((int)um.getX(), (int)um.getY(), (int)dois.getX(), (int)dois.getY());
+        }
+        
+        if (tempCirc != null){
+            g.drawOval((int) tempCirc.getCentro().getX() - tempCirc.getRadius(),
+                       (int) tempCirc.getCentro().getY() - tempCirc.getRadius(), 
+                       tempCirc.getRadius()*2, tempCirc.getRadius()*2);
+        }
     }
     
     public void paintPolygons(){
@@ -92,5 +115,25 @@ public class DrawablePanel extends JPanel {
     public void repaint(){
         paintComponent(graphics);
     }
+
+    public void addTempoLine(Aresta aresta) {
+       tempoLines.add(aresta);
+    }
+
+    public void setMovable(Aresta movable) {
+        this.movable = movable;
+    }
     
+    public void cleanTempoLines(){
+        tempoLines = new ArrayList<>();
+        movable = null;
+    }
+    
+    public void setTempCirc(Vertice center, int radius){
+        tempCirc = new Circunferencia(center, radius);
+    }
+    
+    public void cleanTempCirc(){
+        tempCirc = null;
+    }
 }
