@@ -57,7 +57,7 @@ public class MainV extends javax.swing.JFrame {
                     if (noTyped == -1){
                         LOG.warning("Selecione um tipo de polígono para desenhar.");
                         return;
-                    } else if (noTyped > SIDE_THRESHOLD) {
+                    } else if (noTyped > SIDE_THRESHOLD && noTyped != CIRCUMFERENCE_CODE) {
                         LOG.info("Restrição estabelecida de lados é: " + SIDE_THRESHOLD + ".");
                         return; 
                     } else {
