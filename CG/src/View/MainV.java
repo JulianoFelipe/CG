@@ -51,15 +51,20 @@ public class MainV extends javax.swing.JFrame {
             }*/
             
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {               
                 if(!pendingCreating){
                     int noTyped = getNumberOfSidesFromBtSelected();
                     if (noTyped == -1){
                         LOG.warning("Selecione um tipo de polígono para desenhar.");
                         return;
+                    } else if (noTyped > SIDE_THRESHOLD) {
+                        LOG.info("Restrição estabelecida de lados é: " + SIDE_THRESHOLD + ".");
+                        return; 
                     } else {
                         pendingCreating = true;
                         noPointsToCreate = noTyped;
+                        LOG.info("Clique em " + noPointsToCreate +  " pontos para formar um polígono.");
+                        temporaryList = new ArrayList<>();
                     }
                 }
                 
@@ -393,10 +398,10 @@ public class MainV extends javax.swing.JFrame {
         int noPointsTyped = getNumberOfSidesFromBtSelected();
         if (noPointsTyped <= 1){
             LOG.info("Só é possível criar polígonos com mais que 1 lado.");
-        } else if (noPointsTyped >= SIDE_THRESHOLD) {
+        } else if (noPointsTyped > SIDE_THRESHOLD) {
             LOG.info("Restrição estabelecida de lados é: " + SIDE_THRESHOLD + ".");
         } else {
-            LOG.info("Clique em " + noPointsToCreate +  " pontos para formar um polígono.");
+            LOG.info("Clique em " + noPointsTyped +  " pontos para formar um polígono.");
             pendingCreating = true;
             noPointsToCreate = noPointsTyped;
             temporaryList = new ArrayList<>();

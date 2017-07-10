@@ -1,7 +1,7 @@
 package Model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
@@ -9,7 +9,7 @@ import java.util.List;
  *
  * @author 
  */
-public class Poligono {
+public class Poligono implements Serializable{
     private static long INSTANCES;
     private final long ID;
     
