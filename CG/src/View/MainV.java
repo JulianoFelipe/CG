@@ -11,6 +11,7 @@ import Model.Aresta;
 import Model.Poligono;
 import Model.Vertice;
 import Model.poligonosEsp.Circunferencia;
+import Model.poligonosEsp.Nregular;
 import Model.poligonosEsp.QuadrilateroRegular;
 import Model.poligonosEsp.Triangulo;
 import java.awt.event.MouseEvent;
@@ -32,24 +33,13 @@ public class MainV extends javax.swing.JFrame {
 
     private int noPointsToCreate = -2;
     private boolean pendingCreating = false;
+    private boolean regularSidedPolygon = false;
+    private boolean regularSidedLock = false;
     
     private List<Vertice> temporaryList = new ArrayList();  
     
     private void addMouseListeners(){
-        paneMs.addMouseListener(new java.awt.event.MouseAdapter() {
-            /*public void mouseClicked(java.awt.event.MouseEvent evt) {
-                System.out.println(evt.getX());
-                System.out.println(evt.getY());
-                Vertice a = new Vertice((float) evt.getX(), (float) evt.getY());
-                Vertice b = new Vertice((float) evt.getX()+10, (float) evt.getY()+10);
-                System.out.println(a);
-                System.out.println(b);
-                
-                panelCp.addPoligono(new QuadrilateroRegular(a, b));
-                System.out.println(panelCp.getPoligono(0));
-                panelCp.paintComponent(paneMs.getGraphics());
-            }*/
-            
+        paneMs.addMouseListener(new java.awt.event.MouseAdapter() {           
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {               
                 if(!pendingCreating){
@@ -69,6 +59,20 @@ public class MainV extends javax.swing.JFrame {
                 
                 int x = evt.getX();
                 int y = evt.getY();
+                
+                if (regularSidedLock){   
+                    Vertice radiusPnt = new Vertice((float) x, (float)y);
+                    int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                    panelCp.addPoligono(new Nregular(noPointsToCreate++, dist, temporaryList.get(0)));
+                   
+                    regularSidedLock = false;
+                    pendingCreating = false;
+                    noPointsToCreate = -1;
+                    unToggle();
+                    temporaryList = new ArrayList<>();
+                    panelCp.repaint();
+                    return ;
+                }
                 
                 if (noPointsToCreate == CIRCUMFERENCE_RADIUS_CODE){
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
@@ -105,6 +109,10 @@ public class MainV extends javax.swing.JFrame {
                         int size = temporaryList.size();
                         panelCp.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
                     }    
+                    
+                    if (regularSidedPolygon){
+                        regularSidedLock = true;
+                    }
                 }
                 panelCp.repaint();
             }
@@ -282,6 +290,11 @@ public class MainV extends javax.swing.JFrame {
 
         buttonGroup1.add(regularNsided);
         regularNsided.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/regularPolygon.png"))); // NOI18N
+        regularNsided.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                regularNsidedActionPerformed(evt);
+            }
+        });
 
         jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.black, java.awt.Color.black, null, null));
 
@@ -403,7 +416,7 @@ public class MainV extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void circBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_circBtActionPerformed
-        LOG.info("Clique na região para o centro da circunferência.");
+        LOG.info("Clique na região para o centro da circunferência e depois em outra para ser calculado o raio.");
         pendingCreating = true;
         noPointsToCreate = CIRCUMFERENCE_CODE;
         temporaryList = new ArrayList<>();
@@ -464,6 +477,21 @@ public class MainV extends javax.swing.JFrame {
         paneMs.revalidate();
         //addMouseListeners();
     }//GEN-LAST:event_formComponentResized
+
+    private void regularNsidedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regularNsidedActionPerformed
+        int noPointsTyped = getNumberOfSidesFromBtSelected();
+        if (noPointsTyped <= 1){
+            LOG.info("Só é possível criar polígonos com mais que 1 lado.");
+        } else if (noPointsTyped > SIDE_THRESHOLD) {
+            LOG.info("Restrição estabelecida de lados é: " + SIDE_THRESHOLD + ".");
+        } else {
+            LOG.info("Clique na região para o centro do polígono e depois em outra para ser calculado o raio.");
+            pendingCreating = true;
+            noPointsToCreate = noPointsTyped;
+            temporaryList = new ArrayList<>();
+        }
+        //regularSidedPolygon = regularNsided.isSelected();
+    }//GEN-LAST:event_regularNsidedActionPerformed
 
     /**
      * @param args the command line arguments
@@ -532,7 +560,8 @@ public class MainV extends javax.swing.JFrame {
             return 3;
         } else if (quadrilateroBt.isSelected()) {
             return 2;
-        } else if (irregularPoligonBt.isSelected()){
+        } else if (irregularPoligonBt.isSelected() || regularNsided.isSelected()){
+            regularSidedPolygon = regularNsided.isSelected();
             return Integer.parseInt( jtfLadosPrisma.getText() );
         } else if (circBt.isSelected()){
             return CIRCUMFERENCE_CODE;

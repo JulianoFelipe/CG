@@ -44,5 +44,8 @@ public class Nregular extends Poligono {
         super.addAllVertices(buildNsided());
     }
     
-    
+    @Override
+    public String toString() {
+        return "Polígono Regular {" + super.getVertices() + '}';
+    }
 }
