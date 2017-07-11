@@ -17,7 +17,7 @@ import java.util.List;
  * @author JFPS
  */
 public class InputScene {
-    //http://avajava.com/tutorials/lessons/how-do-i-write-an-object-to-a-file-and-read-it-back.html
+
     public static List<Poligono> getListFromFile(File arquivo) throws IOException, ClassNotFoundException{
         if (!arquivo.getName().endsWith(OutputScene.FILE_EXTENSION))
             throw new IllegalArgumentException("Arquivo sem a extensão gerada pelo programa: " + arquivo.getName());

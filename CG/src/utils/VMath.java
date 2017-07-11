@@ -5,6 +5,7 @@
  */
 package utils;
 
+import Model.Aresta;
 import Model.Vertice;
 
 /**
@@ -59,5 +60,30 @@ public class VMath {
         double secndT = Math.pow((v1.getY() - v2.getY()),2);
         
         return Math.sqrt(firstT + secndT);
+    }
+    
+    //https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
+    public static double shortestDistance(Aresta a, Vertice p) {
+        float px=a.getvFinal().getX() - a.getvInicial().getX();
+        float py=a.getvFinal().getY() - a.getvInicial().getY();
+        float temp=(px*px)+(py*py);
+        float u=((p.getX() - a.getvInicial().getX()) * px + (p.getY() - a.getvInicial().getY()) * py) / (temp);
+        if(u>1){
+            u=1;
+        }
+        else if(u<0){
+            u=0;
+        }
+        float x = a.getvInicial().getX() + u * px;
+        float y = a.getvInicial().getY() + u * py;
+
+        float dx = x - p.getX();
+        float dy = y - p.getY();
+        double dist = Math.sqrt(dx*dx + dy*dy);
+        return dist;
+    }
+    
+    public static double shortestDistance(Vertice lineA, Vertice lineB, Vertice point){
+        return shortestDistance(new Aresta(lineA, lineB), point);
     }
 }

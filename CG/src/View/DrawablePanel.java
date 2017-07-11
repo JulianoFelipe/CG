@@ -156,12 +156,18 @@ public class DrawablePanel extends JPanel {
     }
     
     public void cleanTempCirc(){
-        super.paintComponent(graphics);
+        //super.paintComponent(graphics);
         tempCirc = null;
     }
     
     public void cleanTempRegular(){
         //super.paintComponent(graphics);  
         tempRegular = null;
+    }
+    
+    public void nullTemps(){
+        cleanTempCirc();
+        cleanTempRegular();
+        cleanTempoLines();
     }
 }

@@ -33,6 +33,7 @@ import utils.VProperties;
  * @author Anderson
  */
 public class MainV extends javax.swing.JFrame {
+    private static final double DELETE_THRESHOLD = 3.9;
     private static final int SIDE_THRESHOLD = 30;
     private static final int CIRCUMFERENCE_CODE = Integer.MAX_VALUE;
     private static final int CIRCUMFERENCE_RADIUS_CODE = Integer.MAX_VALUE-1;
@@ -58,6 +59,44 @@ public class MainV extends javax.swing.JFrame {
         paneMs.addMouseListener(new java.awt.event.MouseAdapter() {           
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {               
+                int x = evt.getX();
+                int y = evt.getY();
+                
+                if(deleteBt.isSelected()){
+                    List<Poligono> lista = panelCp.getListaPoligonos();
+                    List<Integer> toRemove = new ArrayList();
+                    
+                    Vertice point = new Vertice((float) x, (float) y);
+                    //System.out.println(point);
+                    
+                    for(int i=0; i<lista.size(); i++){
+                        List<Vertice> vertices = lista.get(i).getVertices();
+                        boolean toAdd = false;
+                        //System.out.println("INNER: " + vertices.size());
+                        innerFor: for(int j=0; j<vertices.size()-1; j++){
+                            Vertice a = vertices.get(j);
+                            Vertice b = vertices.get(j+1);
+                            
+                            //System.out.println(VMath.shortestDistance(a, b, point));
+                            if (VMath.shortestDistance(a, b, point) < DELETE_THRESHOLD){
+                                toAdd = true;
+                                break innerFor;
+                            }
+                        }
+                        
+                        if (toAdd){
+                            LOG.info("Removido o polígono.");
+                            toRemove.add(i);
+                        }
+                    }
+                    
+                    for (Integer i : toRemove){
+                        panelCp.removePoligono(i);
+                    }
+                    
+                    return;
+                }
+                
                 if(!pendingCreating){
                     int noTyped = getNumberOfSidesFromBtSelected();
                     if (noTyped == -1){
@@ -72,9 +111,7 @@ public class MainV extends javax.swing.JFrame {
                         temporaryList = new ArrayList<>();
                     }
                 }
-                
-                int x = evt.getX();
-                int y = evt.getY();
+
                 
                 if (regularSidedLock){   
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
@@ -483,12 +520,16 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_selectBtActionPerformed
 
     private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
-        
+        LOG.info("Clique em alguma parte (Linha) dos polígonos que deseja excluir.");
     }//GEN-LAST:event_deleteBtActionPerformed
 
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
         resetDrawingState();
+        paneMs.repaint();
+        panelCp.nullTemps();
+        panelCp.setVisible(true);
         LOG.info("Criação cancelada");
+        paneMs.validate();
     }//GEN-LAST:event_cancelBtActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
