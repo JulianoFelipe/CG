@@ -78,10 +78,11 @@ public class MainV extends javax.swing.JFrame {
                 
                 if (regularSidedLock){   
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
-                    double pos = x - temporaryList.get(0).getX();
+                    double pos = (x - temporaryList.get(0).getX())/100;
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
                     panelCp.addPoligono(new Nregular(++noPointsToCreate, dist, temporaryList.get(0), pos));
-                   
+                    panelCp.cleanTempRegular();
+                    
                     resetDrawingState();
                     panelCp.repaint();
                     return ;
@@ -142,9 +143,16 @@ public class MainV extends javax.swing.JFrame {
                     panelCp.setTempCirc(temporaryList.get(0), radius);
                     //panelCp.removeAll();
                 } else {
-                    //panelCp.cleanTempoLines();
-                    Vertice last = temporaryList.get(temporaryList.size()-1);
-                    panelCp.setMovable(new Aresta(new Vertice((float) x, (float) y), last));
+                    if (regularSidedLock){
+                        Vertice radiusPnt = new Vertice((float) x, (float)y);
+                        double pos = (x - temporaryList.get(0).getX())/100;
+                        int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                        panelCp.setTempRegular(noPointsToCreate+1, dist, temporaryList.get(0), pos);
+                    } else {
+                        //panelCp.cleanTempoLines();
+                        Vertice last = temporaryList.get(temporaryList.size()-1);
+                        panelCp.setMovable(new Aresta(new Vertice((float) x, (float) y), last));
+                    }
                 } 
                 panelCp.repaint();
             }
@@ -475,7 +483,7 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_selectBtActionPerformed
 
     private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
-        // TODO add your handling code here:
+        
     }//GEN-LAST:event_deleteBtActionPerformed
 
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
@@ -490,10 +498,10 @@ public class MainV extends javax.swing.JFrame {
         panelCp.setSize(paneMs.getSize());
         panelCp.addAllPoligonos(lista);
         paneMs.add(panelCp);
+        paneMs.revalidate();
+        paneMs.repaint();
         panelCp.revalidate();
         panelCp.repaint();
-        
-        System.out.println("RESIZE");
     }//GEN-LAST:event_formComponentResized
 
     private void regularNsidedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regularNsidedActionPerformed

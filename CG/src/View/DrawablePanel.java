@@ -9,6 +9,7 @@ import Model.Aresta;
 import Model.poligonosEsp.Circunferencia;
 import Model.Poligono;
 import Model.Vertice;
+import Model.poligonosEsp.Nregular;
 import Model.poligonosEsp.QuadrilateroRegular;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class DrawablePanel extends JPanel {
     private List<Aresta> tempoLines = new ArrayList<>();
     private Aresta movable = null;
     private Circunferencia tempCirc = null;
+    private Nregular tempRegular = null;
     
     public DrawablePanel(List<Poligono> objetos) {
         this.objetos = objetos;
@@ -52,8 +54,12 @@ public class DrawablePanel extends JPanel {
         objetos.addAll(lista);
     }
     
-    public Poligono getPoligono(int i){
-        return objetos.get(i);
+    public Poligono getPoligono(int index){
+        return objetos.get(index);
+    }
+    
+    public void removePoligono(int index){
+        objetos.remove(index);
     }
     
     public List<Poligono> getListaPoligonos(){
@@ -63,8 +69,7 @@ public class DrawablePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g){      
         if (objetos == null) return;
-        //super.repaint();
-        System.out.println("Paint");
+        
         int xs[], ys[];
         int len;
         
@@ -106,6 +111,14 @@ public class DrawablePanel extends JPanel {
                        (int) tempCirc.getCentro().getY() - tempCirc.getRadius(), 
                        tempCirc.getRadius()*2, tempCirc.getRadius()*2);
         }
+        
+        if (tempRegular != null){
+            xs = tempRegular.getXpoints();
+            ys = tempRegular.getYpoints();
+            len = xs.length;
+
+            g.drawPolygon(xs, ys, len);
+        }
     }
     
     public void paintPolygons(){
@@ -127,6 +140,11 @@ public class DrawablePanel extends JPanel {
         this.movable = movable;
     }
     
+    public void setTempRegular(int lados, int radius, Vertice center, double pos){
+        //super.paintComponent(graphics);
+        tempRegular = new Nregular(lados, radius, center, pos);
+    }
+    
     public void cleanTempoLines(){
         tempoLines = new ArrayList<>();
         movable = null;
@@ -140,5 +158,10 @@ public class DrawablePanel extends JPanel {
     public void cleanTempCirc(){
         super.paintComponent(graphics);
         tempCirc = null;
+    }
+    
+    public void cleanTempRegular(){
+        //super.paintComponent(graphics);  
+        tempRegular = null;
     }
 }
