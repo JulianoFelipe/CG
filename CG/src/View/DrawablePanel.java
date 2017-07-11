@@ -69,7 +69,7 @@ public class DrawablePanel extends JPanel {
     @Override
     protected void paintComponent(Graphics g){      
         if (objetos == null) return;
-        
+        //System.out.println("PAINT");
         int xs[], ys[];
         int len;
         

@@ -206,7 +206,7 @@ public class MainV extends javax.swing.JFrame {
      * Creates new form Principal
      */
     public MainV() {  
-        Toolkit.getDefaultToolkit().setDynamicLayout(false);
+        //Toolkit.getDefaultToolkit().setDynamicLayout(false);
         initComponents();
         panelCp = new DrawablePanel(paneMs.getGraphics());
         paneMs.add(panelCp);
@@ -542,8 +542,8 @@ public class MainV extends javax.swing.JFrame {
         panelCp.setSize(paneMs.getSize());
         panelCp.addAllPoligonos(lista);
         paneMs.add(panelCp);
-        paneMs.revalidate();
-        paneMs.repaint();
+        
+        //paneMs.repaint();
         //panelCp.revalidate();
         //panelCp.repaint();
         resetPaint();
