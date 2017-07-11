@@ -137,6 +137,7 @@ public class MainV extends javax.swing.JFrame {
                     panelCp.addPoligono(new Circunferencia(temporaryList.get(0), (int)Math.round(dist)));
                    
                     resetDrawingState();
+                    resetPaint();
                 } else if (noPointsToCreate == 1){
                     temporaryList.add(new Vertice((float) x, (float)y));
                     switch (temporaryList.size()) {
@@ -253,9 +254,19 @@ public class MainV extends javax.swing.JFrame {
         loadMenu = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                formFocusGained(evt);
+            }
+        });
         addComponentListener(new java.awt.event.ComponentAdapter() {
             public void componentResized(java.awt.event.ComponentEvent evt) {
                 formComponentResized(evt);
+            }
+        });
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowDeiconified(java.awt.event.WindowEvent evt) {
+                formWindowDeiconified(evt);
             }
         });
 
@@ -616,6 +627,14 @@ public class MainV extends javax.swing.JFrame {
             LOG.info("Cena carregada!");
         }
     }//GEN-LAST:event_loadMenuActionPerformed
+
+    private void formWindowDeiconified(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeiconified
+        panelCp.repaint(0);
+    }//GEN-LAST:event_formWindowDeiconified
+
+    private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
+        resetPaint();
+    }//GEN-LAST:event_formFocusGained
 
     /**
      * @param args the command line arguments
