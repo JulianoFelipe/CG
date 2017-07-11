@@ -18,6 +18,7 @@ import ioScene.InputScene;
 import ioScene.OutputScene;
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +47,11 @@ public class MainV extends javax.swing.JFrame {
     private boolean regularSidedLock = false;
     
     private List<Vertice> temporaryList = new ArrayList();  
+    
+    private void resetPaint(){
+        panelCp.nullTemps();
+        panelCp.repaint();
+    }
     
     private void resetDrawingState(){
         regularSidedLock = false;
@@ -525,11 +531,8 @@ public class MainV extends javax.swing.JFrame {
 
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
         resetDrawingState();
-        paneMs.repaint();
-        panelCp.nullTemps();
-        panelCp.setVisible(true);
+        resetPaint();
         LOG.info("Criação cancelada");
-        paneMs.validate();
     }//GEN-LAST:event_cancelBtActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
@@ -541,8 +544,9 @@ public class MainV extends javax.swing.JFrame {
         paneMs.add(panelCp);
         paneMs.revalidate();
         paneMs.repaint();
-        panelCp.revalidate();
-        panelCp.repaint();
+        //panelCp.revalidate();
+        //panelCp.repaint();
+        resetPaint();
     }//GEN-LAST:event_formComponentResized
 
     private void regularNsidedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regularNsidedActionPerformed
