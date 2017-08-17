@@ -61,6 +61,7 @@ public class MainV extends javax.swing.JFrame {
         temporaryList = new ArrayList<>();
     }
     
+    https://en.wikipedia.org/wiki/Z-order_curve // Para armazenar "texture maps"?
     private void addMouseListeners(){
         paneMs.addMouseListener(new java.awt.event.MouseAdapter() {           
             @Override
@@ -218,6 +219,7 @@ public class MainV extends javax.swing.JFrame {
         LOG.addHandler(new PaneHandler(oStream));
         LOG.setLevel(Level.FINE);
         LOG.log(Level.INFO, "Cena inicializada...");
+        LOG.info("O botão \"Cancelar\" pode servir para forçar a atualização da pintura da cena.");
     }
 
     /**
