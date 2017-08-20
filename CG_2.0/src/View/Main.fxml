@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.canvas.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.chart.*?>
 <?import java.lang.*?>
@@ -12,7 +13,7 @@
    <children>
       <BorderPane layoutX="-1.0" layoutY="-1.0" prefHeight="800.0" prefWidth="1280.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
-            <MenuBar BorderPane.alignment="TOP_CENTER">
+            <MenuBar fx:id="menu" BorderPane.alignment="TOP_CENTER">
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
@@ -36,13 +37,19 @@
             </MenuBar>
          </top>
          <bottom>
-            <TextArea prefHeight="45.0" prefWidth="473.0" BorderPane.alignment="BOTTOM_CENTER" />
+            <TextArea fx:id="console" prefHeight="68.0" prefWidth="1280.0" BorderPane.alignment="BOTTOM_CENTER" />
          </bottom>
          <center>
-            <Pane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
+            <Group fx:id="panel" BorderPane.alignment="CENTER" />
          </center>
          <left>
-            <TreeView fx:id="tools" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER_LEFT" />
+            <VBox prefHeight="707.0" prefWidth="193.0" BorderPane.alignment="CENTER">
+               <children>
+                  <Separator prefWidth="200.0" />
+                  <TreeView fx:id="tools" onMouseClicked="#onMouseClickedToolsListener" prefHeight="468.0" prefWidth="171.0" />
+                  <AnchorPane fx:id="options" prefHeight="237.0" prefWidth="193.0" />
+               </children>
+            </VBox>
          </left>
       </BorderPane>
    </children>

@@ -6,7 +6,6 @@
 package m.poligonos;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import javafx.beans.property.ObjectProperty;
@@ -14,10 +13,10 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.Line;
 import javafx.scene.shape.Shape;
 import m.Ponto2D;
 
@@ -26,30 +25,27 @@ import m.Ponto2D;
  * @author JFPS
  */
 public class Poligono implements Serializable{
-    private ObservableList<Integer> points;
-    private ObservableList<Line> arestas;
-    
-    private List<Ponto2D> vertices;
+    private ObservableList<Ponto2D> vertices = FXCollections.observableArrayList();
+    //private ObservableList<Line> arestas;
+
     private boolean changedState = false;
     private Shape toDraw;
         
-    public Poligono() { }
+    public Poligono() {}
 
     public Poligono(List<Ponto2D> vertices) {
-        this.vertices = vertices;
+        this.vertices = FXCollections.observableArrayList();
+        this.vertices.addAll(vertices);
     }
     
     public void addPonto(Ponto2D point){
-        if (vertices == null){
-            vertices = new ArrayList<>();
-        }
+        int lastIdx = vertices.size();
         vertices.add(point);
+        
+        changedState = true;
     }
 
     public void addAllPontos(Collection<Ponto2D> colectionOfPoints){
-        if (vertices == null){
-            vertices = new ArrayList<>();
-        }
         vertices.addAll(colectionOfPoints);
     }
     
@@ -57,21 +53,22 @@ public class Poligono implements Serializable{
         return vertices;
     }
     
-    protected Shape buildShape(){
+    protected void buildShape(){
+        if(!changedState) return;
         
-        points = null;
-        arestas = null;
-        return null;
+        vertices = null;
+        changedState = false;
     }
     
     private ObjectProperty<Shape> shape;
     private ObjectProperty<Paint> fill;
     private StringProperty id;
-
+    
     protected final ChangeListener updateListener = (v, o, n) -> {
+        changedState = true;
         buildShape();
     };
-
+    
     protected void setShape(Shape shape) {
         shapeProperty().set(shape);
     }

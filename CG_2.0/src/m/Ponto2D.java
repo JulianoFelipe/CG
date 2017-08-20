@@ -6,43 +6,42 @@
 package m;
 
 import java.io.Serializable;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.value.ChangeListener;
 
 /**
  *
  * @author JFPS
  */
 public class Ponto2D implements Serializable{
-    private int x;
-    private int y;
+    private final IntegerProperty x = new SimpleIntegerProperty();
+    private final IntegerProperty y = new SimpleIntegerProperty();
 
+    public final IntegerProperty xProperty(){ return x;}
+    public final IntegerProperty yProperty(){ return y;}
+    
+    public final int getX(){ return x.get();}
+    public final int getY(){ return y.get();}
+    
+    public final void setX(int newX){ x.set(newX);}
+    public final void setY(int newY){ y.set(newY);}
+    
     public Ponto2D(int x, int y) {
-        this.x = x;
-        this.y = y;
+        setX(x);
+        setY(y);
     }
 
-    public Ponto2D() { }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
+    public Ponto2D() {
+        setX(0);
+        setY(0);
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 19 * hash + this.x;
-        hash = 19 * hash + this.y;
+        hash = 19 * hash + getX();
+        hash = 19 * hash + getY();
         return hash;
     }
 
@@ -69,6 +68,11 @@ public class Ponto2D implements Serializable{
 
     @Override
     public String toString() {
-        return "Ponto2D{" + "x=" + x + ", y=" + y + '}';
+        return "Ponto2D{" + "x=" + getX() + ", y=" + getY() + '}';
+    }
+    
+    public void addListener(ChangeListener<? super Number> listener){
+        xProperty().addListener(listener);
+        yProperty().addListener(listener);
     }
 }
