@@ -9,9 +9,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.MainController">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane layoutX="-1.0" layoutY="-1.0" prefHeight="800.0" prefWidth="1280.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane fx:id="borderPane" layoutX="-1.0" layoutY="-1.0" prefHeight="800.0" prefWidth="1280.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <MenuBar fx:id="menu" BorderPane.alignment="TOP_CENTER">
               <menus>
@@ -37,11 +37,8 @@
             </MenuBar>
          </top>
          <bottom>
-            <TextArea fx:id="console" prefHeight="68.0" prefWidth="1280.0" BorderPane.alignment="BOTTOM_CENTER" />
+            <TextArea fx:id="console" editable="false" prefHeight="68.0" prefWidth="1280.0" BorderPane.alignment="BOTTOM_CENTER" />
          </bottom>
-         <center>
-            <Group fx:id="panel" BorderPane.alignment="CENTER" />
-         </center>
          <left>
             <VBox prefHeight="707.0" prefWidth="193.0" BorderPane.alignment="CENTER">
                <children>

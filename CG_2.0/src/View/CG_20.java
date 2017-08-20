@@ -5,6 +5,8 @@
  */
 package View;
 
+import View.Options.PaintController;
+import View.Options.RegularPolygonController;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -19,7 +21,13 @@ public class CG_20 extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
-        Parent root = FXMLLoader.load(getClass().getResource("Main.fxml"));
+        PaintController paint = new PaintController();
+        RegularPolygonController regular = new RegularPolygonController();
+        
+        FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("Main.fxml"));
+        mainLoader.setController(new MainController());
+        
+        Parent root = mainLoader.load();
         
         Scene scene = new Scene(root);
         

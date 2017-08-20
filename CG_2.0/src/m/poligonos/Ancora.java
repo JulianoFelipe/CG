@@ -5,16 +5,17 @@
  */
 package m.poligonos;
 
-import View.TriangleTest;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.scene.Cursor;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeType;
+import m.Ponto2D;
 
 /**
  * Âncora para arastar um polígono selecionado
@@ -45,9 +46,8 @@ public class Ancora extends Circle{
     }
 
     private void enableDrag() {
-        /*final Delta dragDelta = new Delta();
+        final Delta dragDelta = new Delta();
         setOnMousePressed((MouseEvent mouseEvent) -> {
-            // record a delta distance for the drag and drop operation.
             dragDelta.x = getCenterX() - mouseEvent.getX();
             dragDelta.y = getCenterY() - mouseEvent.getY();
             getScene().setCursor(Cursor.MOVE);
@@ -77,24 +77,28 @@ public class Ancora extends Circle{
             if (!mouseEvent.isPrimaryButtonDown()) {
                 getScene().setCursor(Cursor.DEFAULT);
             }
-        });*/
+        });
     }
     
-    public static ObservableList<Ancora> createControlAnchorsFor(final ObservableList<Integer> points) {
+    public static ObservableList<Ancora> criarAncorasSelecionaveis(final ObservableList<Ponto2D> points) {
         ObservableList<Ancora> anchors = FXCollections.observableArrayList();
 
-        for (int i = 0; i <points.size(); i+=2) {
+        for (int i = 0; i <points.size(); i++) {
             final int idx = i;
+            Ponto2D idxPt = points.get(i);
 
-            DoubleProperty xProperty = new SimpleDoubleProperty(points.get(i));
-            DoubleProperty yProperty = new SimpleDoubleProperty(points.get(i + 1));
+            DoubleProperty xProperty = new SimpleDoubleProperty(idxPt.getX());
+            DoubleProperty yProperty = new SimpleDoubleProperty(idxPt.getY());
 
+            ///Weird behavior because coordinates are separated?
             xProperty.addListener((ObservableValue<? extends Number> ov, Number oldX, Number x1) -> {
-                points.set(idx, (int) x1);
+                Ponto2D toChange = points.get(idx);
+                points.set(idx, new Ponto2D((int)x1, toChange.getY()));
             });
 
             yProperty.addListener((ObservableValue<? extends Number> ov, Number oldY, Number y1) -> {
-                points.set(idx + 1, (int) y1);
+                Ponto2D toChange = points.get(idx);
+                points.set(idx, new Ponto2D(toChange.getX(), (int)y1));
             });
 
             anchors.add(new Ancora(Color.GOLD, xProperty, yProperty));
@@ -102,4 +106,6 @@ public class Ancora extends Circle{
 
         return anchors;
     }
+    
+    private class Delta { double x, y; } //https://gist.github.com/jewelsea/5375786
 }

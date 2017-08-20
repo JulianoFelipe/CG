@@ -37,6 +37,10 @@ public class Ponto2D implements Serializable{
         setY(0);
     }
 
+    public Ponto2D(Ponto2D old){
+        this(old.getX(), old.getY());
+    }
+    
     @Override
     public int hashCode() {
         int hash = 7;

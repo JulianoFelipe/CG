@@ -39,9 +39,7 @@ public class Poligono implements Serializable{
     }
     
     public void addPonto(Ponto2D point){
-        int lastIdx = vertices.size();
         vertices.add(point);
-        
         changedState = true;
     }
 
@@ -49,7 +47,7 @@ public class Poligono implements Serializable{
         vertices.addAll(colectionOfPoints);
     }
     
-    public List<Ponto2D> getPontos() {
+    public ObservableList<Ponto2D> getPontos() {
         return vertices;
     }
     

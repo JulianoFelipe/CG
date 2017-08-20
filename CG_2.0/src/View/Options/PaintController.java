@@ -24,8 +24,8 @@ public class PaintController implements Initializable {
     
     private static final String PINTAR_FUNDO = "Pintar fundo";
     private static final String PINTAR_BORDA = "Pintar borda";
-    private static final byte PINTAR_FUNDO_CODE = 0;
-    private static final byte PINTER_BORDA_CODE = 1;
+    public static final byte PINTAR_FUNDO_CODE = 0;
+    public static final byte PINTER_BORDA_CODE = 1;
     
     @FXML
     private ColorPicker colorPicker;
@@ -56,4 +56,14 @@ public class PaintController implements Initializable {
         else
             currentPaint = PINTER_BORDA_CODE;
     } 
+
+    public Color getCurrentColor() {
+        return currentColor;
+    }
+
+    public byte getCurrentPaint() {
+        return currentPaint;
+    }
+    
+    
 }

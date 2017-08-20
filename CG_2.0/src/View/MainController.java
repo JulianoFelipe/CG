@@ -5,6 +5,9 @@
  */
 package View;
 
+import View.Options.CanvasPane;
+import View.Options.PaintController;
+import View.Options.RegularPolygonController;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -24,6 +27,7 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.text.Text;
 import resource.description.Ferramentas;
 import resource.description.Poligonos;
@@ -36,6 +40,8 @@ import resource.description.Transformacoes;
 public class MainController implements Initializable {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
     //https://www.youtube.com/watch?v=RY_Rb2UVQKQ
+    @FXML
+    private BorderPane borderPane;
     
     @FXML
     private TreeView<String> tools;
@@ -53,6 +59,8 @@ public class MainController implements Initializable {
         initializeTools();
         initializeMenuBar();
         initializeConsole();
+        
+        borderPane.setCenter( new CanvasPane(this) );
     }
     
     private void initializeTools(){
@@ -94,10 +102,10 @@ public class MainController implements Initializable {
         
     }
 
-    private static final byte NOTHING_SEL       = -1;
-    private static final byte FERRAMENTA_SEL    = 0;
-    private static final byte POLIGONO_SEL      = 1;
-    private static final byte TRANSFORMACAO_SEL = 2;
+    public static final byte NOTHING_SEL       = -1;
+    public static final byte FERRAMENTA_SEL    = 0;
+    public static final byte POLIGONO_SEL      = 1;
+    public static final byte TRANSFORMACAO_SEL = 2;
     
     private byte CURRENT_SEL = NOTHING_SEL;
     private Ferramentas current_ferr;
@@ -105,8 +113,11 @@ public class MainController implements Initializable {
     private Transformacoes current_tra;
     
     private Parent paintOption;
+    private PaintController paintControl;
+    private Parent regularOption;
+    private RegularPolygonController regularControl;
     
-    @FXML
+    @FXML //Clicar na árvore de ferramentas
     private void onMouseClickedToolsListener(MouseEvent e){
         Node node = e.getPickResult().getIntersectedNode();
         if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)){
@@ -117,15 +128,12 @@ public class MainController implements Initializable {
             Transformacoes tra = Transformacoes.fromString(name);
             
             if (ferr != null){
-                System.out.println("Tool");
                 CURRENT_SEL = FERRAMENTA_SEL;
                 current_ferr = ferr;
             } else if (pol != null){
-                System.out.println("Pol");
                 CURRENT_SEL = POLIGONO_SEL;
                 current_pol = pol;
             } else if (tra != null){
-                System.out.println("Tra");
                 CURRENT_SEL = TRANSFORMACAO_SEL;
                 current_tra = tra;
             } else {
@@ -136,16 +144,34 @@ public class MainController implements Initializable {
         }
     }
     
+    private void loadPaint(){
+        try { 
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/PaintOption.fxml"));
+            loader.setController(paintControl);
+            paintOption = loader.load();
+        } catch (IOException ex) {  
+            LOG.log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void loadRegular(){
+        try { 
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/RegularPolygonOption.fxml"));
+            loader.setController(regularControl);
+            regularOption = loader.load();
+        } catch (IOException ex) {  
+            LOG.log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    //Adiciona opções conforme ferramentas
     private void handleSelectedTool(){ //BEWARE! FORSAKEN LAND!
         options.getChildren().clear();
         switch(CURRENT_SEL){
             case FERRAMENTA_SEL:
-                if (null != current_ferr)switch (current_ferr) {
+                if (null != current_ferr) switch (current_ferr) {
                     case Paint:
-                        if (paintOption == null){
-                            try { paintOption = FXMLLoader.load(getClass().getResource("/View/Options/PaintOption.fxml")); } 
-                            catch (IOException ex) {  LOG.log(Level.SEVERE, null, ex); }
-                        }
+                        if (paintOption == null) loadPaint();
                         options.getChildren().add(paintOption);
                         break;
                     case Select:
@@ -155,7 +181,10 @@ public class MainController implements Initializable {
                 }
                 break;
             case POLIGONO_SEL:
-                
+                if(null != current_pol && current_pol == Poligonos.Regular){
+                    if (regularOption == null) loadRegular();
+                    options.getChildren().add(regularOption);
+                }
                 break;
                 
             case TRANSFORMACAO_SEL:
@@ -163,4 +192,30 @@ public class MainController implements Initializable {
                 break;
         }
     }
+
+    public PaintController getPaintControl() {
+        return paintControl;
+    }
+
+    public RegularPolygonController getRegularControl() {
+        return regularControl;
+    }
+
+    public byte getCurrentSelection() {
+        return CURRENT_SEL;
+    }
+
+    public Ferramentas getCurrentFerramenta() {
+        return current_ferr;
+    }
+
+    public Poligonos getCurrentTipoDePoligono() {
+        return current_pol;
+    }
+
+    public Transformacoes getCurrentTrasformacao() {
+        return current_tra;
+    }
+    
+    
 }
