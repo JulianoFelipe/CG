@@ -61,7 +61,7 @@ public class MainV extends javax.swing.JFrame {
         temporaryList = new ArrayList<>();
     }
     
-    https://en.wikipedia.org/wiki/Z-order_curve // Para armazenar "texture maps"?
+    //https://en.wikipedia.org/wiki/Z-order_curve // Para armazenar "texture maps"?
     private void addMouseListeners(){
         paneMs.addMouseListener(new java.awt.event.MouseAdapter() {           
             @Override
