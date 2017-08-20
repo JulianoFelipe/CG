@@ -10,15 +10,10 @@ import Logging.PaneHandler;
 import Model.Aresta;
 import Model.Poligono;
 import Model.Vertice;
-import Model.poligonosEsp.Circunferencia;
-import Model.poligonosEsp.Nregular;
-import Model.poligonosEsp.QuadrilateroRegular;
-import Model.poligonosEsp.Triangulo;
+import Model.Nregular;
 import ioScene.InputScene;
 import ioScene.OutputScene;
 import java.awt.Dimension;
-import java.awt.Toolkit;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JFileChooser;
+import javax.swing.SwingUtilities;
 import utils.VMath;
 import utils.VProperties;
 /**
@@ -34,10 +30,8 @@ import utils.VProperties;
  * @author Anderson
  */
 public class MainV extends javax.swing.JFrame {
+    private static final int MAX_LADOS = 20;
     private static final double DELETE_THRESHOLD = 3.9;
-    private static final int SIDE_THRESHOLD = 30;
-    private static final int CIRCUMFERENCE_CODE = Integer.MAX_VALUE;
-    private static final int CIRCUMFERENCE_RADIUS_CODE = Integer.MAX_VALUE-1;
     private static final Logger LOG = Logger.getLogger("CG");
     private DrawablePanel panelCp;
 
@@ -65,17 +59,18 @@ public class MainV extends javax.swing.JFrame {
     private void addMouseListeners(){
         paneMs.addMouseListener(new java.awt.event.MouseAdapter() {           
             @Override
-            public void mouseClicked(java.awt.event.MouseEvent evt) {               
+            public void mousePressed(java.awt.event.MouseEvent evt) {                               
                 int x = evt.getX();
                 int y = evt.getY();
                 
+                //<editor-fold defaultstate="collapsed" desc="Delete Action">
                 if(deleteBt.isSelected()){
                     List<Poligono> lista = panelCp.getListaPoligonos();
                     List<Integer> toRemove = new ArrayList();
-                    
+
                     Vertice point = new Vertice((float) x, (float) y);
                     //System.out.println(point);
-                    
+
                     for(int i=0; i<lista.size(); i++){
                         List<Vertice> vertices = lista.get(i).getVertices();
                         boolean toAdd = false;
@@ -83,35 +78,33 @@ public class MainV extends javax.swing.JFrame {
                         innerFor: for(int j=0; j<vertices.size()-1; j++){
                             Vertice a = vertices.get(j);
                             Vertice b = vertices.get(j+1);
-                            
+
                             //System.out.println(VMath.shortestDistance(a, b, point));
                             if (VMath.shortestDistance(a, b, point) < DELETE_THRESHOLD){
                                 toAdd = true;
                                 break innerFor;
                             }
                         }
-                        
+
                         if (toAdd){
                             LOG.info("Removido o polígono.");
                             toRemove.add(i);
                         }
                     }
-                    
+
                     for (Integer i : toRemove){
                         panelCp.removePoligono(i);
                     }
-                    
+
                     return;
                 }
+                //</editor-fold>
                 
                 if(!pendingCreating){
                     int noTyped = getNumberOfSidesFromBtSelected();
                     if (noTyped == -1){
                         LOG.warning("Selecione um tipo de polígono para desenhar.");
                         return;
-                    } else if (noTyped > SIDE_THRESHOLD && noTyped != CIRCUMFERENCE_CODE) {
-                        LOG.info("Restrição estabelecida de lados é: " + SIDE_THRESHOLD + ".");
-                        return; 
                     } else {
                         pendingCreating = true;
                         noPointsToCreate = noTyped;
@@ -119,40 +112,32 @@ public class MainV extends javax.swing.JFrame {
                     }
                 }
 
-                
                 if (regularSidedLock){   
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
-                    double pos = (x - temporaryList.get(0).getX())/100;
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.addPoligono(new Nregular(++noPointsToCreate, dist, temporaryList.get(0), pos));
+                    panelCp.addPoligono(new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
                     panelCp.cleanTempRegular();
                     
                     resetDrawingState();
                     panelCp.repaint();
+                    regularSidedLock = false;
+                    regularSidedPolygon = false;
                     return ;
                 }
                 
-                if (noPointsToCreate == CIRCUMFERENCE_RADIUS_CODE){
-                    Vertice radiusPnt = new Vertice((float) x, (float)y);
-                    double dist = VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.addPoligono(new Circunferencia(temporaryList.get(0), (int)Math.round(dist)));
-                   
-                    resetDrawingState();
-                    resetPaint();
+                if (SwingUtilities.isRightMouseButton(evt)){
+                    if (temporaryList.size() < 3){
+                        temporaryList.clear();
+                        resetDrawingState();
+                        panelCp.cleanTempoLines();
+                    } else {
+                        panelCp.addPoligono(new Poligono(temporaryList));                    
+                        resetDrawingState();
+                        panelCp.cleanTempoLines();
+                    }
                 } else if (noPointsToCreate == 1){
                     temporaryList.add(new Vertice((float) x, (float)y));
-                    switch (temporaryList.size()) {
-                        case 2:
-                            panelCp.addPoligono(new QuadrilateroRegular(temporaryList.get(0), temporaryList.get(1)));
-                            break;
-                        case 3:
-                            panelCp.addPoligono(new Triangulo(temporaryList.get(0), temporaryList.get(1), temporaryList.get(2)));
-                            break;
-                        default:
-                            panelCp.addPoligono(new Poligono(temporaryList));
-                            break;
-                    }
-                    
+                    panelCp.addPoligono(new Poligono(temporaryList));                    
                     resetDrawingState();
                     panelCp.cleanTempoLines();
                 } else {
@@ -182,23 +167,15 @@ public class MainV extends javax.swing.JFrame {
                 int x = e.getX();
                 int y = e.getY();
                 
-                if (noPointsToCreate == CIRCUMFERENCE_RADIUS_CODE){             
+                if (regularSidedLock){
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
-                    int radius = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.setTempCirc(temporaryList.get(0), radius);
-                    //panelCp.removeAll();
-                } else {
-                    if (regularSidedLock){
-                        Vertice radiusPnt = new Vertice((float) x, (float)y);
-                        double pos = (x - temporaryList.get(0).getX())/100;
-                        int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                        panelCp.setTempRegular(noPointsToCreate+1, dist, temporaryList.get(0), pos);
-                    } else {
-                        //panelCp.cleanTempoLines();
-                        Vertice last = temporaryList.get(temporaryList.size()-1);
-                        panelCp.setMovable(new Aresta(new Vertice((float) x, (float) y), last));
-                    }
-                } 
+                    int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                    panelCp.setTempRegular(jSlider1.getValue(), dist, temporaryList.get(0), 0.);
+                 } else {
+                    //panelCp.cleanTempoLines();
+                    Vertice last = temporaryList.get(temporaryList.size()-1);
+                    panelCp.setMovable(new Aresta(new Vertice((float) x, (float) y), last));
+                 }
                 panelCp.repaint();
             }
         });
@@ -234,26 +211,31 @@ public class MainV extends javax.swing.JFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
-        selectBt = new javax.swing.JToggleButton();
-        deleteBt = new javax.swing.JToggleButton();
-        cancelBt = new javax.swing.JButton();
+        translateBt = new javax.swing.JToggleButton();
+        rotateBt = new javax.swing.JToggleButton();
+        shearBt = new javax.swing.JToggleButton();
+        scaleBt = new javax.swing.JToggleButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
-        jtfLadosPrisma = new javax.swing.JTextField();
-        quadrilateroBt = new javax.swing.JToggleButton();
-        circBt = new javax.swing.JToggleButton();
-        trianguloBt = new javax.swing.JToggleButton();
         irregularPoligonBt = new javax.swing.JToggleButton();
         regularNsided = new javax.swing.JToggleButton();
-        jPanel4 = new javax.swing.JPanel();
+        jSlider1 = new javax.swing.JSlider();
         jPanel1 = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         consolePane = new javax.swing.JTextPane();
         paneMs = new javax.swing.JScrollPane();
+        jPanel5 = new javax.swing.JPanel();
+        selectBt1 = new javax.swing.JToggleButton();
+        deleteBt = new javax.swing.JToggleButton();
+        cancelBt = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         saveMenu = new javax.swing.JMenuItem();
         loadMenu = new javax.swing.JMenuItem();
+        jMenuItem1 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        javaFillRadio = new javax.swing.JRadioButtonMenuItem();
+        jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addFocusListener(new java.awt.event.FocusAdapter() {
@@ -272,30 +254,38 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Ferramentas"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Transformações"));
         jPanel2.setToolTipText("");
 
-        buttonGroup1.add(selectBt);
-        selectBt.setText("Selecionar");
-        selectBt.setEnabled(false);
-        selectBt.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(translateBt);
+        translateBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/translacao.png"))); // NOI18N
+        translateBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                selectBtActionPerformed(evt);
+                translateBtActionPerformed(evt);
             }
         });
 
-        buttonGroup1.add(deleteBt);
-        deleteBt.setText("Excluir");
-        deleteBt.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(rotateBt);
+        rotateBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/rotacao.png"))); // NOI18N
+        rotateBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteBtActionPerformed(evt);
+                rotateBtActionPerformed(evt);
             }
         });
 
-        cancelBt.setText("Cancelar");
-        cancelBt.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(shearBt);
+        shearBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/cisalhamento.png"))); // NOI18N
+        shearBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cancelBtActionPerformed(evt);
+                shearBtActionPerformed(evt);
+            }
+        });
+
+        buttonGroup1.add(scaleBt);
+        scaleBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/escala.png"))); // NOI18N
+        scaleBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                scaleBtActionPerformed(evt);
             }
         });
 
@@ -306,53 +296,32 @@ public class MainV extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(deleteBt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(selectBt, javax.swing.GroupLayout.DEFAULT_SIZE, 198, Short.MAX_VALUE)
-                    .addComponent(cancelBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(rotateBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(translateBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addComponent(scaleBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(shearBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(selectBt)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(deleteBt)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(rotateBt)
+                    .addComponent(translateBt))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cancelBt)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(shearBt)
+                    .addComponent(scaleBt)))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Objetos"));
 
-        jLabel2.setText("Quantidade de lados");
-
-        jtfLadosPrisma.setText("5");
-        jtfLadosPrisma.setToolTipText("Quantidade de lados para um polígono irregular");
-
-        buttonGroup1.add(quadrilateroBt);
-        quadrilateroBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Quadrado.jpg"))); // NOI18N
-        quadrilateroBt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                quadrilateroBtActionPerformed(evt);
-            }
-        });
-
-        buttonGroup1.add(circBt);
-        circBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Circ.jpg"))); // NOI18N
-        circBt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                circBtActionPerformed(evt);
-            }
-        });
-
-        buttonGroup1.add(trianguloBt);
-        trianguloBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Triangulo.jpg"))); // NOI18N
-        trianguloBt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                trianguloBtActionPerformed(evt);
-            }
-        });
+        jLabel2.setText("Lados para polígono regular");
 
         buttonGroup1.add(irregularPoligonBt);
         irregularPoligonBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/Irregular.jpg"))); // NOI18N
@@ -370,62 +339,41 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED, java.awt.Color.black, java.awt.Color.black, null, null));
-
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 0, Short.MAX_VALUE)
-        );
+        jSlider1.setMajorTickSpacing(3);
+        jSlider1.setMaximum(20);
+        jSlider1.setMinimum(3);
+        jSlider1.setMinorTickSpacing(1);
+        jSlider1.setPaintLabels(true);
+        jSlider1.setPaintTicks(true);
+        jSlider1.setToolTipText("");
+        jSlider1.setValue(3);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addComponent(trianguloBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(quadrilateroBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(circBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 0, Short.MAX_VALUE))
-            .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(irregularPoligonBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(regularNsided, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(47, 47, 47)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jtfLadosPrisma, javax.swing.GroupLayout.PREFERRED_SIZE, 116, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
+                    .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(quadrilateroBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(trianguloBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(circBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(7, 7, 7)
-                .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(7, 7, 7)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(irregularPoligonBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(regularNsided, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap()
+                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(irregularPoligonBt)
+                    .addComponent(regularNsided))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jtfLadosPrisma, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Console"));
@@ -441,6 +389,56 @@ public class MainV extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
+        );
+
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Ferramentas"));
+        jPanel5.setToolTipText("");
+
+        buttonGroup1.add(selectBt1);
+        selectBt1.setText("Selecionar");
+        selectBt1.setEnabled(false);
+        selectBt1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                selectBt1ActionPerformed(evt);
+            }
+        });
+
+        deleteBt.setText("Excluir");
+        deleteBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteBtActionPerformed(evt);
+            }
+        });
+
+        cancelBt.setText("Cancelar");
+        cancelBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cancelBtActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
+        jPanel5.setLayout(jPanel5Layout);
+        jPanel5Layout.setHorizontalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(deleteBt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(selectBt1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cancelBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        jPanel5Layout.setVerticalGroup(
+            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel5Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(selectBt1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(deleteBt)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(cancelBt)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jMenu1.setText("File");
@@ -461,7 +459,38 @@ public class MainV extends javax.swing.JFrame {
         });
         jMenu1.add(loadMenu);
 
+        jMenuItem1.setText("Nova cena");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu1.add(jMenuItem1);
+
         jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Algoritmo de Preenchimento");
+
+        buttonGroup2.add(javaFillRadio);
+        javaFillRadio.setSelected(true);
+        javaFillRadio.setText("Fill Java");
+        javaFillRadio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                javaFillRadioActionPerformed(evt);
+            }
+        });
+        jMenu2.add(javaFillRadio);
+
+        buttonGroup2.add(jRadioButtonMenuItem2);
+        jRadioButtonMenuItem2.setText("Fill CG (Manual)");
+        jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButtonMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(jRadioButtonMenuItem2);
+
+        jMenuBar1.add(jMenu2);
 
         setJMenuBar(jMenuBar1);
 
@@ -474,11 +503,13 @@ public class MainV extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(paneMs, javax.swing.GroupLayout.DEFAULT_SIZE, 770, Short.MAX_VALUE)
+                        .addComponent(paneMs, javax.swing.GroupLayout.DEFAULT_SIZE, 794, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(2, 2, 2)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -487,9 +518,12 @@ public class MainV extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(paneMs))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -499,54 +533,12 @@ public class MainV extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void circBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_circBtActionPerformed
-        LOG.info("Clique na região para o centro da circunferência e depois em outra para ser calculado o raio.");
-        pendingCreating = true;
-        noPointsToCreate = CIRCUMFERENCE_CODE;
-        temporaryList = new ArrayList<>();
-    }//GEN-LAST:event_circBtActionPerformed
-
-    private void trianguloBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_trianguloBtActionPerformed
-        LOG.info("Clique em três pontos para formar um triângulo.");
-        pendingCreating = true;
-        noPointsToCreate = 3;
-        temporaryList = new ArrayList<>();
-    }//GEN-LAST:event_trianguloBtActionPerformed
-
-    private void quadrilateroBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_quadrilateroBtActionPerformed
-        LOG.info("Clique em dois pontos para formar um quadrilátero regular (Cantos).");
-        pendingCreating = true;
-        noPointsToCreate = 2;
-        temporaryList = new ArrayList<>();
-    }//GEN-LAST:event_quadrilateroBtActionPerformed
-
     private void irregularPoligonBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_irregularPoligonBtActionPerformed
-        int noPointsTyped = getNumberOfSidesFromBtSelected();
-        if (noPointsTyped <= 1){
-            LOG.info("Só é possível criar polígonos com mais que 1 lado.");
-        } else if (noPointsTyped > SIDE_THRESHOLD) {
-            LOG.info("Restrição estabelecida de lados é: " + SIDE_THRESHOLD + ".");
-        } else {
-            LOG.info("Clique em " + noPointsTyped +  " pontos para formar um polígono.");
-            pendingCreating = true;
-            noPointsToCreate = noPointsTyped;
-            temporaryList = new ArrayList<>();
-        }
+        LOG.info("Clique em no máximo " + MAX_LADOS +  " e no mínimo 3 pontos para formar um polígono. O botão direito do mouse finaliza criação.");
+        pendingCreating = true;
+        noPointsToCreate = getNumberOfSidesFromBtSelected();
+        temporaryList = new ArrayList<>();
     }//GEN-LAST:event_irregularPoligonBtActionPerformed
-
-    private void selectBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBtActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_selectBtActionPerformed
-
-    private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
-        LOG.info("Clique em alguma parte (Linha) dos polígonos que deseja excluir.");
-    }//GEN-LAST:event_deleteBtActionPerformed
-
-    private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
-        resetDrawingState();
-        resetPaint();
-        LOG.info("Criação cancelada");
-    }//GEN-LAST:event_cancelBtActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
         List<Poligono> lista = panelCp.getListaPoligonos();
@@ -563,17 +555,10 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_formComponentResized
 
     private void regularNsidedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regularNsidedActionPerformed
-        int noPointsTyped = getNumberOfSidesFromBtSelected();
-        if (noPointsTyped <= 1){
-            LOG.info("Só é possível criar polígonos com mais que 1 lado.");
-        } else if (noPointsTyped > SIDE_THRESHOLD) {
-            LOG.info("Restrição estabelecida de lados é: " + SIDE_THRESHOLD + ".");
-        } else {
-            LOG.info("Clique na região para o centro do polígono e depois em outra para ser calculado o raio.");
-            pendingCreating = true;
-            noPointsToCreate = noPointsTyped;
-            temporaryList = new ArrayList<>();
-        }
+        LOG.info("Clique na região para o centro do polígono e depois em outra para ser calculado o raio.");
+        pendingCreating = true;
+        noPointsToCreate = getNumberOfSidesFromBtSelected();
+        temporaryList = new ArrayList<>();
         //regularSidedPolygon = regularNsided.isSelected();
     }//GEN-LAST:event_regularNsidedActionPerformed
 
@@ -638,6 +623,61 @@ public class MainV extends javax.swing.JFrame {
         resetPaint();
     }//GEN-LAST:event_formFocusGained
 
+    private void selectBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBt1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_selectBt1ActionPerformed
+
+    private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_deleteBtActionPerformed
+
+    private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
+        resetDrawingState();
+        resetPaint();
+        LOG.info("Criação cancelada");
+    }//GEN-LAST:event_cancelBtActionPerformed
+
+    private void translateBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_translateBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_translateBtActionPerformed
+
+    private void rotateBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rotateBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rotateBtActionPerformed
+
+    private void shearBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shearBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_shearBtActionPerformed
+
+    private void scaleBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scaleBtActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_scaleBtActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        panelCp.clear();
+        resetDrawingState();
+        resetPaint();
+        LOG.info("Cena limpa");
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
+    private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
+        if (javaFillRadio.isSelected()){
+            panelCp.setUseJavaFill(true);
+        } else {
+            panelCp.setUseJavaFill(false);
+        }
+        repaint();
+    }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
+
+    private void javaFillRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_javaFillRadioActionPerformed
+        if (javaFillRadio.isSelected()){
+            panelCp.setUseJavaFill(true);
+        } else {
+            panelCp.setUseJavaFill(false);
+        }
+        repaint();
+    }//GEN-LAST:event_javaFillRadioActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -667,10 +707,8 @@ public class MainV extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainV().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new MainV().setVisible(true);
         });
     }
 
@@ -678,83 +716,45 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JButton cancelBt;
-    private javax.swing.JToggleButton circBt;
     private javax.swing.JTextPane consolePane;
     private javax.swing.JToggleButton deleteBt;
     private javax.swing.JToggleButton irregularPoligonBt;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
+    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel5;
+    private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTextField jtfLadosPrisma;
+    private javax.swing.JSlider jSlider1;
+    private javax.swing.JRadioButtonMenuItem javaFillRadio;
     private javax.swing.JMenuItem loadMenu;
     private javax.swing.JScrollPane paneMs;
-    private javax.swing.JToggleButton quadrilateroBt;
     private javax.swing.JToggleButton regularNsided;
+    private javax.swing.JToggleButton rotateBt;
     private javax.swing.JMenuItem saveMenu;
-    private javax.swing.JToggleButton selectBt;
-    private javax.swing.JToggleButton trianguloBt;
+    private javax.swing.JToggleButton scaleBt;
+    private javax.swing.JToggleButton selectBt1;
+    private javax.swing.JToggleButton shearBt;
+    private javax.swing.JToggleButton translateBt;
     // End of variables declaration//GEN-END:variables
     
     private int getNumberOfSidesFromBtSelected(){
-        if (trianguloBt.isSelected()){
-            return 3;
-        } else if (quadrilateroBt.isSelected()) {
+        if (regularNsided.isSelected()){
+            regularSidedPolygon = true;
             return 2;
-        } else if (irregularPoligonBt.isSelected() || regularNsided.isSelected()){
-            regularSidedPolygon = regularNsided.isSelected();
-            return Integer.parseInt( jtfLadosPrisma.getText() );
-        } else if (circBt.isSelected()){
-            return CIRCUMFERENCE_CODE;
+        } else if (irregularPoligonBt.isSelected()) {
+            return MAX_LADOS;
         } else {
             return -1;
         }
     }
 
     private void unToggle(){
-        trianguloBt.setSelected(false);
-        quadrilateroBt.setSelected(false);
         irregularPoligonBt.setSelected(false);
-        circBt.setSelected(false);
     }
 }
-
-/*private void vFrenteMouseReleased(java.awt.event.MouseEvent evt) {                                      
-        vi = null;
-    }                                     
-
-    private void vFrenteMouseClicked(java.awt.event.MouseEvent evt) {                                     
-        /*if (poligonoSelecinado != null) { // caso haja um poligono selecionado então tira o seu destaque.
-        CPintura.PintarBordasPoligono(poligonoSelecinado);
-        }
-        // pegando ponto do clique
-        Vertice v = new Vertice();
-        v.setX(evt.getPoint().x);
-        v.setY(evt.getPoint().y);
-        // pega o poligono q foi selecionado
-        poligonoSelecinado = CFuncoes.getPoligonoSelecionadoVistaFrontal(v);
-        // Destaca o poligono que foi selecionado
-        if (poligonoSelecinado != null) {
-        CPintura.PintarBordasPoligono(poligonoSelecinado);
-        }*/
-        /*Point point = evt.getPoint();
-        panelCp.addPoligono(new QuadrilateroRegular(new Vertice((float)point.x, (float)point.x), new Vertice((float)point.x+1, (float)point.x+1)));
-        vFrente = panelCp;
-        vFrente.repaint();
-        System.out.println("ÇLKAJFÇL");
-    }                                    
-
-    private void vFrenteMouseWheelMoved(java.awt.event.MouseWheelEvent evt) {                                        
-        
-    }                                       
-
-    private void vFrenteMouseDragged(java.awt.event.MouseEvent evt) {                                     
-        // Aperta e Arrasta
-        if (selectBt.isSelected() && poligonoSelecinado != null) {
-            
-        }
-    }*/

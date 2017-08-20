@@ -9,11 +9,13 @@ import Model.Aresta;
 import Model.Poligono;
 import Model.Vertice;
 import Model.Nregular;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
+import utils.ManualPaint;
 
 /**
  *
@@ -24,11 +26,12 @@ public class DrawablePanel extends JPanel {
     private final List<Poligono> objetos;
     private final Graphics graphics;
 
+    private boolean useJavaFill = true;
     private List<Aresta> tempoLines = new ArrayList<>();
     private Aresta movable = null;
     private Nregular tempRegular = null;
-    
-    private List<Vertice> selectedPolygonPoints;
+
+    private Poligono selectedPolygon = null;
     
     public DrawablePanel(List<Poligono> objetos) {
         this.objetos = objetos;
@@ -42,6 +45,10 @@ public class DrawablePanel extends JPanel {
     public DrawablePanel(Graphics g){
         this.graphics = g;
         objetos = new ArrayList();
+    }
+
+    public void setUseJavaFill(boolean useJavaFill) {
+        this.useJavaFill = useJavaFill;
     }
     
     public void addPoligono(Poligono p){
@@ -72,14 +79,10 @@ public class DrawablePanel extends JPanel {
         int xs[], ys[];
         int len;
 
-        for (int i=0; i<objetos.size(); i++){
-            xs = objetos.get(i).getXpoints();
-            ys = objetos.get(i).getYpoints();
-            len = xs.length;
+        objetos.forEach((p) -> {
+            paintPolygon(p);
+        });
 
-            g.drawPolygon(xs, ys, len);
-        }
-        
         for (Aresta a : tempoLines){
             Vertice um = a.getvInicial();
             Vertice dois = a.getvFinal();
@@ -99,6 +102,41 @@ public class DrawablePanel extends JPanel {
 
             g.drawPolygon(xs, ys, len);
         }
+        
+        paintSelectedPolygon();
+    }
+    
+    public void paintPolygon(Poligono p){
+        Color previousColor = graphics.getColor();
+        
+        p.setCorFundo(Color.RED);
+        
+        int xs[], ys[];
+        int len;
+        
+        xs = p.getXpoints();
+        ys = p.getYpoints();
+        len = xs.length;
+  
+        graphics.setColor(p.getCorBorda());
+        graphics.drawPolygon(xs, ys, len);
+        if (p.getCorFundo() != null){
+            graphics.setColor(p.getCorFundo());
+            if(useJavaFill)
+                graphics.fillPolygon(xs, ys, len);
+            else{
+                ManualPaint.floodFill(graphics, p);
+                //System.out.println("NOT JAVA FILL");
+            }
+        }
+        
+        graphics.setColor(previousColor);
+    }
+    
+    public void paintSelectedPolygon(){
+        if (selectedPolygon == null) return;
+        
+        //STUFF
     }
     
     public void paintPolygons(){
@@ -142,5 +180,9 @@ public class DrawablePanel extends JPanel {
     
     public void clear(){
         objetos.clear();
+    }
+
+    public void setSelectedPolygon(Poligono selectedPolygon) {
+        this.selectedPolygon = selectedPolygon;
     }
 }

@@ -1,8 +1,8 @@
 package Model;
 
+import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -13,48 +13,25 @@ public class Poligono implements Serializable{
     private static long INSTANCES;
     private final long ID;
     
-    // listas Auxiliares
-    private ArrayList<Aresta> arestas = new ArrayList();
     private ArrayList<Vertice> vertices = new ArrayList();
-    private ArrayList<Vertice> vetoresNormaisMedios = new ArrayList();
+    private Color corFundo = null;
+    private Color corBorda = null;
  
     //<editor-fold defaultstate="collapsed" desc="Construtores">
     public Poligono(){
-        arestas = new ArrayList<>();
         vertices = new ArrayList();
-        vetoresNormaisMedios = new ArrayList<>();
         
-        ID=INSTANCES;
-        INSTANCES++;
+        ID = INSTANCES++;
     }
     
     public Poligono(List<Vertice> vertices){
         this.vertices = new ArrayList(vertices);
-
-        ID=INSTANCES;
-        INSTANCES++;
+        
+        ID = INSTANCES++;
     }
 //</editor-fold>
     
-    //<editor-fold defaultstate="collapsed" desc="Getters & Setters">
-    public ArrayList<Aresta> getArestas() {
-        return arestas;
-    }
-    
-    public void setArestas(ArrayList<Aresta> Arestas) {
-        this.arestas = Arestas;
-        updateVertices();
-    }
-    
-    public void addAllArestas(List<Aresta> novasArestas){
-        arestas.addAll(novasArestas);
-        updateVertices();
-    }
-    
-    public void addAresta (Aresta novaAresta){
-        arestas.add(novaAresta);
-    }
-    
+    //<editor-fold defaultstate="collapsed" desc="Getters & Setters">   
     public ArrayList<Vertice> getVertices() {
         return vertices;
     }
@@ -70,23 +47,22 @@ public class Poligono implements Serializable{
     public void addVertice (Vertice novoVertice){
         vertices.add(novoVertice);
     }
-    
-    public ArrayList<Vertice> getVetoresNormaisMedios() {
-        return vetoresNormaisMedios;
-    }
-    
-    public void setVetoresNormaisMedios(ArrayList<Vertice> vetoresNormaisMedios) {
-        this.vetoresNormaisMedios = vetoresNormaisMedios;
-    }
-   
-    public static long getINSTANCES() {
-        return INSTANCES;
+
+    public Color getCorFundo() {
+        return corFundo;
     }
 
-    public long getID() {
-        return ID;
+    public void setCorFundo(Color corFundo) {
+        this.corFundo = corFundo;
     }
-    
+
+    public Color getCorBorda() {
+        return corBorda;
+    }
+
+    public void setCorBorda(Color corBorda) {
+        this.corBorda = corBorda;
+    }
 //</editor-fold>
  
     public int[] getXpoints(){
@@ -105,30 +81,6 @@ public class Poligono implements Serializable{
         }
         //System.out.println(Arrays.toString(yPts));
         return yPts;
-    }
-    
-    /**
-     * Limpa lista de vertices
-     * e adiciona todos segundo
-     * lista de arestas.
-     */
-    public void updateVertices(){
-        HashSet listaHash = new HashSet<>(); //Usa hashset para nao repetir vertices :D
-        for (Aresta aresta : arestas){
-            listaHash.add(aresta.vInicial);
-            listaHash.add(aresta.vFinal);
-        }
-        vertices = new ArrayList<>(listaHash);
-    }
-    
-    /**
-     * Limpa lista de arestas e
-     * adiciona todas segundo lista
-     * de faces.
-     */
-    public void updateArestas(){
-        
-        updateVertices();
     }
     
     public Vertice calculaCentroide(){
@@ -190,6 +142,5 @@ public class Poligono implements Serializable{
     public String toString() {
         return "Polígono {Lados=" + vertices.size() + '}';
     }
-    
     
 }
