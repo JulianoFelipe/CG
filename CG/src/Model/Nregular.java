@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model.poligonosEsp;
+package Model;
 
 import Model.Poligono;
 import Model.Vertice;
@@ -50,6 +50,6 @@ public class Nregular extends Poligono {
     
     @Override
     public String toString() {
-        return "Polígono Regular {" + super.getVertices() + '}';
+        return "Polígono Regular {Lados=" + super.getVertices().size() + ", Centro=" + center + ", Raio=" + radius + '}';
     }
 }

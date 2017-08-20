@@ -6,11 +6,9 @@
 package View;
 
 import Model.Aresta;
-import Model.poligonosEsp.Circunferencia;
 import Model.Poligono;
 import Model.Vertice;
-import Model.poligonosEsp.Nregular;
-import Model.poligonosEsp.QuadrilateroRegular;
+import Model.Nregular;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,8 +26,9 @@ public class DrawablePanel extends JPanel {
 
     private List<Aresta> tempoLines = new ArrayList<>();
     private Aresta movable = null;
-    private Circunferencia tempCirc = null;
     private Nregular tempRegular = null;
+    
+    private List<Vertice> selectedPolygonPoints;
     
     public DrawablePanel(List<Poligono> objetos) {
         this.objetos = objetos;
@@ -72,26 +71,13 @@ public class DrawablePanel extends JPanel {
         //System.out.println("PAINT");
         int xs[], ys[];
         int len;
-        
-        Poligono temp;
-        for (int i=0; i<objetos.size(); i++){
-            temp = objetos.get(i);
-            if (temp instanceof QuadrilateroRegular){
-                QuadrilateroRegular quad = ((QuadrilateroRegular) temp);
-                g.drawRect((int)quad.getMinX(), (int)quad.getMinY(), (int)quad.getWidth(), (int)quad.getHeight());
-            } else if (temp instanceof Circunferencia){ 
-                Circunferencia circ = ((Circunferencia) temp);
-                g.drawOval((int) circ.getCentro().getX() - circ.getRadius(),
-                           (int) circ.getCentro().getY() - circ.getRadius(), 
-                           circ.getRadius()*2, circ.getRadius()*2);
-            } else {
-            
-                xs = objetos.get(i).getXpoints();
-                ys = objetos.get(i).getYpoints();
-                len = xs.length;
 
-                g.drawPolygon(xs, ys, len);
-            }
+        for (int i=0; i<objetos.size(); i++){
+            xs = objetos.get(i).getXpoints();
+            ys = objetos.get(i).getYpoints();
+            len = xs.length;
+
+            g.drawPolygon(xs, ys, len);
         }
         
         for (Aresta a : tempoLines){
@@ -104,12 +90,6 @@ public class DrawablePanel extends JPanel {
             Vertice um = movable.getvInicial();
             Vertice dois = movable.getvFinal();
             g.drawLine((int)um.getX(), (int)um.getY(), (int)dois.getX(), (int)dois.getY());
-        }
-        
-        if (tempCirc != null){
-            g.drawOval((int) tempCirc.getCentro().getX() - tempCirc.getRadius(),
-                       (int) tempCirc.getCentro().getY() - tempCirc.getRadius(), 
-                       tempCirc.getRadius()*2, tempCirc.getRadius()*2);
         }
         
         if (tempRegular != null){
@@ -150,24 +130,17 @@ public class DrawablePanel extends JPanel {
         movable = null;
     }
     
-    public void setTempCirc(Vertice center, int radius){
-        super.paintComponent(graphics);
-        tempCirc = new Circunferencia(center, radius);
-    }
-    
-    public void cleanTempCirc(){
-        //super.paintComponent(graphics);
-        tempCirc = null;
-    }
-    
     public void cleanTempRegular(){
         //super.paintComponent(graphics);  
         tempRegular = null;
     }
     
     public void nullTemps(){
-        cleanTempCirc();
         cleanTempRegular();
         cleanTempoLines();
+    }
+    
+    public void clear(){
+        objetos.clear();
     }
 }

@@ -188,7 +188,7 @@ public class Poligono implements Serializable{
 
     @Override
     public String toString() {
-        return "Polígono {" + vertices + '}';
+        return "Polígono {Lados=" + vertices.size() + '}';
     }
     
     
