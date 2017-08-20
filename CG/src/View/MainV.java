@@ -69,16 +69,16 @@ public class MainV extends javax.swing.JFrame {
                     List<Integer> toRemove = new ArrayList();
 
                     Vertice point = new Vertice((float) x, (float) y);
-                    //System.out.println(point);
 
                     for(int i=0; i<lista.size(); i++){
                         List<Vertice> vertices = lista.get(i).getVertices();
                         boolean toAdd = false;
-                        //System.out.println("INNER: " + vertices.size());
-                        innerFor: for(int j=0; j<vertices.size()-1; j++){
-                            Vertice a = vertices.get(j);
-                            Vertice b = vertices.get(j+1);
 
+                        innerFor: for(int j=0; j<vertices.size(); j++){
+                            Vertice a = vertices.get(j), b;
+                            if (j == vertices.size()-1) b=vertices.get(0);
+                            else b=vertices.get(j+1);
+                            
                             //System.out.println(VMath.shortestDistance(a, b, point));
                             if (VMath.shortestDistance(a, b, point) < DELETE_THRESHOLD){
                                 toAdd = true;
@@ -92,9 +92,9 @@ public class MainV extends javax.swing.JFrame {
                         }
                     }
 
-                    for (Integer i : toRemove){
+                    /*for (Integer i : toRemove){
                         panelCp.removePoligono(i);
-                    }
+                    }*/
 
                     return;
                 }
@@ -225,7 +225,7 @@ public class MainV extends javax.swing.JFrame {
         consolePane = new javax.swing.JTextPane();
         paneMs = new javax.swing.JScrollPane();
         jPanel5 = new javax.swing.JPanel();
-        selectBt1 = new javax.swing.JToggleButton();
+        selectBt = new javax.swing.JToggleButton();
         deleteBt = new javax.swing.JToggleButton();
         cancelBt = new javax.swing.JButton();
         jMenuBar1 = new javax.swing.JMenuBar();
@@ -394,12 +394,12 @@ public class MainV extends javax.swing.JFrame {
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Ferramentas"));
         jPanel5.setToolTipText("");
 
-        buttonGroup1.add(selectBt1);
-        selectBt1.setText("Selecionar");
-        selectBt1.setEnabled(false);
-        selectBt1.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup1.add(selectBt);
+        selectBt.setText("Selecionar");
+        selectBt.setEnabled(false);
+        selectBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                selectBt1ActionPerformed(evt);
+                selectBtActionPerformed(evt);
             }
         });
 
@@ -425,7 +425,7 @@ public class MainV extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(deleteBt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(selectBt1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(selectBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(cancelBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -433,7 +433,7 @@ public class MainV extends javax.swing.JFrame {
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(selectBt1)
+                .addComponent(selectBt)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(deleteBt)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -623,12 +623,12 @@ public class MainV extends javax.swing.JFrame {
         resetPaint();
     }//GEN-LAST:event_formFocusGained
 
-    private void selectBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBt1ActionPerformed
+    private void selectBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBtActionPerformed
         // TODO add your handling code here:
-    }//GEN-LAST:event_selectBt1ActionPerformed
+    }//GEN-LAST:event_selectBtActionPerformed
 
     private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
-        // TODO add your handling code here:
+        LOG.info("Clique em alguma parte (Linha) dos polígonos que deseja excluir.");
     }//GEN-LAST:event_deleteBtActionPerformed
 
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
@@ -738,7 +738,7 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JToggleButton rotateBt;
     private javax.swing.JMenuItem saveMenu;
     private javax.swing.JToggleButton scaleBt;
-    private javax.swing.JToggleButton selectBt1;
+    private javax.swing.JToggleButton selectBt;
     private javax.swing.JToggleButton shearBt;
     private javax.swing.JToggleButton translateBt;
     // End of variables declaration//GEN-END:variables
