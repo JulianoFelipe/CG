@@ -26,6 +26,7 @@ import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
+import utils.PMath;
 import utils.VMath;
 /**
  *
@@ -33,7 +34,7 @@ import utils.VMath;
  */
 public class MainV extends javax.swing.JFrame {
     private static final int MAX_LADOS = 20;
-    private static final double DELETE_THRESHOLD = 3.9;
+    private static final double LINE_PROXIMITY_THRESHOLD = 3.9;
     private static final Logger LOG = Logger.getLogger("CG");
     private final JToggleButton ghost = new JToggleButton();
     private DrawablePanel panelCp;
@@ -89,7 +90,7 @@ public class MainV extends javax.swing.JFrame {
                             else b=vertices.get(j+1);
                             
                             //System.out.println(VMath.shortestDistance(a, b, point));
-                            if (VMath.shortestDistance(a, b, point) < DELETE_THRESHOLD){
+                            if (VMath.shortestDistance(a, b, point) < LINE_PROXIMITY_THRESHOLD){
                                 toAdd = true;
                                 break innerFor;
                             }
@@ -176,29 +177,61 @@ public class MainV extends javax.swing.JFrame {
             @Override
             public void mouseEntered(MouseEvent e) {
                 if (currentAction != NO_ACTION){
-                    paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                    //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 } else {
                     paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
-            }
-            
-            
+            }          
         });
         
         paneMs.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
-                /*if (currentAction == TRANSLATE_ACTION){
-                    if ()
-                }*/
+                int x = e.getX();
+                int y = e.getY();
+                
+                if (currentAction != NO_ACTION){
+                    Vertice v = new Vertice((float) x, (float)y);
+                    if (currentAction == SHEAR_ACTION){
+                        int selSize = selectedPolygon.getVertices().size();
+                        boolean toAdd=false;
+                        Aresta closeLine = null;
+                        for(int j=0; j<selSize; j++){
+                            Vertice a = selectedPolygon.getVertices().get(j), b;
+                            if (j == selSize-1) b=selectedPolygon.getVertices().get(0);
+                            else b=selectedPolygon.getVertices().get(j+1);
+                            
+                            if (VMath.shortestDistance(a, b, v) < LINE_PROXIMITY_THRESHOLD){
+                                toAdd = true;
+                                closeLine = new Aresta(a,b);
+                                break;
+                            }
+                        }
+                        if (toAdd){
+                           boolean isVert=VMath.isLineVertical(closeLine), isHori=VMath.isLineHorizontal(closeLine);
+                           if (isVert){
+                               System.out.println("VERT");
+                               paneMs.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                           } else if (isHori){
+                               System.out.println("HORI");
+                               paneMs.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
+                           } else {
+                               System.out.println("NONE- " + VMath.lineSlope(closeLine));
+                               paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                           }
+                        }
+                    } else {
+                        if (PMath.proximoDeQualquerVerticeDoPoligono(selectedPolygon, v))
+                            paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                        else
+                            paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                }
                 
                 if (temporaryList.size() < 1) return;
                 if (!pendingCreating) return;
                 //paneMs.repaint();
-                
-                int x = e.getX();
-                int y = e.getY();
-                
+                               
                 if (regularSidedLock){
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);

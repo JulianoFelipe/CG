@@ -115,7 +115,7 @@ public class VMath {
     
     public static void main(String...args){
         Vertice a = new Vertice((float) 1., (float)1.);
-        Vertice b = new Vertice((float) 1.0, (float)2);
+        Vertice b = new Vertice((float) 2.0, (float)1);
         
         System.out.println("SLOPE: " + lineSlope(new Aresta(a, b)));
         System.out.println("Is Hor: " + isLineHorizontal(a, b));
