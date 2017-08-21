@@ -86,4 +86,39 @@ public class VMath {
     public static double shortestDistance(Vertice lineA, Vertice lineB, Vertice point){
         return shortestDistance(new Aresta(lineA, lineB), point);
     }
+    
+    public static double lineSlope(Aresta line){
+        return (line.getvFinal().getY() - line.getvInicial().getY()) / 
+               (line.getvFinal().getX() - line.getvInicial().getX());
+    }
+    
+    public static boolean isLineHorizontal(Aresta line){
+        Double m = lineSlope(line);
+        //return m==0.0; //Exactly Horizontal
+        return m>-1.0 && m<1.0;
+    }
+    
+    public static boolean isLineHorizontal(Vertice a, Vertice b){
+        return isLineHorizontal(new Aresta(a, b));
+    }
+    
+    public static boolean isLineVertical(Aresta line){
+        //return !isLineVertical(line);
+        Double m = lineSlope(line);
+        //return m==Double.POSITIVE_INFINITY || m==Double.NEGATIVE_INFINITY; //Exaclty Vertical
+        return m<-1.0 || m>1.0;
+    }
+    
+    public static boolean isLineVertical(Vertice a, Vertice b){
+        return isLineVertical(new Aresta(a, b));
+    }
+    
+    public static void main(String...args){
+        Vertice a = new Vertice((float) 1., (float)1.);
+        Vertice b = new Vertice((float) 1.0, (float)2);
+        
+        System.out.println("SLOPE: " + lineSlope(new Aresta(a, b)));
+        System.out.println("Is Hor: " + isLineHorizontal(a, b));
+        System.out.println("Is Ver: " + isLineVertical(a, b));
+    }
 }

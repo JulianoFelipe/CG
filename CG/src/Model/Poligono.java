@@ -11,26 +11,80 @@ import java.util.logging.Logger;
  * @author 
  */
 public class Poligono implements Serializable{
+    public static final Color DEFAULT_BORDA = Color.BLACK;
+    public static final Color DEFAULT_FUNDO = null;
     private static final Logger LOG = Logger.getLogger("CG");
     private static long INSTANCES;
     private final long ID;
     
     private ArrayList<Vertice> vertices = new ArrayList();
-    private Color corFundo = null;
-    private Color corBorda = Color.black;
+    private Color corFundo;
+    private Color corBorda;
  
     //<editor-fold defaultstate="collapsed" desc="Construtores">
-    public Poligono(){
-        vertices = new ArrayList();
-        
+    /**
+     * Constrói um polígono sem vértices e as cores padrão de borda e de fundo,
+     * indicadas por {@link #DEFAULT_BORDA} e {@link #DEFAULT_FUNDO},
+     * respectivamente.
+     */
+    public Poligono(){ this(new ArrayList(), DEFAULT_BORDA, DEFAULT_FUNDO); }
+    
+    /**
+     * Constrói um polígono com os vértices passados e as cores padrão de
+     * borda e de fundo, indicadas por {@link #DEFAULT_BORDA} e {@link #DEFAULT_FUNDO},
+     * respectivamente.
+     * 
+     * @param vertices Vertices a serem copiados.
+     */
+    public Poligono(List<Vertice> vertices){ this(vertices, DEFAULT_BORDA, DEFAULT_FUNDO); }
+    
+    /**
+     * Construtor de polígonos com cor estipulada ora para 
+     * borda ora para o fundo. 
+     * <p>
+     * Se o parâmetro "corBorda" for verdadeiro, a cor
+     * passada será atribuída para a borda (Se for null,
+     * a borda terá a cor padrão de {@link #DEFAULT_BORDA}).
+     * Caso contrário, será atribuído para o fundo.
+     * 
+     * @param vertices Vertices para serem copiados.
+     * @param cor      Cor a ser atribuída.
+     * @param corBorda Verdadeiro se "cor" é para a borda;
+     *                 falso se para o fundo.
+     */
+    public Poligono(List<Vertice> vertices, Color cor, boolean corBorda){
         ID = INSTANCES++;
+        this.vertices = new ArrayList(vertices);
+        if (corBorda){
+            if (cor != null){
+                this.corBorda = cor;
+            } else {
+                this.corBorda = DEFAULT_BORDA;
+            }
+        } else {
+            corFundo = cor;
+        }
     }
     
-    public Poligono(List<Vertice> vertices){
-        this.vertices = new ArrayList(vertices);
-        
+    /**
+     * Construtor de polígonos.
+     * 
+     * @param vertices Vertices para serem copiados.
+     * @param corBorda Cor para a borda diferente de null (Se for null,
+     *                 será ignorada e a borda terá o valor indicado por
+     *                 {@link #DEFAULT_BORDA}).
+     * @param corFundo Cor do fundo. Se for null, fundo é transparente.
+     */
+    public Poligono(List<Vertice> vertices, Color corBorda, Color corFundo){
         ID = INSTANCES++;
-    }
+        this.vertices = new ArrayList(vertices);
+        if (corBorda != null){
+            this.corBorda = corBorda;
+        } else {
+            this.corBorda = DEFAULT_BORDA;
+        }
+        this.corFundo = corFundo;
+    }    
 //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">   

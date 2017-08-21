@@ -99,11 +99,7 @@ public class DrawablePanel extends JPanel {
         }
         
         if (tempRegular != null){
-            xs = tempRegular.getXpoints();
-            ys = tempRegular.getYpoints();
-            len = xs.length;
-
-            g.drawPolygon(xs, ys, len);
+            paintPolygon(tempRegular);
         }
         
         paintSelectedPolygon();
@@ -171,9 +167,8 @@ public class DrawablePanel extends JPanel {
         this.movable = movable;
     }
     
-    public void setTempRegular(int lados, int radius, Vertice center, double pos){
-        //super.paintComponent(graphics);
-        tempRegular = new Nregular(lados, radius, center, pos);
+    public void setTempRegular(Nregular regularPolygon){
+        tempRegular = regularPolygon;
     }
     
     public void cleanTempoLines(){

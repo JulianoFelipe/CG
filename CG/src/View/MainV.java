@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
+import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import utils.VMath;
 /**
@@ -34,16 +35,22 @@ public class MainV extends javax.swing.JFrame {
     private static final int MAX_LADOS = 20;
     private static final double DELETE_THRESHOLD = 3.9;
     private static final Logger LOG = Logger.getLogger("CG");
+    private final JToggleButton ghost = new JToggleButton();
     private DrawablePanel panelCp;
 
     private int noPointsToCreate = -2;
     private boolean pendingCreating = false;
     private boolean regularSidedPolygon = false;
     private boolean regularSidedLock = false;
-    
     private List<Vertice> temporaryList = new ArrayList();  
-    
     private Poligono selectedPolygon = null;
+    
+    private static final byte NO_ACTION        = 0;
+    private static final byte ROTATE_ACTION    = 1;
+    private static final byte TRANSLATE_ACTION = 2;
+    private static final byte SHEAR_ACTION     = 3;
+    private static final byte SCALE_ACTION     = 4;
+    private byte currentAction = NO_ACTION;
     
     private void resetPaint(){
         panelCp.nullTemps();
@@ -54,7 +61,7 @@ public class MainV extends javax.swing.JFrame {
         regularSidedLock = false;
         pendingCreating = false;
         noPointsToCreate = -1;
-        unToggle();
+        //unToggle();
         temporaryList = new ArrayList<>();
     }
     
@@ -63,6 +70,7 @@ public class MainV extends javax.swing.JFrame {
         paneMs.addMouseListener(new java.awt.event.MouseAdapter() {           
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {                               
+                if (currentAction != NO_ACTION) return;
                 int x = evt.getX();
                 int y = evt.getY();
                 
@@ -114,7 +122,7 @@ public class MainV extends javax.swing.JFrame {
                 if (regularSidedLock){   
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.addPoligono(new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
+                    panelCp.addPoligono(localPolygonBuilder(dist));  //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
                     panelCp.cleanTempRegular();
                     
                     resetDrawingState();
@@ -130,13 +138,13 @@ public class MainV extends javax.swing.JFrame {
                         resetDrawingState();
                         panelCp.cleanTempoLines();
                     } else {
-                        panelCp.addPoligono(new Poligono(temporaryList));                    
+                        panelCp.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));          
                         resetDrawingState();
                         panelCp.cleanTempoLines();
                     }
                 } else if (noPointsToCreate == 1){
                     temporaryList.add(new Vertice((float) x, (float)y));
-                    panelCp.addPoligono(new Poligono(temporaryList));                    
+                    panelCp.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));        
                     resetDrawingState();
                     panelCp.cleanTempoLines();
                 } else {
@@ -154,11 +162,36 @@ public class MainV extends javax.swing.JFrame {
                 }
                 panelCp.repaint();
             }
+
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if (selectedPolygon!=null && currentAction!=NO_ACTION){
+                    int x = e.getX();
+                    int y = e.getY();
+                    System.out.println(x);
+                    System.out.println(y);
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                if (currentAction != NO_ACTION){
+                    paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                } else {
+                    paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                }
+            }
+            
+            
         });
         
         paneMs.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
+                /*if (currentAction == TRANSLATE_ACTION){
+                    if ()
+                }*/
+                
                 if (temporaryList.size() < 1) return;
                 if (!pendingCreating) return;
                 //paneMs.repaint();
@@ -169,7 +202,7 @@ public class MainV extends javax.swing.JFrame {
                 if (regularSidedLock){
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.setTempRegular(jSlider1.getValue(), dist, temporaryList.get(0), 0.);
+                    panelCp.setTempRegular(localPolygonBuilder(dist));
                 } else {
                     //panelCp.cleanTempoLines();
                     Vertice last = temporaryList.get(temporaryList.size()-1);
@@ -180,8 +213,6 @@ public class MainV extends javax.swing.JFrame {
                 //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
         });
-        
-        //paneMs.addM
     }
     
     /**
@@ -200,6 +231,7 @@ public class MainV extends javax.swing.JFrame {
         LOG.setLevel(Level.FINE);
         LOG.log(Level.INFO, "Cena inicializada...");
         LOG.info("O botão \"Cancelar\" pode servir para forçar a atualização da pintura da cena.");
+        buttonGroup1.add(ghost); //Para "deselecionar" os botões
     }
 
     /**
@@ -213,13 +245,13 @@ public class MainV extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
-        buttonGroup3 = new javax.swing.ButtonGroup();
+        buttonGroup4 = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
         paintBt = new javax.swing.JButton();
-        bordaRadio = new javax.swing.JRadioButton();
-        jRadioButton2 = new javax.swing.JRadioButton();
         colorChooser = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
+        bordaBox = new javax.swing.JCheckBox();
+        fundoBox = new javax.swing.JCheckBox();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         irregularPoligonBt = new javax.swing.JToggleButton();
@@ -246,6 +278,9 @@ public class MainV extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         javaFillRadio = new javax.swing.JRadioButtonMenuItem();
         jRadioButtonMenuItem2 = new javax.swing.JRadioButtonMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        defaultColorRadio = new javax.swing.JRadioButtonMenuItem();
+        setColorRadio = new javax.swing.JRadioButtonMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addFocusListener(new java.awt.event.FocusAdapter() {
@@ -268,18 +303,12 @@ public class MainV extends javax.swing.JFrame {
         jPanel2.setToolTipText("");
 
         paintBt.setText("Pintar");
+        paintBt.setToolTipText("Pintar polígono selecionado na cor exibida");
         paintBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 paintBtActionPerformed(evt);
             }
         });
-
-        buttonGroup3.add(bordaRadio);
-        bordaRadio.setSelected(true);
-        bordaRadio.setText("Borda");
-
-        buttonGroup3.add(jRadioButton2);
-        jRadioButton2.setText("Fundo");
 
         colorChooser.setBackground(new java.awt.Color(51, 51, 255));
         colorChooser.setForeground(new java.awt.Color(51, 51, 255));
@@ -291,11 +320,16 @@ public class MainV extends javax.swing.JFrame {
         });
 
         jButton1.setText("Transparente");
+        jButton1.setToolTipText("Selecionar cor transparente");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
+
+        bordaBox.setText("Borda");
+
+        fundoBox.setText("Fundo");
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -305,16 +339,17 @@ public class MainV extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(colorChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(bordaRadio)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(paintBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jRadioButton2, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING))))
+                                .addComponent(bordaBox)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(fundoBox))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(paintBt, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jButton1)))
+                        .addGap(4, 4, 4)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -325,11 +360,11 @@ public class MainV extends javax.swing.JFrame {
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(bordaRadio)
-                    .addComponent(jRadioButton2))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(colorChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
-                .addContainerGap())
+                    .addComponent(bordaBox)
+                    .addComponent(fundoBox))
+                .addGap(10, 10, 10)
+                .addComponent(colorChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Objetos"));
@@ -517,7 +552,7 @@ public class MainV extends javax.swing.JFrame {
                     .addComponent(scaleBt1)))
         );
 
-        jMenu1.setText("File");
+        jMenu1.setText("Arquivo");
 
         saveMenu.setText("Salvar");
         saveMenu.addActionListener(new java.awt.event.ActionListener() {
@@ -568,6 +603,19 @@ public class MainV extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu2);
 
+        jMenu3.setText("Pintura");
+
+        buttonGroup4.add(defaultColorRadio);
+        defaultColorRadio.setSelected(true);
+        defaultColorRadio.setText("Criar polígonos com cor padrão");
+        jMenu3.add(defaultColorRadio);
+
+        buttonGroup4.add(setColorRadio);
+        setColorRadio.setText("Criar polígonos com cor da área de pintura");
+        jMenu3.add(setColorRadio);
+
+        jMenuBar1.add(jMenu3);
+
         setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -579,7 +627,7 @@ public class MainV extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(paneMs, javax.swing.GroupLayout.DEFAULT_SIZE, 794, Short.MAX_VALUE)
+                        .addComponent(paneMs, javax.swing.GroupLayout.DEFAULT_SIZE, 790, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -601,7 +649,8 @@ public class MainV extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(paneMs))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -704,15 +753,17 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_formFocusGained
 
     private void selectBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBtActionPerformed
-        // TODO add your handling code here:
         LOG.info("Clique em alguma parte (Linha) dos polígonos que deseja selecionar.");
     }//GEN-LAST:event_selectBtActionPerformed
 
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
+        selectedPolygon = null;
+        panelCp.setSelectedPolygon(null);
         resetDrawingState();
         resetPaint();
         LOG.info("Criação cancelada");
         unToggle();
+        currentAction = NO_ACTION;
     }//GEN-LAST:event_cancelBtActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
@@ -743,6 +794,8 @@ public class MainV extends javax.swing.JFrame {
     private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
         if (selectedPolygon == null){
             LOG.info("Selecione um polígono com a ferramenta de seleção para poder excluir.");
+            unToggle();
+            //selectBt.doClick();
         } else {
             panelCp.remove(selectedPolygon);
             panelCp.setSelectedPolygon(null);
@@ -751,19 +804,47 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_deleteBtActionPerformed
 
     private void translateBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_translateBt1ActionPerformed
-        // TODO add your handling code here:
+        if (selectedPolygon == null){
+            LOG.info("Selecione um polígono com a ferramenta de seleção para poder transladar.");
+            unToggle();
+            //selectBt.doClick();
+        } else {
+            ///
+            currentAction = TRANSLATE_ACTION;
+        }
     }//GEN-LAST:event_translateBt1ActionPerformed
 
     private void rotateBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rotateBt1ActionPerformed
-        // TODO add your handling code here:
+        if (selectedPolygon == null){
+            LOG.info("Selecione um polígono com a ferramenta de seleção para poder rotacionar.");
+            unToggle();
+            //selectBt.doClick();
+        } else {
+            ///
+            currentAction = ROTATE_ACTION;
+        }
     }//GEN-LAST:event_rotateBt1ActionPerformed
 
     private void shearBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shearBt1ActionPerformed
-        // TODO add your handling code here:
+        if (selectedPolygon == null){
+            LOG.info("Selecione um polígono com a ferramenta de seleção para poder realizar o cisalhamento.");
+            unToggle();
+            //selectBt.doClick();
+        } else {
+            ///
+            currentAction = SHEAR_ACTION;
+        }
     }//GEN-LAST:event_shearBt1ActionPerformed
 
     private void scaleBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scaleBt1ActionPerformed
-        // TODO add your handling code here:
+        if (selectedPolygon == null){
+            LOG.info("Selecione um polígono com a ferramenta de seleção para poder alterar a escala.");
+            unToggle();
+            //selectBt.doClick();
+        } else {
+            ///
+            currentAction = SCALE_ACTION;
+        }
     }//GEN-LAST:event_scaleBt1ActionPerformed
 
     private Color current = Color.BLUE;
@@ -782,10 +863,12 @@ public class MainV extends javax.swing.JFrame {
         if (selectedPolygon == null){
             LOG.info("Selecione um polígono com a ferramenta de seleção para poder pintar.");
         } else {
-            if (bordaRadio.isSelected()){
+            if (bordaBox.isSelected()){
                 selectedPolygon.setCorBorda(current);
                 if (current != null) LOG.info("Borda do polígono pintada.");
-            } else{
+            } 
+            
+            if (fundoBox.isSelected()){
                 selectedPolygon.setCorFundo(current);
                 LOG.info("Fundo do polígono pintado.");
             }
@@ -836,19 +919,22 @@ public class MainV extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JRadioButton bordaRadio;
+    private javax.swing.JCheckBox bordaBox;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
-    private javax.swing.ButtonGroup buttonGroup3;
+    private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.JButton cancelBt;
     private javax.swing.JButton colorChooser;
     private javax.swing.JTextPane consolePane;
+    private javax.swing.JRadioButtonMenuItem defaultColorRadio;
     private javax.swing.JButton deleteBt;
+    private javax.swing.JCheckBox fundoBox;
     private javax.swing.JToggleButton irregularPoligonBt;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
@@ -856,7 +942,6 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
-    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSlider jSlider1;
@@ -869,6 +954,7 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JMenuItem saveMenu;
     private javax.swing.JToggleButton scaleBt1;
     private javax.swing.JToggleButton selectBt;
+    private javax.swing.JRadioButtonMenuItem setColorRadio;
     private javax.swing.JToggleButton shearBt1;
     private javax.swing.JToggleButton translateBt1;
     // End of variables declaration//GEN-END:variables
@@ -885,7 +971,41 @@ public class MainV extends javax.swing.JFrame {
     }
 
     private void unToggle(){
-        irregularPoligonBt.setSelected(false);
+        /*irregularPoligonBt.setSelected(false);
         selectBt.setSelected(false);
+        regularNsided.setSelected(false);
+        rotateBt1.setSelected(false);
+        translateBt1.setSelected(false);
+        shearBt1.setSelected(false);
+        scaleBt1.setSelected(false);*/
+        ghost.doClick(); //Botão que não faz nada para atualizar a seleção de todos os botões no mesmo grupo
+    }
+    
+    private Poligono localPolygonBuilder(){
+        if (defaultColorRadio.isSelected()){
+            return new Poligono(temporaryList);
+        } else {
+            Color borda=Poligono.DEFAULT_BORDA, fundo=null;
+            if (bordaBox.isSelected() && current!=null)
+                borda = current;
+            if (fundoBox.isSelected())
+                fundo = current; 
+            
+            return new Poligono(temporaryList, borda, fundo);
+        }
+    }
+    
+    private Nregular localPolygonBuilder(int radius){
+        //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
+        if (defaultColorRadio.isSelected()){
+           return new Nregular(jSlider1.getValue(), radius, temporaryList.get(0)); 
+        } else {
+            Color borda=Poligono.DEFAULT_BORDA, fundo=null;
+            if (bordaBox.isSelected() && current!=null)
+                borda = current;
+            if (fundoBox.isSelected())
+                fundo = current; 
+            return new Nregular(jSlider1.getValue(), radius, temporaryList.get(0), borda, fundo);
+        }
     }
 }

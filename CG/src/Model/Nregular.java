@@ -6,7 +6,10 @@
 package Model;
 
 import Model.Poligono;
+import static Model.Poligono.DEFAULT_BORDA;
+import static Model.Poligono.DEFAULT_FUNDO;
 import Model.Vertice;
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,13 +44,29 @@ public class Nregular extends Poligono {
     }
     
     public Nregular(int noLados, int radius, Vertice center, double pos){
+        super(); //Default color and stuff
         this.radius = radius;
         this.noLados = noLados;
         this.center = center;
         
         super.addAllVertices(buildNsided(pos));
     }
+
+    public Nregular(int noLados, int radius, Vertice center, Color cor, boolean corBorda){
+        this(noLados, radius, center, 0.);
+        
+        if (corBorda)
+            super.setCorBorda(cor);
+        else
+            super.setCorFundo(cor);
+    }
     
+    public Nregular(int noLados, int radius, Vertice center, Color corBorda, Color corFundo){
+        this(noLados, radius, center, 0.);
+        super.setCorBorda(corBorda);
+        super.setCorFundo(corFundo);
+    }
+       
     @Override
     public String toString() {
         return "Polígono Regular {Lados=" + super.getVertices().size() + ", Centro=" + center + ", Raio=" + radius + '}';

@@ -50,11 +50,15 @@ public class ConsoleFormatter extends Formatter{
     @Override
     public String format(LogRecord record) {
         Date date=new Date(record.getMillis()); //HH para 0-23 hrs
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", locale);
+        //SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss dd/MM/yyyy", locale);
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm:ss", locale);
         
-        String ret = formatter.format(date) + " - " + record.getSourceClassName() +
+        /*String ret = formatter.format(date) + " - " + record.getSourceClassName() +
                " " + record.getSourceMethodName() + 
-              " - " + record.getLevel() + ": " + record.getMessage() + "\n";
+              " - " + record.getLevel() + ": " + record.getMessage() + "\n";*/
+        
+        String ret = formatter.format(date) + " - " +
+                record.getLevel() + ": " + record.getMessage() + "\n";
         
         return ret;
     }
