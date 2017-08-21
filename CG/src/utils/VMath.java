@@ -6,6 +6,7 @@
 package utils;
 
 import Model.Aresta;
+import Model.Movimento;
 import Model.Vertice;
 
 /**
@@ -102,6 +103,11 @@ public class VMath {
         return isLineHorizontal(new Aresta(a, b));
     }
     
+    public static boolean isLineExactlyHorizontal(Aresta line){
+        double m = lineSlope(line);
+        return (m==0.0) || (m==-0.0);
+    }
+    
     public static boolean isLineVertical(Aresta line){
         //return !isLineVertical(line);
         Double m = lineSlope(line);
@@ -113,6 +119,11 @@ public class VMath {
         return isLineVertical(new Aresta(a, b));
     }
     
+    public static boolean isLineExactlyVertical(Aresta line){
+        double m = lineSlope(line);
+        return Double.isInfinite(m);
+    }
+    
     public static void main(String...args){
         Vertice a = new Vertice((float) 1., (float)1.);
         Vertice b = new Vertice((float) 2.0, (float)1);
@@ -120,5 +131,36 @@ public class VMath {
         System.out.println("SLOPE: " + lineSlope(new Aresta(a, b)));
         System.out.println("Is Hor: " + isLineHorizontal(a, b));
         System.out.println("Is Ver: " + isLineVertical(a, b));
+    }
+    
+    /**
+     * Movimento do segundo vértice em relação ao primeiro.
+     * Se o segundo está "Acima" do primeiro, é retornado
+     * "Movimento.Cima"; e assim sucessivamente.
+     * 
+     * @param primeiro vértice.
+     * @param segundo vértice.
+     * @return Movimento do segundo em relação ao primeiro.
+     */
+    public static Movimento movimentoSegundoParaPrimeiro(Vertice primeiro, Vertice segundo){
+        if (primeiro.equals(segundo)) return Movimento.Estatico;
+        
+        Double slope = lineSlope(new Aresta(primeiro, segundo));
+        
+        if (slope == Double.POSITIVE_INFINITY){
+            
+        } else if (slope == Double.NEGATIVE_INFINITY){
+            
+        } else if (slope == 0.0){}
+        /* SLOPE
+        +Inf = CIMA
+        -Inf = Baixo
+        0 = Direita
+        -0 = Esquerda
+        */
+        
+        
+        
+        return Movimento.Baixo;
     }
 }

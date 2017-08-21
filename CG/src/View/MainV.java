@@ -267,7 +267,8 @@ public class MainV extends javax.swing.JFrame {
                                                        0, selectedPolygon);
                     } else if (currentAction == SCALE_ACTION){
                         double factor = VMath.distancia(previousDrag, curr);
-                        factor /= 100;
+                        //factor = 1.2;
+                        System.out.println(factor);
                         Escala sc = new Escala();
                         switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
                             case Cursor.N_RESIZE_CURSOR: //Vertical
@@ -835,6 +836,7 @@ public class MainV extends javax.swing.JFrame {
 
     private void selectBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBtActionPerformed
         LOG.info("Clique em alguma parte (Linha) dos polígonos que deseja selecionar.");
+        currentAction = NO_ACTION;
     }//GEN-LAST:event_selectBtActionPerformed
 
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed

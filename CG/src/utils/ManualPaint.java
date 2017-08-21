@@ -19,6 +19,7 @@ public class ManualPaint {
     
     //https://softwareengineering.stackexchange.com/questions/105580/what-is-the-best-bucket-fill-algorithm
     //https://stackoverflow.com/questions/23983465/is-there-a-fill-function-for-arbitrary-shapes-in-javafx
+    //https://www.tutorialspoint.com/computer_graphics/polygon_filling_algorithm.htm
     public static void floodFill(Graphics g, Poligono p){
         
     }
