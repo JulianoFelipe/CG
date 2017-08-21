@@ -40,8 +40,12 @@ public class OutputScene {
         oos.close();
     }
     
-    public static void outputToFile(List<Poligono> lista, File directory) throws IOException{
-        File out = new File(directory.getCanonicalPath() + "\\CG-" + DATE_F.format(new Date()) + FILE_EXTENSION);
+    public static void outputToFile(List<Poligono> lista, File file) throws IOException{
+        File out = null;
+        if (file.isDirectory())
+            out = new File(file.getCanonicalPath() + "\\CG-" + DATE_F.format(new Date()) + FILE_EXTENSION);
+        else
+            out = new File(file+FILE_EXTENSION);
         
         FileOutputStream fos = null;
         try {

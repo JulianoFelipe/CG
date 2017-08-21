@@ -6,6 +6,7 @@
 package Model.Transformações;
 
 import Model.Eixo;
+import Model.Poligono;
 import Model.Vertice;
 import java.util.List;
 
@@ -51,5 +52,25 @@ public class Translacao{
     public List<Vertice> transladar(int unidadesX, int unidadesY, int unidadesZ, List<Vertice> listaDePontos){
         ///FAÇA AQUI
         return null; //So coloquei para tirar o aviso de "sem return".
+    }
+    
+    public Poligono transladar(int unidadesX, int unidadesY, int unidadesZ, Poligono p){
+        ///FAÇA AQUI
+        return null; //So coloquei para tirar o aviso de "sem return".
+    }
+    
+    public Poligono transladar(Eixo axis, int unidades, Poligono p){
+        int unidadesX=0, unidadesY=0, unidadesZ=0;
+        switch(axis){
+            case Eixo_X:   unidadesX = unidades; break;
+            case Eixo_Y:   unidadesY = unidades; break;
+            case Eixo_Z:   unidadesZ = unidades; break;
+            case Eixo_XY:  unidadesX = unidadesY = unidades; break;
+            case Eixo_XZ:  unidadesX = unidadesZ = unidades; break;
+            case Eixo_YZ:  unidadesY = unidadesZ = unidades; break;
+            case Eixo_XYZ: unidadesX = unidadesY = unidadesZ = unidades; break;
+        }
+        
+        return transladar(unidadesX, unidadesY, unidadesZ, p);
     }
 }

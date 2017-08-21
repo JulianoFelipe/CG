@@ -14,7 +14,7 @@ import Model.Nregular;
 import ioScene.InputScene;
 import ioScene.OutputScene;
 import java.awt.Color;
-import java.awt.Dimension;
+import java.awt.Cursor;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
@@ -26,7 +26,6 @@ import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import utils.VMath;
-import utils.VProperties;
 /**
  *
  * @author Anderson
@@ -171,14 +170,18 @@ public class MainV extends javax.swing.JFrame {
                     Vertice radiusPnt = new Vertice((float) x, (float)y);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
                     panelCp.setTempRegular(jSlider1.getValue(), dist, temporaryList.get(0), 0.);
-                 } else {
+                } else {
                     //panelCp.cleanTempoLines();
                     Vertice last = temporaryList.get(temporaryList.size()-1);
                     panelCp.setMovable(new Aresta(new Vertice((float) x, (float) y), last));
-                 }
+                }
                 panelCp.repaint();
+                
+                //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
         });
+        
+        //paneMs.addM
     }
     
     /**
@@ -642,14 +645,14 @@ public class MainV extends javax.swing.JFrame {
     private void saveMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuActionPerformed
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
-        fileChooser.setDialogTitle("Escolha um diretório para salvar");
-        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        fileChooser.setDialogTitle("Escolha um caminho");
+        fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         int result = fileChooser.showOpenDialog(this);
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
-            
+                       
             List<Poligono> toSave = panelCp.getListaPoligonos();
-            System.out.println(toSave);
+            //System.out.println(toSave);
             try {
                 OutputScene.outputToFile(toSave, selectedFile);
             } catch (IOException ex) {
