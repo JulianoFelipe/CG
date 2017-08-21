@@ -156,14 +156,14 @@ public class BufferedPaneOutputStream extends OutputStream {
         }
         if (info == null){
             SimpleAttributeSet standard = new SimpleAttributeSet();
-            StyleConstants.setForeground(standard, Color.BLUE);
+            StyleConstants.setForeground(standard, Color.DARK_GRAY);
             StyleConstants.setBackground(standard, Color.WHITE);
             StyleConstants.setBold(standard, false);
             attributes[INFO] = standard;
         }
         if (warn == null){
             SimpleAttributeSet standard = new SimpleAttributeSet();
-            StyleConstants.setForeground(standard, Color.ORANGE);
+            StyleConstants.setForeground(standard, Color.BLUE);
             StyleConstants.setBackground(standard, Color.WHITE);
             StyleConstants.setBold(standard, false);
             attributes[WARNING] = standard;

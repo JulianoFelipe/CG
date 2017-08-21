@@ -13,6 +13,7 @@ import Model.Vertice;
 import Model.Nregular;
 import ioScene.InputScene;
 import ioScene.OutputScene;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.io.File;
@@ -21,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JColorChooser;
 import javax.swing.JFileChooser;
 import javax.swing.SwingUtilities;
 import utils.VMath;
@@ -41,6 +43,8 @@ public class MainV extends javax.swing.JFrame {
     private boolean regularSidedLock = false;
     
     private List<Vertice> temporaryList = new ArrayList();  
+    
+    private Poligono selectedPolygon = null;
     
     private void resetPaint(){
         panelCp.nullTemps();
@@ -63,11 +67,9 @@ public class MainV extends javax.swing.JFrame {
                 int x = evt.getX();
                 int y = evt.getY();
                 
-                //<editor-fold defaultstate="collapsed" desc="Delete Action">
-                if(deleteBt.isSelected()){
+                //<editor-fold defaultstate="collapsed" desc="Select Action">
+                if(selectBt.isSelected()){
                     List<Poligono> lista = panelCp.getListaPoligonos();
-                    List<Integer> toRemove = new ArrayList();
-
                     Vertice point = new Vertice((float) x, (float) y);
 
                     for(int i=0; i<lista.size(); i++){
@@ -87,15 +89,13 @@ public class MainV extends javax.swing.JFrame {
                         }
 
                         if (toAdd){
-                            LOG.info("Removido o polígono.");
-                            toRemove.add(i);
+                            LOG.info("Polígono selecionado.");
+                            selectedPolygon = lista.get(i);
+                            panelCp.setSelectedPolygon(selectedPolygon);
+                            resetPaint();
+                            return;
                         }
                     }
-
-                    /*for (Integer i : toRemove){
-                        panelCp.removePoligono(i);
-                    }*/
-
                     return;
                 }
                 //</editor-fold>
@@ -210,11 +210,13 @@ public class MainV extends javax.swing.JFrame {
 
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
+        buttonGroup3 = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
-        translateBt = new javax.swing.JToggleButton();
-        rotateBt = new javax.swing.JToggleButton();
-        shearBt = new javax.swing.JToggleButton();
-        scaleBt = new javax.swing.JToggleButton();
+        paintBt = new javax.swing.JButton();
+        bordaRadio = new javax.swing.JRadioButton();
+        jRadioButton2 = new javax.swing.JRadioButton();
+        colorChooser = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         irregularPoligonBt = new javax.swing.JToggleButton();
@@ -226,8 +228,13 @@ public class MainV extends javax.swing.JFrame {
         paneMs = new javax.swing.JScrollPane();
         jPanel5 = new javax.swing.JPanel();
         selectBt = new javax.swing.JToggleButton();
-        deleteBt = new javax.swing.JToggleButton();
         cancelBt = new javax.swing.JButton();
+        deleteBt = new javax.swing.JButton();
+        jPanel4 = new javax.swing.JPanel();
+        translateBt1 = new javax.swing.JToggleButton();
+        rotateBt1 = new javax.swing.JToggleButton();
+        shearBt1 = new javax.swing.JToggleButton();
+        scaleBt1 = new javax.swing.JToggleButton();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         saveMenu = new javax.swing.JMenuItem();
@@ -254,38 +261,36 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Transformações"));
+        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Pintura"));
         jPanel2.setToolTipText("");
 
-        buttonGroup1.add(translateBt);
-        translateBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/translacao.png"))); // NOI18N
-        translateBt.addActionListener(new java.awt.event.ActionListener() {
+        paintBt.setText("Pintar");
+        paintBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                translateBtActionPerformed(evt);
+                paintBtActionPerformed(evt);
             }
         });
 
-        buttonGroup1.add(rotateBt);
-        rotateBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/rotacao.png"))); // NOI18N
-        rotateBt.addActionListener(new java.awt.event.ActionListener() {
+        buttonGroup3.add(bordaRadio);
+        bordaRadio.setSelected(true);
+        bordaRadio.setText("Borda");
+
+        buttonGroup3.add(jRadioButton2);
+        jRadioButton2.setText("Fundo");
+
+        colorChooser.setBackground(new java.awt.Color(51, 51, 255));
+        colorChooser.setForeground(new java.awt.Color(51, 51, 255));
+        colorChooser.setToolTipText("Seleção de cores");
+        colorChooser.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                rotateBtActionPerformed(evt);
+                colorChooserActionPerformed(evt);
             }
         });
 
-        buttonGroup1.add(shearBt);
-        shearBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/cisalhamento.png"))); // NOI18N
-        shearBt.addActionListener(new java.awt.event.ActionListener() {
+        jButton1.setText("Transparente");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                shearBtActionPerformed(evt);
-            }
-        });
-
-        buttonGroup1.add(scaleBt);
-        scaleBt.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/escala.png"))); // NOI18N
-        scaleBt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                scaleBtActionPerformed(evt);
+                jButton1ActionPerformed(evt);
             }
         });
 
@@ -296,27 +301,32 @@ public class MainV extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(colorChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addComponent(rotateBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(translateBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(scaleBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(shearBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addComponent(bordaRadio)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(paintBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jRadioButton2, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jButton1, javax.swing.GroupLayout.Alignment.TRAILING))))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(rotateBt)
-                    .addComponent(translateBt))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(paintBt)
+                    .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(shearBt)
-                    .addComponent(scaleBt)))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bordaRadio)
+                    .addComponent(jRadioButton2))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(colorChooser, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Objetos"));
@@ -359,7 +369,7 @@ public class MainV extends javax.swing.JFrame {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, 178, Short.MAX_VALUE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
         );
         jPanel3Layout.setVerticalGroup(
@@ -396,17 +406,9 @@ public class MainV extends javax.swing.JFrame {
 
         buttonGroup1.add(selectBt);
         selectBt.setText("Selecionar");
-        selectBt.setEnabled(false);
         selectBt.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 selectBtActionPerformed(evt);
-            }
-        });
-
-        deleteBt.setText("Excluir");
-        deleteBt.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                deleteBtActionPerformed(evt);
             }
         });
 
@@ -417,6 +419,13 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
+        deleteBt.setText("Excluir");
+        deleteBt.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                deleteBtActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
         jPanel5.setLayout(jPanel5Layout);
         jPanel5Layout.setHorizontalGroup(
@@ -424,21 +433,85 @@ public class MainV extends javax.swing.JFrame {
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(deleteBt, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(selectBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(cancelBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(cancelBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(deleteBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
-                .addContainerGap()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(selectBt)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(deleteBt)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cancelBt)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(cancelBt))
+        );
+
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Transformações"));
+        jPanel4.setToolTipText("");
+
+        buttonGroup1.add(translateBt1);
+        translateBt1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/translacao.png"))); // NOI18N
+        translateBt1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                translateBt1ActionPerformed(evt);
+            }
+        });
+
+        buttonGroup1.add(rotateBt1);
+        rotateBt1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/rotacao.png"))); // NOI18N
+        rotateBt1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                rotateBt1ActionPerformed(evt);
+            }
+        });
+
+        buttonGroup1.add(shearBt1);
+        shearBt1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/cisalhamento.png"))); // NOI18N
+        shearBt1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                shearBt1ActionPerformed(evt);
+            }
+        });
+
+        buttonGroup1.add(scaleBt1);
+        scaleBt1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/escala.png"))); // NOI18N
+        scaleBt1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                scaleBt1ActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
+        jPanel4.setLayout(jPanel4Layout);
+        jPanel4Layout.setHorizontalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addComponent(rotateBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(translateBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
+                        .addComponent(scaleBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(shearBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
+        );
+        jPanel4Layout.setVerticalGroup(
+            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel4Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(rotateBt1)
+                    .addComponent(translateBt1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(shearBt1)
+                    .addComponent(scaleBt1)))
         );
 
         jMenu1.setText("File");
@@ -508,7 +581,8 @@ public class MainV extends javax.swing.JFrame {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(2, 2, 2)))
                 .addContainerGap())
         );
@@ -522,12 +596,13 @@ public class MainV extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(paneMs))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addGap(2, 2, 2))
         );
 
         pack();
@@ -546,6 +621,8 @@ public class MainV extends javax.swing.JFrame {
         panelCp = new DrawablePanel(paneMs.getGraphics());
         panelCp.setSize(paneMs.getSize());
         panelCp.addAllPoligonos(lista);
+        panelCp.setSelectedPolygon(selectedPolygon);
+        ///panelCp.addTempoLine(aresta); //Problema ser der resize no meio da operação
         paneMs.add(panelCp);
         
         //paneMs.repaint();
@@ -601,22 +678,22 @@ public class MainV extends javax.swing.JFrame {
                 LOG.log(Level.SEVERE, null, ex);
             }
             
-            Vertice max = VProperties.getMaxVertex(loaded);
+            //Vertice max = VProperties.getMaxVertex(loaded);
             
             paneMs.remove(panelCp);
             panelCp = new DrawablePanel(paneMs.getGraphics());
-            panelCp.setSize(new Dimension((int) max.getX(), (int) max.getY()));
+            //panelCp.setSize(new Dimension((int) max.getX(), (int) max.getY()));
+            panelCp.setSize(paneMs.getSize());
             panelCp.addAllPoligonos(loaded);
             paneMs.add(panelCp);
-            panelCp.revalidate();
-            panelCp.repaint();
+            resetPaint();
             
             LOG.info("Cena carregada!");
         }
     }//GEN-LAST:event_loadMenuActionPerformed
 
     private void formWindowDeiconified(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeiconified
-        panelCp.repaint(0);
+        resetPaint();
     }//GEN-LAST:event_formWindowDeiconified
 
     private void formFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_formFocusGained
@@ -625,33 +702,15 @@ public class MainV extends javax.swing.JFrame {
 
     private void selectBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_selectBtActionPerformed
         // TODO add your handling code here:
+        LOG.info("Clique em alguma parte (Linha) dos polígonos que deseja selecionar.");
     }//GEN-LAST:event_selectBtActionPerformed
-
-    private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
-        LOG.info("Clique em alguma parte (Linha) dos polígonos que deseja excluir.");
-    }//GEN-LAST:event_deleteBtActionPerformed
 
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
         resetDrawingState();
         resetPaint();
         LOG.info("Criação cancelada");
+        unToggle();
     }//GEN-LAST:event_cancelBtActionPerformed
-
-    private void translateBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_translateBtActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_translateBtActionPerformed
-
-    private void rotateBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rotateBtActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_rotateBtActionPerformed
-
-    private void shearBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shearBtActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_shearBtActionPerformed
-
-    private void scaleBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scaleBtActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_scaleBtActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
         panelCp.clear();
@@ -677,6 +736,67 @@ public class MainV extends javax.swing.JFrame {
         }
         repaint();
     }//GEN-LAST:event_javaFillRadioActionPerformed
+
+    private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
+        if (selectedPolygon == null){
+            LOG.info("Selecione um polígono com a ferramenta de seleção para poder excluir.");
+        } else {
+            panelCp.remove(selectedPolygon);
+            panelCp.setSelectedPolygon(null);
+            repaint();
+        }
+    }//GEN-LAST:event_deleteBtActionPerformed
+
+    private void translateBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_translateBt1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_translateBt1ActionPerformed
+
+    private void rotateBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_rotateBt1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_rotateBt1ActionPerformed
+
+    private void shearBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_shearBt1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_shearBt1ActionPerformed
+
+    private void scaleBt1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_scaleBt1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_scaleBt1ActionPerformed
+
+    private Color current = Color.BLUE;
+    
+    private void colorChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorChooserActionPerformed
+        Color newColor = JColorChooser.showDialog(null, "Escolha uma cor", current);
+        if(newColor != null){
+            current = newColor;
+            colorChooser.setBackground(current);
+            colorChooser.setForeground(current);
+            colorChooser.setText("");
+        }
+    }//GEN-LAST:event_colorChooserActionPerformed
+
+    private void paintBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paintBtActionPerformed
+        if (selectedPolygon == null){
+            LOG.info("Selecione um polígono com a ferramenta de seleção para poder pintar.");
+        } else {
+            if (bordaRadio.isSelected()){
+                selectedPolygon.setCorBorda(current);
+                if (current != null) LOG.info("Borda do polígono pintada.");
+            } else{
+                selectedPolygon.setCorFundo(current);
+                LOG.info("Fundo do polígono pintado.");
+            }
+            
+            resetPaint();
+        }
+    }//GEN-LAST:event_paintBtActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        current = null;
+        colorChooser.setBackground(current);
+        colorChooser.setForeground(current);
+        colorChooser.setText("Transparente");
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -713,12 +833,16 @@ public class MainV extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JRadioButton bordaRadio;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
+    private javax.swing.ButtonGroup buttonGroup3;
     private javax.swing.JButton cancelBt;
+    private javax.swing.JButton colorChooser;
     private javax.swing.JTextPane consolePane;
-    private javax.swing.JToggleButton deleteBt;
+    private javax.swing.JButton deleteBt;
     private javax.swing.JToggleButton irregularPoligonBt;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
@@ -727,20 +851,23 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
+    private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JRadioButtonMenuItem javaFillRadio;
     private javax.swing.JMenuItem loadMenu;
+    private javax.swing.JButton paintBt;
     private javax.swing.JScrollPane paneMs;
     private javax.swing.JToggleButton regularNsided;
-    private javax.swing.JToggleButton rotateBt;
+    private javax.swing.JToggleButton rotateBt1;
     private javax.swing.JMenuItem saveMenu;
-    private javax.swing.JToggleButton scaleBt;
+    private javax.swing.JToggleButton scaleBt1;
     private javax.swing.JToggleButton selectBt;
-    private javax.swing.JToggleButton shearBt;
-    private javax.swing.JToggleButton translateBt;
+    private javax.swing.JToggleButton shearBt1;
+    private javax.swing.JToggleButton translateBt1;
     // End of variables declaration//GEN-END:variables
     
     private int getNumberOfSidesFromBtSelected(){
@@ -756,5 +883,6 @@ public class MainV extends javax.swing.JFrame {
 
     private void unToggle(){
         irregularPoligonBt.setSelected(false);
+        selectBt.setSelected(false);
     }
 }

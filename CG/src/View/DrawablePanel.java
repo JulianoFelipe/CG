@@ -23,6 +23,9 @@ import utils.ManualPaint;
  */
 public class DrawablePanel extends JPanel {
     private static final Logger LOG = Logger.getLogger("CG");
+    public static final int SELECTED_RADIUS = 5;
+    public static final Color SELECTED_COLOR = Color.RED;
+    
     private final List<Poligono> objetos;
     private final Graphics graphics;
 
@@ -109,8 +112,6 @@ public class DrawablePanel extends JPanel {
     public void paintPolygon(Poligono p){
         Color previousColor = graphics.getColor();
         
-        p.setCorFundo(Color.RED);
-        
         int xs[], ys[];
         int len;
         
@@ -120,6 +121,7 @@ public class DrawablePanel extends JPanel {
   
         graphics.setColor(p.getCorBorda());
         graphics.drawPolygon(xs, ys, len);
+        
         if (p.getCorFundo() != null){
             graphics.setColor(p.getCorFundo());
             if(useJavaFill)
@@ -135,8 +137,19 @@ public class DrawablePanel extends JPanel {
     
     public void paintSelectedPolygon(){
         if (selectedPolygon == null) return;
+        Color prev = graphics.getColor();
+        graphics.setColor(SELECTED_COLOR);
         
-        //STUFF
+        selectedPolygon.getVertices().forEach((ponto) -> {
+            graphics.drawOval((int) ponto.getX() - SELECTED_RADIUS,
+                              (int) ponto.getY() - SELECTED_RADIUS,
+                              SELECTED_RADIUS*2, SELECTED_RADIUS*2);
+            graphics.fillOval((int) ponto.getX() - SELECTED_RADIUS,
+                              (int) ponto.getY() - SELECTED_RADIUS,
+                              SELECTED_RADIUS*2, SELECTED_RADIUS*2);
+        });
+        
+        graphics.setColor(prev);
     }
     
     public void paintPolygons(){
@@ -180,9 +193,15 @@ public class DrawablePanel extends JPanel {
     
     public void clear(){
         objetos.clear();
+        nullTemps();
+        selectedPolygon = null;
     }
 
     public void setSelectedPolygon(Poligono selectedPolygon) {
         this.selectedPolygon = selectedPolygon;
+    }
+    
+    public void remove(Poligono p){
+        objetos.remove(p);
     }
 }

@@ -4,18 +4,20 @@ import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  *
  * @author 
  */
 public class Poligono implements Serializable{
+    private static final Logger LOG = Logger.getLogger("CG");
     private static long INSTANCES;
     private final long ID;
     
     private ArrayList<Vertice> vertices = new ArrayList();
     private Color corFundo = null;
-    private Color corBorda = null;
+    private Color corBorda = Color.black;
  
     //<editor-fold defaultstate="collapsed" desc="Construtores">
     public Poligono(){
@@ -61,7 +63,10 @@ public class Poligono implements Serializable{
     }
 
     public void setCorBorda(Color corBorda) {
-        this.corBorda = corBorda;
+        if (corBorda != null)
+            this.corBorda = corBorda;
+        else
+            LOG.warning("Borda não pode ser transparente!");
     }
 //</editor-fold>
  
