@@ -38,6 +38,10 @@ public class Vertice implements Serializable{
         INSTANCES++;
     }
     
+    public Vertice(int x, int y){
+        this((float) x, (float) y);
+    }
+    
     /**
      * Construtor de copia
      * @param A Vertice a ser copiado

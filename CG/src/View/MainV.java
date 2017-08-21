@@ -8,9 +8,13 @@ package View;
 import Logging.BufferedPaneOutputStream;
 import Logging.PaneHandler;
 import Model.Aresta;
+import Model.Eixo;
 import Model.Poligono;
 import Model.Vertice;
 import Model.Nregular;
+import Model.Transformações.Cisalhamento;
+import Model.Transformações.Escala;
+import Model.Transformações.Translacao;
 import ioScene.InputScene;
 import ioScene.OutputScene;
 import java.awt.Color;
@@ -52,6 +56,7 @@ public class MainV extends javax.swing.JFrame {
     private static final byte SHEAR_ACTION     = 3;
     private static final byte SCALE_ACTION     = 4;
     private byte currentAction = NO_ACTION;
+    private Vertice previousDrag;
     
     private void resetPaint(){
         panelCp.nullTemps();
@@ -71,14 +76,18 @@ public class MainV extends javax.swing.JFrame {
         paneMs.addMouseListener(new java.awt.event.MouseAdapter() {           
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {                               
-                if (currentAction != NO_ACTION) return;
                 int x = evt.getX();
                 int y = evt.getY();
                 
+                if (currentAction != NO_ACTION){
+                    previousDrag = new Vertice(x, y);
+                    return;
+                }
+
                 //<editor-fold defaultstate="collapsed" desc="Select Action">
                 if(selectBt.isSelected()){
                     List<Poligono> lista = panelCp.getListaPoligonos();
-                    Vertice point = new Vertice((float) x, (float) y);
+                    Vertice point = new Vertice(x, y);
 
                     for(int i=0; i<lista.size(); i++){
                         List<Vertice> vertices = lista.get(i).getVertices();
@@ -164,24 +173,14 @@ public class MainV extends javax.swing.JFrame {
                 panelCp.repaint();
             }
 
-            @Override
-            public void mouseDragged(MouseEvent e) {
-                if (selectedPolygon!=null && currentAction!=NO_ACTION){
-                    int x = e.getX();
-                    int y = e.getY();
-                    System.out.println(x);
-                    System.out.println(y);
-                }
-            }
-
-            @Override
+            /*@Override
             public void mouseEntered(MouseEvent e) {
                 if (currentAction != NO_ACTION){
                     //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
                 } else {
                     paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                 }
-            }          
+            } */     
         });
         
         paneMs.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -192,7 +191,7 @@ public class MainV extends javax.swing.JFrame {
                 
                 if (currentAction != NO_ACTION){
                     Vertice v = new Vertice((float) x, (float)y);
-                    if (currentAction == SHEAR_ACTION){
+                    if (currentAction==SHEAR_ACTION || currentAction==SCALE_ACTION){
                         int selSize = selectedPolygon.getVertices().size();
                         boolean toAdd=false;
                         Aresta closeLine = null;
@@ -210,15 +209,14 @@ public class MainV extends javax.swing.JFrame {
                         if (toAdd){
                            boolean isVert=VMath.isLineVertical(closeLine), isHori=VMath.isLineHorizontal(closeLine);
                            if (isVert){
-                               System.out.println("VERT");
                                paneMs.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
                            } else if (isHori){
-                               System.out.println("HORI");
                                paneMs.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
                            } else {
-                               System.out.println("NONE- " + VMath.lineSlope(closeLine));
                                paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                            }
+                        } else {
+                            paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         }
                     } else {
                         if (PMath.proximoDeQualquerVerticeDoPoligono(selectedPolygon, v))
@@ -244,6 +242,48 @@ public class MainV extends javax.swing.JFrame {
                 panelCp.repaint();
                 
                 //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                Vertice curr = new Vertice(e.getX(), e.getY());
+                if (selectedPolygon!=null && currentAction!=NO_ACTION){
+                    if (currentAction == SHEAR_ACTION){
+                        double factor = VMath.distancia(previousDrag, curr);
+                        factor /= 100;
+                        Cisalhamento c = new Cisalhamento();
+                        switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
+                            case Cursor.N_RESIZE_CURSOR: //Vertical
+                                selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, factor, selectedPolygon);
+                                break;
+                            case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                selectedPolygon = c.cisalhamento(Eixo.Eixo_X, factor, selectedPolygon);
+                                break;
+                        }
+                    } else if (currentAction == TRANSLATE_ACTION){
+                        Translacao t = new Translacao();
+                        selectedPolygon = t.transladar((int) -(previousDrag.getX() - curr.getX()),
+                                                       (int) -(previousDrag.getY() - curr.getY()),
+                                                       0, selectedPolygon);
+                    } else if (currentAction == SCALE_ACTION){
+                        double factor = VMath.distancia(previousDrag, curr);
+                        factor /= 100;
+                        Escala sc = new Escala();
+                        switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
+                            case Cursor.N_RESIZE_CURSOR: //Vertical
+                                selectedPolygon = sc.escala(Eixo.Eixo_Y, factor, selectedPolygon);
+                                break;
+                            case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                selectedPolygon = sc.escala(Eixo.Eixo_X, factor, selectedPolygon);
+                                break;
+                        }
+                    } else if (currentAction == ROTATE_ACTION){
+                        
+                    }
+                }
+                panelCp.setSelectedPolygon(selectedPolygon);
+                resetPaint();
+                previousDrag = curr;
             }
         });
     }
@@ -698,6 +738,10 @@ public class MainV extends javax.swing.JFrame {
         pendingCreating = true;
         noPointsToCreate = getNumberOfSidesFromBtSelected();
         temporaryList = new ArrayList<>();
+        selectedPolygon = null;
+        panelCp.setSelectedPolygon(selectedPolygon);
+        currentAction = NO_ACTION;
+        resetPaint();
     }//GEN-LAST:event_irregularPoligonBtActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
@@ -722,6 +766,10 @@ public class MainV extends javax.swing.JFrame {
         noPointsToCreate = getNumberOfSidesFromBtSelected();
         temporaryList = new ArrayList<>();
         //regularSidedPolygon = regularNsided.isSelected();
+        selectedPolygon = null;
+        panelCp.setSelectedPolygon(selectedPolygon);
+        currentAction = NO_ACTION;
+        resetPaint();
     }//GEN-LAST:event_regularNsidedActionPerformed
 
     private void saveMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveMenuActionPerformed
@@ -1012,6 +1060,7 @@ public class MainV extends javax.swing.JFrame {
         shearBt1.setSelected(false);
         scaleBt1.setSelected(false);*/
         ghost.doClick(); //Botão que não faz nada para atualizar a seleção de todos os botões no mesmo grupo
+        currentAction = NO_ACTION;
     }
     
     private Poligono localPolygonBuilder(){
