@@ -62,7 +62,7 @@ public class MainV extends javax.swing.JFrame {
     private Vertice firstActionPoint = null;
     
     private void resetPaint(){
-        panelCp.nullTemps();
+        //panelCp.nullTemps();
         panelCp.repaint();
     }
     
@@ -70,6 +70,7 @@ public class MainV extends javax.swing.JFrame {
         regularSidedLock = false;
         pendingCreating = false;
         noPointsToCreate = -1;
+        panelCp.nullTemps();
         //unToggle();
         temporaryList = new ArrayList<>();
     }
@@ -262,15 +263,21 @@ public class MainV extends javax.swing.JFrame {
                     }
                     //<editor-fold defaultstate="collapsed" desc="Cisalhamento Drag">
                     if (currentAction == SHEAR_ACTION){
-                        double factor = VMath.distancia(previousDrag, curr);
-                        factor /= 100;
                         Cisalhamento c = new Cisalhamento();
                         switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
                             case Cursor.N_RESIZE_CURSOR: //Vertical
-                                selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, factor, selectedPolygon, center);
+                                Movimento v = VMath.movimentoVertical(previousDrag, curr);
+                                if (v == Movimento.Cima) 
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, 0.99, selectedPolygon, center);
                                 break;
                             case Cursor.E_RESIZE_CURSOR: //Horizontal
-                                selectedPolygon = c.cisalhamento(Eixo.Eixo_X, factor, selectedPolygon, center);
+                                Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                                if (h == Movimento.Direita)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, 1.01, selectedPolygon, center);
+                                else if (h == Movimento.Esquerda)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, 0.99, selectedPolygon, center);
                                 break;
                         }
                     //</editor-fold>
@@ -283,28 +290,35 @@ public class MainV extends javax.swing.JFrame {
                     //</editor-fold>
                     //<editor-fold defaultstate="collapsed" desc="Escala Drag">
                     } else if (currentAction == SCALE_ACTION){
-                        double factor = VMath.distancia(previousDrag, curr);
-                        //factor = 1.2;
-                        if (factor == 1.0) factor = 1.001;
                         Escala sc = new Escala();
                         switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
                             case Cursor.N_RESIZE_CURSOR: //Vertical
-                                selectedPolygon = sc.escala(Eixo.Eixo_Y, factor, selectedPolygon, center);
+                                Movimento v = VMath.movimentoVertical(previousDrag, curr);
+                                if (v == Movimento.Cima)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 0.99, selectedPolygon, center);
                                 break;
                             case Cursor.E_RESIZE_CURSOR: //Horizontal
-                                selectedPolygon = sc.escala(Eixo.Eixo_X, factor, selectedPolygon, center);
+                                Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                                if (h == Movimento.Esquerda)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 1.01, selectedPolygon, center);
+                                else if (h == Movimento.Direita)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 0.99, selectedPolygon, center);
                                 break;
                         }
                     //</editor-fold>
                     //<editor-fold defaultstate="collapsed" desc="Rotação Drag">
                     } else if (currentAction == ROTATE_ACTION){
-                        //Orientaçao em relacao ao "previous" e "current"
+                        Vertice rotAxis = null;
+                        if (center != null) rotAxis = center;
+                        else rotAxis = new Vertice(firstActionPoint);
                         Movimento m = VMath.movimentoHorizontal(previousDrag, curr);
                         Rotacao r = new Rotacao();
                         if (m == Movimento.Direita)
-                            selectedPolygon = r.rotacao(0.1, selectedPolygon, new Vertice(firstActionPoint));
+                            selectedPolygon = r.rotacao(0.1, selectedPolygon, rotAxis);
                         else if (m == Movimento.Esquerda)
-                            selectedPolygon = r.rotacao(-0.1, selectedPolygon, new Vertice(firstActionPoint));
+                            selectedPolygon = r.rotacao(-0.1, selectedPolygon, rotAxis);
                     }
                     //</editor-fold>
                 }
