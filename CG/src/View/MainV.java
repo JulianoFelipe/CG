@@ -14,6 +14,7 @@ import Model.Vertice;
 import Model.Nregular;
 import Model.Transformações.Cisalhamento;
 import Model.Transformações.Escala;
+import Model.Transformações.Rotacao;
 import Model.Transformações.Translacao;
 import ioScene.InputScene;
 import ioScene.OutputScene;
@@ -279,7 +280,8 @@ public class MainV extends javax.swing.JFrame {
                                 break;
                         }
                     } else if (currentAction == ROTATE_ACTION){
-                        
+                        Rotacao r = new Rotacao();
+                        selectedPolygon = r.rotacao(0.00001, selectedPolygon, previousDrag);
                     }
                 }
                 panelCp.setSelectedPolygon(selectedPolygon);

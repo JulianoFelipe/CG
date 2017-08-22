@@ -7,6 +7,7 @@ package utils;
 
 import Model.Aresta;
 import Model.Movimento;
+import Model.Transformações.Translacao;
 import Model.Vertice;
 
 /**
@@ -145,21 +146,50 @@ public class VMath {
     public static Movimento movimentoSegundoParaPrimeiro(Vertice primeiro, Vertice segundo){
         if (primeiro.equals(segundo)) return Movimento.Estatico;
         
-        Double slope = lineSlope(new Aresta(primeiro, segundo));
+        /*
+        Transladam-se ambos os pontos e
+        retorna o movimento em relação
+        à posição do segundo ponto
+        nos quadrantes do plano XY.
         
-        if (slope == Double.POSITIVE_INFINITY){
-            
-        } else if (slope == Double.NEGATIVE_INFINITY){
-            
-        } else if (slope == 0.0){}
-        /* SLOPE
-        +Inf = CIMA
-        -Inf = Baixo
-        0 = Direita
-        -0 = Esquerda
+        Ex.:
+             |   
+           2 | 
+         ----1----
+             | 
+             |  
+        
+        Dois está à esquerda cima
+        */
+        float x = primeiro.getX(), y = primeiro.getY();
+        //primeiro.setX(0); primeiro.setY(0);
+        segundo.setX(segundo.getX() - x);
+        segundo.setY(segundo.getY() - y);
+        
+        /* (Desconsidere. Anotação "mental")
+        Ex. octante:
+          \  |   /
+          2\ | /
+         ----1----
+           / | \
+         /   |  \
         */
         
+ 
         
+        boolean right = segundo.getX() >  0.0; //Direita se x é positivo
+        boolean up    = segundo.getY() >  0.0; //Cima se y é positivo
+        boolean ex_up = segundo.getY() == 0.0; 
+        boolean ex_rg = segundo.getX() == 0.0; 
+        
+             if ( up &&  right && !ex_up && !ex_rg) return Movimento.Cima_Direita;
+        else if ( up && !right && !ex_up && !ex_rg) return Movimento.Cima_Esquerda;
+        else if (!up &&  right && !ex_up && !ex_rg) return Movimento.Baixo_Direita;
+        else if (!up && !right && !ex_up && !ex_rg) return Movimento.Cima;
+        else if ( up &&  right &&  ex_up &&  ex_rg) return Movimento.Cima;
+        else if ( up && !right &&  ex_up &&  ex_rg) return Movimento.Cima;
+        else if (!up &&  right &&  ex_up &&  ex_rg) return Movimento.Cima;
+        else if (!up && !right &&  ex_up &&  ex_rg) return Movimento.Cima;
         
         return Movimento.Baixo;
     }
