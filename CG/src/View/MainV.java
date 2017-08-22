@@ -58,6 +58,7 @@ public class MainV extends javax.swing.JFrame {
     private static final byte SCALE_ACTION     = 4;
     private byte currentAction = NO_ACTION;
     private Vertice previousDrag;
+    private Vertice firstActionPoint = null;
     
     private void resetPaint(){
         panelCp.nullTemps();
@@ -172,16 +173,7 @@ public class MainV extends javax.swing.JFrame {
                     LOG.info("Ponto capturado.");
                 }
                 panelCp.repaint();
-            }
-
-            /*@Override
-            public void mouseEntered(MouseEvent e) {
-                if (currentAction != NO_ACTION){
-                    //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                } else {
-                    paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                }
-            } */     
+            } 
         });
         
         paneMs.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -192,6 +184,7 @@ public class MainV extends javax.swing.JFrame {
                 
                 if (currentAction != NO_ACTION){
                     Vertice v = new Vertice((float) x, (float)y);
+                    //<editor-fold defaultstate="collapsed" desc="Escala e Cisalhamento Move">
                     if (currentAction==SHEAR_ACTION || currentAction==SCALE_ACTION){
                         int selSize = selectedPolygon.getVertices().size();
                         boolean toAdd=false;
@@ -200,7 +193,7 @@ public class MainV extends javax.swing.JFrame {
                             Vertice a = selectedPolygon.getVertices().get(j), b;
                             if (j == selSize-1) b=selectedPolygon.getVertices().get(0);
                             else b=selectedPolygon.getVertices().get(j+1);
-                            
+
                             if (VMath.shortestDistance(a, b, v) < LINE_PROXIMITY_THRESHOLD){
                                 toAdd = true;
                                 closeLine = new Aresta(a,b);
@@ -208,23 +201,28 @@ public class MainV extends javax.swing.JFrame {
                             }
                         }
                         if (toAdd){
-                           boolean isVert=VMath.isLineVertical(closeLine), isHori=VMath.isLineHorizontal(closeLine);
-                           if (isVert){
-                               paneMs.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-                           } else if (isHori){
-                               paneMs.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
-                           } else {
-                               paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                           }
+                            boolean isVert=VMath.isLineVertical(closeLine), isHori=VMath.isLineHorizontal(closeLine);
+                            if (isVert){
+                                paneMs.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                            } else if (isHori){
+                                paneMs.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
+                            } else {
+                                paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                            }
                         } else {
                             paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Resto Move">
                     } else {
-                        if (PMath.proximoDeQualquerVerticeDoPoligono(selectedPolygon, v))
+                        Vertice prox = PMath.verticeProximoDeQualquerVerticeDoPoligono(selectedPolygon, v);
+                        if (prox != null){
                             paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
-                        else
+                            firstActionPoint = prox;
+                        } else
                             paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                     }
+                    //</editor-fold>
                 }
                 
                 if (temporaryList.size() < 1) return;
@@ -249,6 +247,7 @@ public class MainV extends javax.swing.JFrame {
             public void mouseDragged(MouseEvent e) {
                 Vertice curr = new Vertice(e.getX(), e.getY());
                 if (selectedPolygon!=null && currentAction!=NO_ACTION){
+                    //<editor-fold defaultstate="collapsed" desc="Cisalhamento Drag">
                     if (currentAction == SHEAR_ACTION){
                         double factor = VMath.distancia(previousDrag, curr);
                         factor /= 100;
@@ -261,32 +260,41 @@ public class MainV extends javax.swing.JFrame {
                                 selectedPolygon = c.cisalhamento(Eixo.Eixo_X, factor, selectedPolygon);
                                 break;
                         }
-                    } else if (currentAction == TRANSLATE_ACTION){
-                        Translacao t = new Translacao();
-                        selectedPolygon = t.transladar((int) -(previousDrag.getX() - curr.getX()),
-                                                       (int) -(previousDrag.getY() - curr.getY()),
-                                                       0, selectedPolygon);
-                    } else if (currentAction == SCALE_ACTION){
-                        double factor = VMath.distancia(previousDrag, curr);
-                        //factor = 1.2;
-                        System.out.println(factor);
-                        Escala sc = new Escala();
-                        switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
-                            case Cursor.N_RESIZE_CURSOR: //Vertical
-                                selectedPolygon = sc.escala(Eixo.Eixo_Y, factor, selectedPolygon);
-                                break;
-                            case Cursor.E_RESIZE_CURSOR: //Horizontal
-                                selectedPolygon = sc.escala(Eixo.Eixo_X, factor, selectedPolygon);
-                                break;
-                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Translação Drag">
+                                        } else if (currentAction == TRANSLATE_ACTION){
+                                            Translacao t = new Translacao();
+                                            selectedPolygon = t.transladar((int) -(previousDrag.getX() - curr.getX()),
+                                                    (int) -(previousDrag.getY() - curr.getY()),
+                                                    0, selectedPolygon);
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Escala Drag">
+                                                            } else if (currentAction == SCALE_ACTION){
+                                                                double factor = VMath.distancia(previousDrag, curr);
+                                                                //factor = 1.2;
+                                                                System.out.println(factor);
+                                                                Escala sc = new Escala();
+                                                                switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
+                                                                    case Cursor.N_RESIZE_CURSOR: //Vertical
+                                                                        selectedPolygon = sc.escala(Eixo.Eixo_Y, factor, selectedPolygon);
+                                                                        break;
+                                                                    case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                                                        selectedPolygon = sc.escala(Eixo.Eixo_X, factor, selectedPolygon);
+                                                                        break;
+                                                                }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Rotação Drag">
                     } else if (currentAction == ROTATE_ACTION){
+                        //Orientaçao em relacao ao "previous" e "current"
                         Rotacao r = new Rotacao();
-                        selectedPolygon = r.rotacao(0.00001, selectedPolygon, previousDrag);
+                        selectedPolygon = r.rotacao(0.01, selectedPolygon, previousDrag);
                     }
+                    //</editor-fold>
                 }
                 panelCp.setSelectedPolygon(selectedPolygon);
                 resetPaint();
-                previousDrag = curr;
+                if (currentAction != ROTATE_ACTION)
+                    previousDrag = curr;
             }
         });
     }

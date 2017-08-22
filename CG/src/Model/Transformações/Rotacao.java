@@ -27,22 +27,32 @@ public class Rotacao{
         return p;
     }
     
-    public Poligono rotacao(double graus, Poligono p, Vertice pontoFixo){
+    public Poligono rotacao(double graus, Poligono p, final Vertice pontoFixo){
         int vertices = p.getVertices().size();
         
+        for (Vertice v : p.getVertices())
+            System.out.println(v);
+        System.out.println("FIX: " + pontoFixo);
+        
         Translacao t = new Translacao();
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), 0, p);
+        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), 0, p);
         
         for (int i=0; i<vertices; i++){
             Vertice copy = p.getVertices().get(i);
             double x = copy.getX(), y = copy.getY();
             double sin = Math.sin(graus);
             double cos = Math.cos(graus);
+            
             p.getVertices().get(i).setX((float) ((x*cos)-(y*sin)));
             p.getVertices().get(i).setY((float) ((x*sin)+(y*cos)));
         }
         
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), 0, p);
+        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), 0, p);
+        
+        for (Vertice v : p.getVertices())
+            System.out.println(v);
+        System.out.println("FIX: " + pontoFixo);
+        
         return p;
     }
 }

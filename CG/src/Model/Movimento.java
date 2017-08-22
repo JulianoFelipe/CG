@@ -25,4 +25,35 @@ public enum Movimento {
     private Movimento(int flags) {
         this.flags = flags;
     }
+    
+    public Movimento decomporEmHorizontal(Movimento mov){
+        Movimento rightDec = fromFlags(mov.flags & Direita.flags);
+        Movimento leftDec  = fromFlags(mov.flags & Esquerda.flags);
+        
+        if (rightDec.flags == Direita.flags)
+            return Direita;
+        else if (leftDec.flags == Esquerda.flags)
+            return Esquerda;
+        else 
+            return Estatico;
+    }
+    
+    public Movimento decomporEmVertical(Movimento mov){
+        Movimento cimaDec = fromFlags(mov.flags & Cima.flags);
+        Movimento baixDec = fromFlags(mov.flags & Baixo.flags);
+        
+        if (cimaDec.flags == Cima.flags)
+            return Cima;
+        else if (baixDec.flags == Baixo.flags)
+            return Baixo;
+        else 
+            return Estatico;
+    }
+    
+    private Movimento fromFlags(int flags){
+        for (Movimento m : Movimento.values())
+            if (m.flags == flags)
+                return m;
+        return Estatico;
+    }
 }
