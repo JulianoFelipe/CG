@@ -5,10 +5,6 @@
  */
 package Model;
 
-import Model.Poligono;
-import static Model.Poligono.DEFAULT_BORDA;
-import static Model.Poligono.DEFAULT_FUNDO;
-import Model.Vertice;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
@@ -71,4 +67,11 @@ public class Nregular extends Poligono {
     public String toString() {
         return "Polígono Regular {Lados=" + super.getVertices().size() + ", Centro=" + center + ", Raio=" + radius + '}';
     }
+
+    /*@Override
+    public Vertice getCentroideDaMedia() {
+        return center;
+    }*/
+    
+    
 }

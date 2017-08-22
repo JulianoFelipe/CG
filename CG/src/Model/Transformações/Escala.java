@@ -25,6 +25,17 @@ public class Escala {
         }
     }
     
+    public Poligono escala(Eixo axis, double fator, Poligono p, final Vertice pontoFixo){
+        switch (axis) {
+            case Eixo_X:
+                return escalaX(fator, p, pontoFixo);
+            case Eixo_Y:
+                return escalaY(fator, p, pontoFixo);
+            default:
+                throw new UnsupportedOperationException("Não implementado");
+        }
+    }
+    
     public Poligono escalaX(double fator, Poligono p){
         int vertices = p.getVertices().size();
         for (int i=0; i<vertices; i++){
@@ -40,6 +51,24 @@ public class Escala {
             Vertice copy = p.getVertices().get(i);
             p.getVertices().get(i).setY((float) (copy.getY() * fator));
         }
+        return p;
+    }
+    
+    public Poligono escalaX(double fator, Poligono p, final Vertice pontoFixo){
+        if (pontoFixo == null) return escalaX(fator, p);
+        Translacao t = new Translacao();
+        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), 0, p);
+        p = escalaX(fator, p);
+        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), 0, p);
+        return p;
+    }
+    
+    public Poligono escalaY(double fator, Poligono p, final Vertice pontoFixo){
+        if (pontoFixo == null) return escalaY(fator, p);
+        Translacao t = new Translacao();
+        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), 0, p);
+        p = escalaY(fator, p);
+        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), 0, p);
         return p;
     }
 }

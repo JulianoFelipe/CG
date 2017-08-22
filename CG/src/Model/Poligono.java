@@ -20,6 +20,8 @@ public class Poligono implements Serializable{
     private ArrayList<Vertice> vertices = new ArrayList();
     private Color corFundo;
     private Color corBorda;
+    
+    private Vertice centroid = null;
  
     //<editor-fold defaultstate="collapsed" desc="Construtores">
     /**
@@ -98,10 +100,12 @@ public class Poligono implements Serializable{
     
     public void addAllVertices(List<Vertice> novosVertices){
         vertices.addAll(novosVertices);
+        centroid = null;
     }
     
     public void addVertice (Vertice novoVertice){
         vertices.add(novoVertice);
+        centroid = null;
     }
 
     public Color getCorFundo() {
@@ -202,4 +206,39 @@ public class Poligono implements Serializable{
         return "Polígono {Lados=" + vertices.size() + '}';
     }
     
+    //https://stackoverflow.com/questions/2792443/finding-the-centroid-of-a-polygon
+    public Vertice getCentroideDaMedia(){
+        if (centroid != null) return centroid;
+        
+        Vertice centroid = new Vertice();
+        double signedArea = 0.0;
+        Vertice v0, v1;
+        double a = 0.0;  // Partial signed area
+
+        // For all vertices except last
+        int i=0;
+        for (i=0; i<vertices.size()-1; ++i) {
+            v0 = vertices.get(i);
+            v1 = vertices.get(i+1);
+            a = v0.getX()*v1.getY() - v1.getX()*v0.getY();
+            signedArea += a;
+            centroid.setX( (float)((v0.getX() + v1.getX())*a) + centroid.getX());
+            centroid.setY( (float)((v0.getY() + v1.getY())*a) + centroid.getY());
+        }
+
+        // Do last vertex separately to avoid performing an expensive
+        // modulus operation in each iteration.
+        v0 = vertices.get(i);
+        v1 = vertices.get(0);
+        a = v0.getX()*v1.getY() - v1.getX()*v0.getY();
+        signedArea += a;
+        centroid.setX( (float)((v0.getX() + v1.getX())*a) + centroid.getX());
+        centroid.setY( (float)((v0.getY() + v1.getY())*a) + centroid.getY());
+
+        signedArea *= 0.5;
+        centroid.x /= (6.0*signedArea);
+        centroid.y /= (6.0*signedArea);
+
+        return centroid;
+    }
 }

@@ -25,6 +25,8 @@ public class DrawablePanel extends JPanel {
     private static final Logger LOG = Logger.getLogger("CG");
     public static final int SELECTED_RADIUS = 5;
     public static final Color SELECTED_COLOR = Color.RED;
+    public static final Color ANCHOR_COLOR1 = Color.BLUE;
+    public static final Color ANCHOR_COLOR2 = Color.MAGENTA;
     
     private final List<Poligono> objetos;
     private final Graphics graphics;
@@ -35,6 +37,7 @@ public class DrawablePanel extends JPanel {
     private Nregular tempRegular = null;
 
     private Poligono selectedPolygon = null;
+    private Vertice centerAnchor = null;
     
     public DrawablePanel(List<Poligono> objetos) {
         this.objetos = objetos;
@@ -145,6 +148,18 @@ public class DrawablePanel extends JPanel {
                               SELECTED_RADIUS*2, SELECTED_RADIUS*2);
         });
         
+        
+        if (centerAnchor != null){
+            if (selectedPolygon.getCorFundo() == ANCHOR_COLOR1) 
+                graphics.setColor(ANCHOR_COLOR2);
+            else 
+                graphics.setColor(ANCHOR_COLOR1);
+            
+            graphics.fillOval((int) centerAnchor.getX() - SELECTED_RADIUS,
+                              (int) centerAnchor.getY() - SELECTED_RADIUS,
+                              SELECTED_RADIUS*2, SELECTED_RADIUS*2);
+        }
+        
         graphics.setColor(prev);
     }
     
@@ -198,5 +213,9 @@ public class DrawablePanel extends JPanel {
     
     public void remove(Poligono p){
         objetos.remove(p);
+    }
+    
+    public void setAnchor(Vertice v){
+        centerAnchor = v;
     }
 }

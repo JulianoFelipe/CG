@@ -126,12 +126,14 @@ public class VMath {
     }
     
     public static void main(String...args){
-        Vertice a = new Vertice((float) 1., (float)1.);
-        Vertice b = new Vertice((float) 2.0, (float)1);
+        Vertice a = new Vertice((float) 1, (float)1);
+        Vertice b = new Vertice((float) 1, (float)2);
         
         System.out.println("SLOPE: " + lineSlope(new Aresta(a, b)));
         System.out.println("Is Hor: " + isLineHorizontal(a, b));
         System.out.println("Is Ver: " + isLineVertical(a, b));
+        
+        System.out.println(movimentoSegundoParaPrimeiro(a, b));
     }
     
     /**
@@ -144,53 +146,91 @@ public class VMath {
      * @return Movimento do segundo em relação ao primeiro.
      */
     public static Movimento movimentoSegundoParaPrimeiro(Vertice primeiro, Vertice segundo){
-        if (primeiro.equals(segundo)) return Movimento.Estatico;
+        Movimento hori = movimentoHorizontal(primeiro, segundo);
+        Movimento vert = movimentoVertical(primeiro, segundo);
         
-        /*
-        Transladam-se ambos os pontos e
-        retorna o movimento em relação
-        à posição do segundo ponto
-        nos quadrantes do plano XY.
-        
-        Ex.:
-             |   
-           2 | 
-         ----1----
-             | 
-             |  
-        
-        Dois está à esquerda cima
-        */
-        float x = primeiro.getX(), y = primeiro.getY();
-        //primeiro.setX(0); primeiro.setY(0);
-        segundo.setX(segundo.getX() - x);
-        segundo.setY(segundo.getY() - y);
-        
-        /* (Desconsidere. Anotação "mental")
-        Ex. octante:
-          \  |   /
-          2\ | /
-         ----1----
-           / | \
-         /   |  \
-        */
-        
- 
-        
-        boolean right = segundo.getX() >  0.0; //Direita se x é positivo
-        boolean up    = segundo.getY() >  0.0; //Cima se y é positivo
-        boolean ex_up = segundo.getY() == 0.0; 
-        boolean ex_rg = segundo.getX() == 0.0; 
-        
-             if ( up &&  right && !ex_up && !ex_rg) return Movimento.Cima_Direita;
-        else if ( up && !right && !ex_up && !ex_rg) return Movimento.Cima_Esquerda;
-        else if (!up &&  right && !ex_up && !ex_rg) return Movimento.Baixo_Direita;
-        else if (!up && !right && !ex_up && !ex_rg) return Movimento.Cima;
-        else if ( up &&  right &&  ex_up &&  ex_rg) return Movimento.Cima;
-        else if ( up && !right &&  ex_up &&  ex_rg) return Movimento.Cima;
-        else if (!up &&  right &&  ex_up &&  ex_rg) return Movimento.Cima;
-        else if (!up && !right &&  ex_up &&  ex_rg) return Movimento.Cima;
-        
-        return Movimento.Baixo;
+        return Movimento.compor(vert, hori);
+    }
+    
+    public static Movimento movimentoHorizontal(Vertice primeiro, Vertice segundo){
+        if (segundo.getX() < primeiro.getX()) return Movimento.Esquerda;
+        else if (segundo.getX() > primeiro.getX()) return Movimento.Direita;
+        else return Movimento.Estatico;
+    }
+    
+    public static Movimento movimentoVertical(Vertice primeiro, Vertice segundo){
+        if (segundo.getY() < primeiro.getY()) return Movimento.Baixo;
+        else if (segundo.getY() > primeiro.getY()) return Movimento.Cima;
+        else return Movimento.Estatico;
     }
 }
+
+///Rascunho
+//        if (primeiro.equals(segundo)) return Movimento.Estatico;
+//        
+//        /*
+//        Transladam-se ambos os pontos e
+//        retorna o movimento em relação
+//        à posição do segundo ponto
+//        nos quadrantes do plano XY.
+//        
+//        Ex.:
+//             |   
+//           2 | 
+//         ----1----
+//             | 
+//             |  
+//        
+//        Dois está à esquerda cima
+//        */
+//        float x = primeiro.getX(), y = primeiro.getY();
+//        //primeiro.setX(0); primeiro.setY(0);
+//        segundo.setX(segundo.getX() - x);
+//        segundo.setY(segundo.getY() - y);
+//        
+//        /* (Desconsidere. Anotação "mental")
+//        Ex. octante:
+//          \  |   /
+//          2\ | /
+//         ----1----
+//           / | \
+//         /   |  \
+//        */
+//        
+//        int right = (segundo.getX() >  0.0 ? 1 : 0); //Direita se x é positivo
+//        int up    = (segundo.getY() >  0.0 ? 1 : 0); //Cima se y é positivo
+//        int ex_up = (segundo.getY() == 0.0 ? 1 : 0);
+//        int ex_rg = (segundo.getX() == 0.0 ? 1 : 0); 
+//        
+//        Movimento E = null;
+//        
+//        //1D - Right
+//        //2D - Up
+//        //3D - Exactly in Y
+//        //4D - Exactly in X
+//        Movimento lookup[][][][] = new Movimento[2][2][2][2];
+//        lookup[1][1][0][0] = Movimento.Cima_Direita;
+//        lookup[0][1][0][0] = Movimento.Cima_Esquerda;
+//        lookup[1][0][0][0] = Movimento.Baixo_Direita;
+//        lookup[1][1][0][0] = Movimento.Baixo_Esquerda;
+//        lookup[0][0][1][0] = Movimento.Cima;
+//        lookup[0][0][0][0] = Movimento.Baixo;
+//        lookup[0][0][0][1] = Movimento.Direita;
+//        lookup[0][0][0][0] = Movimento.Esquerda;
+//        
+//        int[][][] threeDArray = 
+//    {  { {1,   2,  3}, { 4,  5,  6}, { 7,  8,  9} },
+//       { {10, 11, 12}, {13, 14, 15}, {16, 17, 18} },
+//       { {19, 20, 21}, {22, 23, 24}, {25, 26, 27} } };
+//        
+//             if ( up &&  right && !ex_up && !ex_rg) return Movimento.Cima_Direita;
+//        else if ( up && !right && !ex_up && !ex_rg) return Movimento.Cima_Esquerda;
+//        else if (!up &&  right && !ex_up && !ex_rg) return Movimento.Baixo_Direita;
+//        else if (!up && !right && !ex_up && !ex_rg) return Movimento.Cima;
+//        else if ( up &&  right &&  ex_up &&  ex_rg) return Movimento.Cima;
+//        else if ( up && !right &&  ex_up &&  ex_rg) return Movimento.Cima;
+//        else if (!up &&  right &&  ex_up &&  ex_rg) return Movimento.Cima;
+//        else if (!up && !right &&  ex_up &&  ex_rg) return Movimento.Cima;
+//        
+//        return Movimento.Baixo;
+//    }

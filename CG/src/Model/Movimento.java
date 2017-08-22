@@ -26,7 +26,7 @@ public enum Movimento {
         this.flags = flags;
     }
     
-    public Movimento decomporEmHorizontal(Movimento mov){
+    public static Movimento decomporEmHorizontal(Movimento mov){
         Movimento rightDec = fromFlags(mov.flags & Direita.flags);
         Movimento leftDec  = fromFlags(mov.flags & Esquerda.flags);
         
@@ -38,7 +38,7 @@ public enum Movimento {
             return Estatico;
     }
     
-    public Movimento decomporEmVertical(Movimento mov){
+    public static Movimento decomporEmVertical(Movimento mov){
         Movimento cimaDec = fromFlags(mov.flags & Cima.flags);
         Movimento baixDec = fromFlags(mov.flags & Baixo.flags);
         
@@ -50,7 +50,11 @@ public enum Movimento {
             return Estatico;
     }
     
-    private Movimento fromFlags(int flags){
+    public static Movimento compor(Movimento um, Movimento dois){
+        return fromFlags(um.flags | dois.flags);
+    }
+    
+    private static Movimento fromFlags(int flags){
         for (Movimento m : Movimento.values())
             if (m.flags == flags)
                 return m;

@@ -9,6 +9,7 @@ import Logging.BufferedPaneOutputStream;
 import Logging.PaneHandler;
 import Model.Aresta;
 import Model.Eixo;
+import Model.Movimento;
 import Model.Poligono;
 import Model.Vertice;
 import Model.Nregular;
@@ -174,6 +175,12 @@ public class MainV extends javax.swing.JFrame {
                 }
                 panelCp.repaint();
             } 
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                panelCp.setAnchor(null);
+                resetPaint();
+            }            
         });
         
         paneMs.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
@@ -247,6 +254,12 @@ public class MainV extends javax.swing.JFrame {
             public void mouseDragged(MouseEvent e) {
                 Vertice curr = new Vertice(e.getX(), e.getY());
                 if (selectedPolygon!=null && currentAction!=NO_ACTION){
+                    boolean anchor = centerAnchorBox.isSelected();
+                    Vertice center = null;
+                    if (anchor){
+                        center = selectedPolygon.getCentroideDaMedia();
+                        panelCp.setAnchor(center);
+                    }
                     //<editor-fold defaultstate="collapsed" desc="Cisalhamento Drag">
                     if (currentAction == SHEAR_ACTION){
                         double factor = VMath.distancia(previousDrag, curr);
@@ -254,47 +267,50 @@ public class MainV extends javax.swing.JFrame {
                         Cisalhamento c = new Cisalhamento();
                         switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
                             case Cursor.N_RESIZE_CURSOR: //Vertical
-                                selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, factor, selectedPolygon);
+                                selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, factor, selectedPolygon, center);
                                 break;
                             case Cursor.E_RESIZE_CURSOR: //Horizontal
-                                selectedPolygon = c.cisalhamento(Eixo.Eixo_X, factor, selectedPolygon);
+                                selectedPolygon = c.cisalhamento(Eixo.Eixo_X, factor, selectedPolygon, center);
                                 break;
                         }
                     //</editor-fold>
                     //<editor-fold defaultstate="collapsed" desc="Translação Drag">
-                                        } else if (currentAction == TRANSLATE_ACTION){
-                                            Translacao t = new Translacao();
-                                            selectedPolygon = t.transladar((int) -(previousDrag.getX() - curr.getX()),
-                                                    (int) -(previousDrag.getY() - curr.getY()),
-                                                    0, selectedPolygon);
+                        } else if (currentAction == TRANSLATE_ACTION){
+                            Translacao t = new Translacao();
+                            selectedPolygon = t.transladar((int) -(previousDrag.getX() - curr.getX()),
+                                                           (int) -(previousDrag.getY() - curr.getY()),
+                                                           0, selectedPolygon);
                     //</editor-fold>
                     //<editor-fold defaultstate="collapsed" desc="Escala Drag">
-                                                            } else if (currentAction == SCALE_ACTION){
-                                                                double factor = VMath.distancia(previousDrag, curr);
-                                                                //factor = 1.2;
-                                                                System.out.println(factor);
-                                                                Escala sc = new Escala();
-                                                                switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
-                                                                    case Cursor.N_RESIZE_CURSOR: //Vertical
-                                                                        selectedPolygon = sc.escala(Eixo.Eixo_Y, factor, selectedPolygon);
-                                                                        break;
-                                                                    case Cursor.E_RESIZE_CURSOR: //Horizontal
-                                                                        selectedPolygon = sc.escala(Eixo.Eixo_X, factor, selectedPolygon);
-                                                                        break;
-                                                                }
+                    } else if (currentAction == SCALE_ACTION){
+                        double factor = VMath.distancia(previousDrag, curr);
+                        //factor = 1.2;
+                        if (factor == 1.0) factor = 1.001;
+                        Escala sc = new Escala();
+                        switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
+                            case Cursor.N_RESIZE_CURSOR: //Vertical
+                                selectedPolygon = sc.escala(Eixo.Eixo_Y, factor, selectedPolygon, center);
+                                break;
+                            case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                selectedPolygon = sc.escala(Eixo.Eixo_X, factor, selectedPolygon, center);
+                                break;
+                        }
                     //</editor-fold>
                     //<editor-fold defaultstate="collapsed" desc="Rotação Drag">
                     } else if (currentAction == ROTATE_ACTION){
                         //Orientaçao em relacao ao "previous" e "current"
+                        Movimento m = VMath.movimentoHorizontal(previousDrag, curr);
                         Rotacao r = new Rotacao();
-                        selectedPolygon = r.rotacao(0.01, selectedPolygon, previousDrag);
+                        if (m == Movimento.Direita)
+                            selectedPolygon = r.rotacao(0.1, selectedPolygon, new Vertice(firstActionPoint));
+                        else if (m == Movimento.Esquerda)
+                            selectedPolygon = r.rotacao(-0.1, selectedPolygon, new Vertice(firstActionPoint));
                     }
                     //</editor-fold>
                 }
                 panelCp.setSelectedPolygon(selectedPolygon);
                 resetPaint();
-                if (currentAction != ROTATE_ACTION)
-                    previousDrag = curr;
+                previousDrag = curr;
             }
         });
     }
@@ -354,6 +370,7 @@ public class MainV extends javax.swing.JFrame {
         rotateBt1 = new javax.swing.JToggleButton();
         shearBt1 = new javax.swing.JToggleButton();
         scaleBt1 = new javax.swing.JToggleButton();
+        centerAnchorBox = new javax.swing.JCheckBox();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         saveMenu = new javax.swing.JMenuItem();
@@ -430,7 +447,7 @@ public class MainV extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addComponent(fundoBox))
                             .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(paintBt, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
+                                .addComponent(paintBt, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(jButton1)))
                         .addGap(4, 4, 4)))
@@ -606,6 +623,9 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
+        centerAnchorBox.setText("Ancorar centróide");
+        centerAnchorBox.setToolTipText("Torna invariante em relação ao centróide.");
+
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
         jPanel4Layout.setHorizontalGroup(
@@ -613,27 +633,30 @@ public class MainV extends javax.swing.JFrame {
             .addGroup(jPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(centerAnchorBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addComponent(rotateBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(rotateBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(scaleBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(translateBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel4Layout.createSequentialGroup()
-                        .addComponent(scaleBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(shearBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(translateBt1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(shearBt1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel4Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(rotateBt1)
-                    .addComponent(translateBt1))
+                    .addComponent(translateBt1)
+                    .addComponent(rotateBt1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(shearBt1)
-                    .addComponent(scaleBt1)))
+                    .addComponent(scaleBt1)
+                    .addComponent(shearBt1))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(centerAnchorBox)
+                .addContainerGap())
         );
 
         jMenu1.setText("Arquivo");
@@ -711,7 +734,7 @@ public class MainV extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(paneMs, javax.swing.GroupLayout.DEFAULT_SIZE, 790, Short.MAX_VALUE)
+                        .addComponent(paneMs, javax.swing.GroupLayout.DEFAULT_SIZE, 788, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                             .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -732,9 +755,8 @@ public class MainV extends javax.swing.JFrame {
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(paneMs))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -902,8 +924,8 @@ public class MainV extends javax.swing.JFrame {
             unToggle();
             //selectBt.doClick();
         } else {
-            ///
             currentAction = TRANSLATE_ACTION;
+            LOG.warning("Arraste um vértice para transladar.");
         }
     }//GEN-LAST:event_translateBt1ActionPerformed
 
@@ -913,7 +935,8 @@ public class MainV extends javax.swing.JFrame {
             unToggle();
             //selectBt.doClick();
         } else {
-            ///
+            LOG.warning("Arraste um vértice para rotacionar. A rotação é baseada somente no movimento horizontal do cursor.");
+            //Movimentação do ponto devido à erros de arredondamento.
             currentAction = ROTATE_ACTION;
         }
     }//GEN-LAST:event_rotateBt1ActionPerformed
@@ -924,8 +947,8 @@ public class MainV extends javax.swing.JFrame {
             unToggle();
             //selectBt.doClick();
         } else {
-            ///
             currentAction = SHEAR_ACTION;
+            LOG.warning("Arraste uma aresta para realizar o cisalhamento.");
         }
     }//GEN-LAST:event_shearBt1ActionPerformed
 
@@ -935,8 +958,8 @@ public class MainV extends javax.swing.JFrame {
             unToggle();
             //selectBt.doClick();
         } else {
-            ///
             currentAction = SCALE_ACTION;
+            LOG.warning("Arraste uma aresta para alterar a escala.");
         }
     }//GEN-LAST:event_scaleBt1ActionPerformed
 
@@ -1017,6 +1040,7 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.JButton cancelBt;
+    private javax.swing.JCheckBox centerAnchorBox;
     private javax.swing.JButton colorChooser;
     private javax.swing.JTextPane consolePane;
     private javax.swing.JRadioButtonMenuItem defaultColorRadio;

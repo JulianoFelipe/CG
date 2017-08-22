@@ -25,6 +25,17 @@ public class Cisalhamento {
         }
     }
     
+    public Poligono cisalhamento(Eixo axis, double fator, Poligono p, final Vertice pontoFixo){
+        switch (axis) {
+            case Eixo_X:
+                return cisalhamentoX(fator, p, pontoFixo);
+            case Eixo_Y:
+                return cisalhamentoY(fator, p, pontoFixo);
+            default:
+                throw new UnsupportedOperationException("Não implementado");
+        }
+    }
+    
     public Poligono cisalhamentoX(double fator, Poligono p){
         int vertices = p.getVertices().size();
         for (int i=0; i<vertices; i++){
@@ -42,4 +53,24 @@ public class Cisalhamento {
         }
         return p;
     }
+    
+    public Poligono cisalhamentoX(double graus, Poligono p, final Vertice pontoFixo){    
+        if (pontoFixo == null) return cisalhamentoX(graus, p);
+        Translacao t = new Translacao();
+        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), 0, p);
+        p = cisalhamentoX(graus, p);
+        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), 0, p);
+        return p;
+    }
+        
+    public Poligono cisalhamentoY(double graus, Poligono p, final Vertice pontoFixo){
+        if (pontoFixo == null) return cisalhamentoY(graus, p);
+        Translacao t = new Translacao();
+        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), 0, p);
+        p = cisalhamentoY(graus, p);
+        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), 0, p);
+        return p;
+    }
+        
+    
 }
