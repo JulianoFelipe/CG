@@ -126,7 +126,8 @@ public class DrawablePanel extends JPanel {
             if(useJavaFill)
                 graphics.fillPolygon(xs, ys, len);
             else{
-                ManualPaint.floodFill(graphics, p);
+                ManualPaint m = new ManualPaint(1280,720);
+                m.floodFill(graphics, p);
                 //System.out.println("NOT JAVA FILL");
             }
         }

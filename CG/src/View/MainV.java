@@ -268,16 +268,16 @@ public class MainV extends javax.swing.JFrame {
                             case Cursor.N_RESIZE_CURSOR: //Vertical
                                 Movimento v = VMath.movimentoVertical(previousDrag, curr);
                                 if (v == Movimento.Cima) 
-                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y,  0.01, selectedPolygon, center);
                                 else if (v == Movimento.Baixo)
-                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, 0.99, selectedPolygon, center);
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, -0.01, selectedPolygon, center);
                                 break;
                             case Cursor.E_RESIZE_CURSOR: //Horizontal
                                 Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
                                 if (h == Movimento.Direita)
-                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, 1.01, selectedPolygon, center);
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X,  0.01, selectedPolygon, center);
                                 else if (h == Movimento.Esquerda)
-                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, 0.99, selectedPolygon, center);
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, -0.01, selectedPolygon, center);
                                 break;
                         }
                     //</editor-fold>
@@ -316,9 +316,9 @@ public class MainV extends javax.swing.JFrame {
                         Movimento m = VMath.movimentoHorizontal(previousDrag, curr);
                         Rotacao r = new Rotacao();
                         if (m == Movimento.Direita)
-                            selectedPolygon = r.rotacao(0.1, selectedPolygon, rotAxis);
+                            selectedPolygon = r.rotacao(0.05, selectedPolygon, rotAxis);
                         else if (m == Movimento.Esquerda)
-                            selectedPolygon = r.rotacao(-0.1, selectedPolygon, rotAxis);
+                            selectedPolygon = r.rotacao(-0.05, selectedPolygon, rotAxis);
                     }
                     //</editor-fold>
                 }
@@ -637,6 +637,7 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
+        centerAnchorBox.setSelected(true);
         centerAnchorBox.setText("Ancorar centróide");
         centerAnchorBox.setToolTipText("Torna invariante em relação ao centróide.");
 
@@ -929,6 +930,7 @@ public class MainV extends javax.swing.JFrame {
             panelCp.remove(selectedPolygon);
             panelCp.setSelectedPolygon(null);
             repaint();
+            cancelBt.doClick();
         }
     }//GEN-LAST:event_deleteBtActionPerformed
 

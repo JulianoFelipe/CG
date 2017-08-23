@@ -241,4 +241,33 @@ public class Poligono implements Serializable{
 
         return centroid;
     }
+    
+    //https://rosettacode.org/wiki/Ray-casting_algorithm#Java
+    public boolean contains(Vertice v){
+        boolean inside = false;
+        int len = vertices.size();
+        for (int i = 0; i < len; i++) {
+            if (intersects(vertices.get(i), vertices.get( (i+1) %len), v))
+                inside = !inside;
+        }
+        return inside;
+    }
+    
+    private boolean intersects(Vertice linePA, Vertice linePB, Vertice P) {
+        if (linePA.getY() > linePB.getY())
+            return intersects(linePB, linePA, P);
+ 
+        if (P.getY() == linePA.getY() || P.getY() == linePB.getY())
+            P.y += 0.0001;
+ 
+        if (P.getY() > linePB.getY() || P.getY() < linePA.getY() || P.getX() > Math.max(linePA.getX(), linePB.getX()))
+            return false;
+ 
+        if (P.getX() < Math.min(linePA.getX(), linePB.getX()))
+            return true;
+ 
+        double red = (P.getY() - linePA.getY()) / (double) (P.getX() - linePA.getX());
+        double blue = (linePB.getY() - linePA.getY()) / (double) (linePB.getX() - linePA.getX());
+        return red >= blue;
+    }
 }
