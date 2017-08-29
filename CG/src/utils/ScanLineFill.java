@@ -29,13 +29,21 @@ public class ScanLineFill {
         this.g = g;
     }
     
-    public void scanLineFill(Poligono p){
+    /*public void scanLineFill(Poligono p){
         intersectsList.clear();
         
         buildIntersectionList(p);
         
         for(int i=0; i<intersectsList.size(); i+=2)
             paintLine(intersectsList.get(i), intersectsList.get(i+1));
+    }*/
+    
+    public void scanLineFill(Poligono p){
+        List<Aresta> paint = p.getPaintLines();
+        
+        paint.forEach((a) -> {
+            paintLine(a.getvInicial(), a.getvFinal());
+        });
     }
     
     private void paintLine(Vertice begin, Vertice end){

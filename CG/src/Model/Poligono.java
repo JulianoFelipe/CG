@@ -96,6 +96,8 @@ public class Poligono implements Serializable{
     
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">   
     public ArrayList<Vertice> getVertices() {
+        changeScans = true;
+        changeCentroid = true; //Altera a coleção de pontos
         return vertices;
     }
     
@@ -222,7 +224,7 @@ public class Poligono implements Serializable{
         if (scanlines!=null && changeScans==false) return scanlines;
         
         scanlines = VProperties.calculateScanLines(this);
-        
+
         changeScans = false;
         return scanlines;
     }
