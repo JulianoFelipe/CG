@@ -14,9 +14,14 @@ public class Aresta implements Serializable{
     /**
      * Vertice Inicial (vInicial) e final (vFinal)
      */
-    public Vertice vInicial;
-    public Vertice vFinal;
+    private Vertice vInicial;
+    private Vertice vFinal;
 
+    private float maxY;
+    private float minY;
+    private float maxX;
+    private float minX;
+    
     private final long ID;
     
     //<editor-fold defaultstate="collapsed" desc="Construtores">
@@ -40,6 +45,22 @@ public class Aresta implements Serializable{
         this.vInicial = I;
         this.vFinal = F;
         
+        if (I.getX() > F.getX()){
+            maxX = I.getX();
+            minX = F.getX();
+        } else {
+            maxX = F.getX();
+            minX = I.getX();
+        }
+        
+        if (I.getY() > F.getY()){
+            maxY = I.getY();
+            minY = F.getY();
+        } else {
+            maxY = F.getY();
+            minY = I.getY();
+        }
+        
         ID = INSTANCES;
         INSTANCES++;
     }
@@ -52,6 +73,16 @@ public class Aresta implements Serializable{
     
     public void setvInicial(Vertice vInicial) {
         this.vInicial = vInicial;
+        
+        if (vInicial.getX() > maxX)
+            maxX = vInicial.getX();
+        if (vInicial.getX() < minX)
+            minX = vInicial.getX();
+        
+        if (vInicial.getY() > maxY)
+            maxY = vInicial.getY();
+        if (vInicial.getY() < minY)
+            minY = vInicial.getY();
     }
     
     public Vertice getvFinal() {
@@ -60,56 +91,34 @@ public class Aresta implements Serializable{
     
     public void setvFinal(Vertice vFinal) {
         this.vFinal = vFinal;
-    }
-    
-    public Vertice getVerticeMaxX() {
-        if (vInicial.x > vFinal.x) {
-            return vInicial;
-        } else {
-            return vFinal;
-        }
-    }
-    
-    public Vertice getVerticeMaxY() {
-        if (vInicial.y > vFinal.y) {
-            return vInicial;
-        } else {
-            return vFinal;
-        }
-    }
-      
-    public Vertice getVerticeMinX() {
-        if (vInicial.x < vFinal.x) {
-            return vInicial;
-        } else {
-            return vFinal;
-        }
-    }
-    
-    public Vertice getVerticeMinY() {
-        if (vInicial.y < vFinal.y) {
-            return vInicial;
-        } else {
-            return vFinal;
-        }
-    }
-    
-    public Vertice getVerticeMin() {
-        if (vInicial.y != vFinal.y) {
-            return getVerticeMinY();
-        } else {
-            return getVerticeMinX();
-        }
-    }
-    
-    public Vertice getVerticeMax() {
-        if (vInicial.y != vFinal.y) {
-            return getVerticeMaxY();
-        } else {
-            return getVerticeMaxX();
-        }
+        
+        if (vFinal.getX() > maxX)
+            maxX = vFinal.getX();
+        if (vFinal.getX() < minX)
+            minX = vFinal.getX();
+        
+        if (vFinal.getY() > maxY)
+            maxY = vFinal.getY();
+        if (vFinal.getY() < minY)
+            minY = vFinal.getY();
     }
 
+    public float getMaxY() {
+        return maxY;
+    }
+
+    public float getMinY() {
+        return minY;
+    }
+
+    public float getMaxX() {
+        return maxX;
+    }
+
+    public float getMinX() {
+        return minX;
+    }
+        
     public long getID() {
         return ID;
     }

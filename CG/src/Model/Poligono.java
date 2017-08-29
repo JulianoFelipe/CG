@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import utils.VProperties;
 
 /**
  *
@@ -17,11 +18,15 @@ public class Poligono implements Serializable{
     private static long INSTANCES;
     private final long ID;
     
+    private List<Aresta> scanlines = null;
     private ArrayList<Vertice> vertices = new ArrayList();
     private Color corFundo;
     private Color corBorda;
     
     private Vertice centroid = null;
+    
+    private boolean changeScans    = false;
+    private boolean changeCentroid = false;
  
     //<editor-fold defaultstate="collapsed" desc="Construtores">
     /**
@@ -95,15 +100,21 @@ public class Poligono implements Serializable{
     }
     
     public void setVertices(ArrayList<Vertice> vertices) {
+        changeScans = true;
+        changeCentroid = true;
         this.vertices = vertices;
     }
     
     public void addAllVertices(List<Vertice> novosVertices){
+        changeScans = true;
+        changeCentroid = true;
         vertices.addAll(novosVertices);
         centroid = null;
     }
     
     public void addVertice (Vertice novoVertice){
+        changeScans = true;
+        changeCentroid = true;
         vertices.add(novoVertice);
         centroid = null;
     }
@@ -145,42 +156,6 @@ public class Poligono implements Serializable{
         //System.out.println(Arrays.toString(yPts));
         return yPts;
     }
-    
-    public Vertice calculaCentroide(){
-        Vertice vertice;
-        float xMim = Float.MAX_VALUE;
-        float xMax = Float.MIN_VALUE;
-        float yMim = Float.MAX_VALUE;
-        float yMax = Float.MIN_VALUE;
-       
-        for (Vertice vertice1 : vertices) {
-            if (vertice1.getX() < xMim) {
-                xMim = vertice1.getX();
-            }
-            if (vertice1.getX() > xMax) {
-                xMax = vertice1.getX();
-            }
-            if (vertice1.getY() < yMim) {
-                yMim = vertice1.getY();
-            }
-            if (vertice1.getY() > yMax) {
-                yMax = vertice1.getY();
-            }
-        }
-       
-        float x = (xMax + xMim)/2;
-        float y = (yMax + yMim)/2;
-        vertice = new Vertice(x, y);
-        return vertice;
-    }
-   
-    public Vertice calculaCentroideNegativo(){
-        Vertice v = calculaCentroide();
-        v.setX(v.getX()*-1);
-        v.setY(v.getY()*-1);
-       
-        return v;
-    }
 
     @Override
     public int hashCode() {
@@ -208,7 +183,7 @@ public class Poligono implements Serializable{
     
     //https://stackoverflow.com/questions/2792443/finding-the-centroid-of-a-polygon
     public Vertice getCentroideDaMedia(){
-        if (centroid != null) return centroid;
+        if (centroid!=null && changeCentroid==false) return centroid;
         
         Vertice centroid = new Vertice();
         double signedArea = 0.0;
@@ -239,7 +214,17 @@ public class Poligono implements Serializable{
         centroid.x /= (6.0*signedArea);
         centroid.y /= (6.0*signedArea);
 
+        changeCentroid = false;
         return centroid;
+    }
+    
+    public List<Aresta> getPaintLines(){
+        if (scanlines!=null && changeScans==false) return scanlines;
+        
+        scanlines = VProperties.calculateScanLines(this);
+        
+        changeScans = false;
+        return scanlines;
     }
     
     //https://rosettacode.org/wiki/Ray-casting_algorithm#Java

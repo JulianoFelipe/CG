@@ -7,7 +7,6 @@ package utils;
 
 import Model.Poligono;
 import Model.Vertice;
-import java.awt.Color;
 import java.awt.Graphics;
 import java.util.Stack;
 
@@ -39,6 +38,7 @@ public class ManualPaint {
     //https://softwareengineering.stackexchange.com/questions/105580/what-is-the-best-bucket-fill-algorithm
     //https://stackoverflow.com/questions/23983465/is-there-a-fill-function-for-arbitrary-shapes-in-javafx
     //https://www.tutorialspoint.com/computer_graphics/polygon_filling_algorithm.htm
+    //https://github.com/opencv/opencv/blob/master/modules/imgproc/src/drawing.cpp
     public void floodFill(Graphics g, Poligono p){
         pol = p;
         Stack<Vertice> stack = new Stack<>();

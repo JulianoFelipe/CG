@@ -7,7 +7,6 @@ package utils;
 
 import Model.Aresta;
 import Model.Movimento;
-import Model.Transformações.Translacao;
 import Model.Vertice;
 
 /**
@@ -105,8 +104,9 @@ public class VMath {
     }
     
     public static boolean isLineExactlyHorizontal(Aresta line){
-        double m = lineSlope(line);
-        return (m==0.0) || (m==-0.0);
+        /*double m = lineSlope(line);
+        return (m==0.0) || (m==-0.0);*/
+        return line.getvInicial().getY() == line.getvFinal().getY();
     }
     
     public static boolean isLineVertical(Aresta line){
@@ -128,6 +128,22 @@ public class VMath {
     public static void main(String...args){
         Vertice a = new Vertice((float) 1, (float)1);
         Vertice b = new Vertice((float) 1, (float)2);
+        /*Vertice c = new Vertice( 2, 2);
+        Vertice d = new Vertice( 3, 4);
+        
+        List<Vertice> lista = new ArrayList();
+        lista.add(b); lista.add(d); lista.add(c); lista.add(a);
+        
+        System.out.println(lista);
+        
+        Collections.sort(lista, new Comparator<Vertice>() {
+            @Override
+            public int compare(Vertice o1, Vertice o2) {
+                return Float.compare(o1.getX(), o2.getX());
+            }
+        });
+        
+        System.out.println(lista);*/
         
         System.out.println("SLOPE: " + lineSlope(new Aresta(a, b)));
         System.out.println("Is Hor: " + isLineHorizontal(a, b));

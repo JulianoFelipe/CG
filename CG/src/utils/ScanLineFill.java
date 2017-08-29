@@ -5,168 +5,74 @@
  */
 package utils;
 
+import Model.Aresta;
 import Model.Poligono;
-import java.awt.Rectangle;
+import Model.Vertice;
+import java.awt.Graphics;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author JFPS
  */
 public class ScanLineFill {
-    int edges; // number of edges
-	int activeEdges; // number of  active edges
+    private Graphics g;
+    private ArrayList<Vertice> intersectsList;
+    
+    public ScanLineFill(Graphics g) {
+        intersectsList = new ArrayList<>();
+        this.g = g;
+    }
 
-	// the polygon
-	int[] x; // x coordinates
-	int[] y; // y coordinates
-	int n;  // number of coordinates
-
-	// edge table
-	double[] ex;	// x coordinates
-	int[] ey1;	// upper y coordinates
-	int[] ey2;	// lower y coordinates
-	double[] eslope;   // inverse slopes (1/m)
-
-	// sorted edge table (indexes into edge table) (currently not used)
-	int[] sedge;
-
-	// active edge table (indexes into edge table)
-	int[] aedge; 
-
-        Poligono p;
+    public void setG(Graphics g) {
+        this.g = g;
+    }
+    
+    public void scanLineFill(Poligono p){
+        intersectsList.clear();
         
-	public ScanLineFill(Poligono p) {
-            this.p = p;
-	 }
-
-	 void allocateArrays(int n) {
-            if (ex==null || n>ex.length) {
-                    ex = new double[n];
-                    ey1 = new int[n];
-                    ey2 = new int[n];
-                    sedge = new int[n];
-                    aedge = new int[n];
-                    eslope = new double[n];
-            }
-	}
-
-	/** Generates the edge table. */
-	void buildEdgeTable(int[] x, int[] y, int n) {
-            int length, iplus1, x1, x2, y1, y2;
-            edges = 0;
-            for (int i=0; i<n; i++) {
-                    iplus1 = i==n-1?0:i+1;
-                    y1 = y[i];	y2 = y[iplus1];
-                    x1 = x[i];	x2 = x[iplus1];
-                    if (y1==y2)
-                            continue; //ignore horizontal lines
-                    if (y1>y2) { // swap ends
-                            int tmp = y1;
-                            y1=y2; y2=tmp;
-                            tmp=x1;
-                            x1=x2; x2=tmp;
-                    }
-                    double slope = (double)(x2-x1)/(y2-y1);
-                    ex[edges] = x1 + slope/2.0; 
-                    ey1[edges] = y1;
-                    ey2[edges] = y2;
-                    eslope[edges] = slope;
-                    edges++;   
-            }
-            for (int i=0; i<edges; i++)
-                    sedge[i] = i;
-            activeEdges = 0;
-	}
-
-	/** Fills the polygon using the ImageProcessor's current drawing color. */
-	public void fill(ImageProcessor ip, Rectangle r) {
-		ip.fill(getMask(r.width, r.height));
-	}
-
-	/** Returns a byte mask containing a filled version of the polygon. */
-	public ImageProcessor getMask(int width, int height) {
-		allocateArrays(n);
-		buildEdgeTable(x, y, n);
-		//printEdges();
-		int x1, x2, offset, index;
-		ImageProcessor mask = new ByteProcessor(width, height);
-		byte[] pixels = (byte[])mask.getPixels();
-		for (int y=0; y<height; y++) {
-			removeInactiveEdges(y);
-			activateEdges(y);
-			offset = y*width;
-			for (int i=0; i<activeEdges; i+=2) {
-				x1 = (int)(ex[aedge[i]]+0.5);
-				if (x1<0) x1=0;
-				if (x1>width) x1 = width;
-				x2 = (int)(ex[aedge[i+1]]+0.5); 
-				if (x2<0) x2=0; 
-				if (x2>width) x2 = width;
-				//IJ.log(y+" "+x1+"  "+x2);
-				for (int x=x1; x<x2; x++)
-					pixels[offset+x] = -1; // 255 (white)
-			}			
-			updateXCoordinates();
-		}
-		return mask;
-	}	
-
-	/** Updates the x coordinates in the active edges list and sorts the list if necessary. */
-	void updateXCoordinates() {
-		int index;
-		double x1=-Double.MAX_VALUE, x2;
-		boolean sorted = true;
-		for (int i=0; i<activeEdges; i++) {
-			index = aedge[i];
-			x2 = ex[index] + eslope[index];
-			ex[index] = x2;
-			if (x2<x1) sorted = false;
-			x1 = x2;
-		}
-		if (!sorted) 
-			sortActiveEdges();
-	}
-
-	/** Sorts the active edges list by x coordinate using a selection sort. */
-	void sortActiveEdges() {
-		int min, tmp;
-		for (int i=0; i<activeEdges; i++) {
-			min = i;
-			for (int j=i; j<activeEdges; j++)
-				if (ex[aedge[j]] <ex[aedge[min]]) min = j;
-			tmp=aedge[min];
-			aedge[min] = aedge[i]; 
-			aedge[i]=tmp;
-		}
-	}
-
-	/** Removes edges from the active edge table that are no longer needed. */
-	void removeInactiveEdges(int y) {
-		int i = 0;
-		while (i<activeEdges) {
-			int index = aedge[i];
-			if (y<ey1[index] || y>=ey2[index]) {
-				for (int j=i; j<activeEdges-1; j++)
-					aedge[j] = aedge[j+1];
-				activeEdges--; 
-			} else
-				i++;		 
-		}
-	}
-
-	/** Adds edges to the active edge table. */
-	void activateEdges(int y) {
-		for (int i=0; i<edges; i++) {
-			int edge =sedge[i];
-			if (y==ey1[edge]) {
-				int index = 0;
-				while (index<activeEdges && ex[edge]>ex[aedge[index]])
-					index++;
-				for (int j=activeEdges-1; j>=index; j--) 
-					aedge[j+1] = aedge[j];
-				aedge[index] = edge;
-				activeEdges++;
-			}
-		}
-}
+        buildIntersectionList(p);
+        
+        for(int i=0; i<intersectsList.size(); i+=2)
+            paintLine(intersectsList.get(i), intersectsList.get(i+1));
+    }
+    
+    private void paintLine(Vertice begin, Vertice end){
+        g.drawLine((int)begin.getX(), (int)begin.getY(),
+                   (int)  end.getX(), (int)  end.getY());
+    }
+    
+    private void buildIntersectionList(Poligono p){
+        List<Aresta> edgeList = buildEdges(p);
+    }
+    
+    public float[] findMaxMinY(Poligono p){
+        float min = Float.MIN_VALUE;
+        float max = Float.MAX_VALUE;
+        
+        for (Vertice v : p.getVertices()){
+            float y = v.getY();
+            if (y < min)
+                min = y;
+            if(y > max)
+                max = y;
+        }
+        
+        float[] ret = {min,max};
+        
+        return ret;
+    }
+    
+    public List<Aresta> buildEdges(Poligono p){
+        List<Vertice> listaVertices = p.getVertices();
+        List<Aresta> lista = new ArrayList();
+        
+        int i;
+        for (i=0; i<listaVertices.size()-1; i++)
+            lista.add(new Aresta(listaVertices.get(i), listaVertices.get(i+1)));
+        
+        lista.add(new Aresta(listaVertices.get(i), listaVertices.get(0)));
+        return lista;
+    }
 }
