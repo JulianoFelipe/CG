@@ -127,7 +127,7 @@ public class VMath {
     
     public static void main(String...args){
         Vertice a = new Vertice((float) 1, (float)1);
-        Vertice b = new Vertice((float) 1, (float)2);
+        Vertice b = new Vertice((float) 2, (float)2);
         /*Vertice c = new Vertice( 2, 2);
         Vertice d = new Vertice( 3, 4);
         

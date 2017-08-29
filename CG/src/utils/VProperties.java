@@ -8,11 +8,9 @@ package utils;
 import Model.Aresta;
 import Model.Poligono;
 import Model.Vertice;
-import com.sun.org.apache.bcel.internal.generic.AALOAD;
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -54,7 +52,7 @@ public class VProperties {
             //http://www.geeksforgeeks.org/scan-line-polygon-filling-using-opengl-c/
             //https://stackoverflow.com/questions/24469459/scanline-algorithm-how-to-calculate-intersection-points
             
-            List<Vertice> points = new ArrayList();
+            HashSet<Vertice> points = new HashSet();
             float x1, x2, y1, y2;
             double deltax, deltay, x;
             
@@ -76,17 +74,29 @@ public class VProperties {
                 }
             }
             
+            List<Vertice> copyPoints = new ArrayList(points);
             //you have to sort the intersection points of every scanline from the lowest x value to thr highest
-            Collections.sort(points, (Vertice o1, Vertice o2) -> {
+            Collections.sort(copyPoints, (Vertice o1, Vertice o2) -> {
                 return Float.compare(o1.getX(), o2.getX());
             });
             
             for (int i=0; i<points.size()-1; i+=2)
-                paintLines.add(new Aresta(points.get(i), points.get(i+1)));
+                paintLines.add(new Aresta(copyPoints.get(i), copyPoints.get(i+1)));
         }
         
         return paintLines;
     }
+    
+    private static void addAndRemoveFromScan(int scanLine, List<Aresta> activeList, List<Aresta> nonProcessedList){
+        for (int i=0; i<activeList.size(); i++){
+            
+        }
+        
+        for (int i=0; i<nonProcessedList.size(); i++){
+            
+        }
+    }
+
     
     private static float[] findMinMaxOfPolygon(Poligono p){
         float min = Float.MAX_VALUE;
