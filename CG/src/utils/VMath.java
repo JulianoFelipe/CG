@@ -169,16 +169,28 @@ public class VMath {
     }
     
     public static Movimento movimentoHorizontal(Vertice primeiro, Vertice segundo){
-        if (segundo.getX() < primeiro.getX()) return Movimento.Esquerda;
+             if (segundo.getX() < primeiro.getX()) return Movimento.Esquerda;
         else if (segundo.getX() > primeiro.getX()) return Movimento.Direita;
         else return Movimento.Estatico;
     }
     
     public static Movimento movimentoVertical(Vertice primeiro, Vertice segundo){
-        if (segundo.getY() < primeiro.getY()) return Movimento.Baixo;
+             if (segundo.getY() < primeiro.getY()) return Movimento.Baixo;
         else if (segundo.getY() > primeiro.getY()) return Movimento.Cima;
         else return Movimento.Estatico;
     }
+    
+    public static Movimento invertHorizontal(Movimento m){
+        if (m == Movimento.Direita) return Movimento.Esquerda;
+        else if (m == Movimento.Esquerda) return Movimento.Direita;
+        else return m;
+    }
+    
+    public static Movimento invertVertical(Movimento m){
+        if (m == Movimento.Baixo) return Movimento.Cima;
+        else if (m == Movimento.Cima) return Movimento.Baixo;
+        else return m;
+    } 
 }
 
 ///Rascunho

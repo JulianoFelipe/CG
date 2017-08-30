@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
+import utils.ScanLineFill;
 import utils.VProperties;
 
 /**
@@ -223,7 +224,9 @@ public class Poligono implements Serializable{
     public List<Aresta> getPaintLines(){
         if (scanlines!=null && changeScans==false) return scanlines;
         
-        scanlines = VProperties.calculateScanLines(this);
+        ScanLineFill scn = new ScanLineFill(this);
+        scanlines = scn.calculateScans();
+        //scanlines = VProperties.calculateScanLines(this);
 
         changeScans = false;
         return scanlines;

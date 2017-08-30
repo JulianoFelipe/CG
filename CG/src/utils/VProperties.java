@@ -96,9 +96,8 @@ public class VProperties {
             
         }
     }
-
     
-    private static float[] findMinMaxOfPolygon(Poligono p){
+    public static float[] findMinMaxOfPolygon(Poligono p){
         float min = Float.MAX_VALUE;
         float max = Float.MIN_VALUE;
         

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
 import utils.ManualPaint;
-import utils.ScanLineFill;
+import utils.NaiveScanLineFill;
 
 /**
  *
@@ -130,7 +130,8 @@ public class DrawablePanel extends JPanel {
                 //ManualPaint m = new ManualPaint(1280,720);
                 //m.floodFill(graphics, p);
                 //System.out.println("NOT JAVA FILL");
-                ScanLineFill scn = new ScanLineFill(graphics);
+                
+                NaiveScanLineFill scn = new NaiveScanLineFill(graphics);
                 scn.scanLineFill(p);
             }
         }

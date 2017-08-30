@@ -60,6 +60,7 @@ public class MainV extends javax.swing.JFrame {
     private byte currentAction = NO_ACTION;
     private Vertice previousDrag;
     private Vertice firstActionPoint = null;
+    private boolean invertSlope = false;
     
     private void resetPaint(){
         //panelCp.nullTemps();
@@ -269,6 +270,7 @@ public class MainV extends javax.swing.JFrame {
                         Cisalhamento c = new Cisalhamento();
                         Movimento v = VMath.movimentoVertical(previousDrag, curr);
                         Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                            
                         switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
                             case Cursor.N_RESIZE_CURSOR: //Vertical
                                 if (v == Movimento.Cima) 
@@ -306,6 +308,7 @@ public class MainV extends javax.swing.JFrame {
                         Escala sc = new Escala();
                         Movimento v = VMath.movimentoVertical(previousDrag, curr);
                         Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                        
                         switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
                             case Cursor.N_RESIZE_CURSOR: //Vertical
                                 if (v == Movimento.Cima)
