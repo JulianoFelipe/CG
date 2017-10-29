@@ -24,7 +24,7 @@ public class MVMath {
         float z = (m[2][0] * v.getX()) + (m[2][1] * v.getY()) + (m[2][2] * v.getW());
         float w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getW());
         
-        v.setAll(x, y, w);
+        v.setAll(x, y, z,w);
     }
     
     /**
@@ -39,7 +39,7 @@ public class MVMath {
         double z = (m[2][0] * v.getX()) + (m[2][1] * v.getY()) + (m[2][2] * v.getW());
         double w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getW());
         
-        v.setAll((float)x,(float) y,(float) w); /* MUCH PRECISÃO. VERY CASTING. WOW*/
+        v.setAll((float)x,(float) y,(float) z, (float) w); /* MUCH PRECISÃO. VERY CASTING. WOW*/
     }
     
     /**
@@ -56,7 +56,7 @@ public class MVMath {
         float w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getW());
         
         Vertice vertice = new Vertice();
-        vertice.setAll(x, y, w);
+        vertice.setAll(x, y, z, w);
         return vertice;
     }
 }

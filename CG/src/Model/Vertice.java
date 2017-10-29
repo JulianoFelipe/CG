@@ -15,6 +15,7 @@ public class Vertice implements Serializable{
      */
     public float x;
     public float y;
+    public float z;
     public float w;
     
     //<editor-fold defaultstate="collapsed" desc="Construtores">
@@ -29,13 +30,18 @@ public class Vertice implements Serializable{
      * @param y valor para y
      * @param z valor para z
      */
-    public Vertice(float x, float y) {
+    public Vertice(float x, float y, float z) {
         this.x = x;
         this.y = y;
+        this.z = z;
         this.w = 1;
         
         ID = INSTANCES;
         INSTANCES++;
+    }
+    
+    public Vertice(float x, float y){
+        this(x,y,0);
     }
     
     public Vertice(int x, int y){
@@ -82,29 +88,23 @@ public class Vertice implements Serializable{
         return ID;
     }
     
-    public void setAll(float x, float y, float w ){
+    public void setAll(float x, float y, float z, float w ){
         this.x=x;
         this.y=y;
+        this.z=z;
         this.w=w;
     }
 //</editor-fold>
     
     @Override
     public String toString() {
-        return "("+x+";"+y+")";
+        return "("+x+";"+y+";" + z + ")";
     }
     
     public String toString(String nome) {
-        return nome+"=("+x+";"+y+";"+w+")";
+        return nome+"=("+x+";"+y+";"+z+")";
     }
-    
-    @Override
-    public int hashCode() {
-        int hash = 3;
-        hash = 97 * hash + Float.floatToIntBits(this.x);
-        hash = 97 * hash + Float.floatToIntBits(this.y);
-        return hash;
-    }
+
     
     /**
      * Método equals para comparação entre vértices. Uso:
@@ -123,6 +123,9 @@ public class Vertice implements Serializable{
      */
     @Override
     public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
         if (obj == null) {
             return false;
         }
@@ -133,6 +136,21 @@ public class Vertice implements Serializable{
         if (Float.floatToIntBits(this.x) != Float.floatToIntBits(other.x)) {
             return false;
         }
-        return Float.floatToIntBits(this.y) == Float.floatToIntBits(other.y);
+        if (Float.floatToIntBits(this.y) != Float.floatToIntBits(other.y)) {
+            return false;
+        }
+        if (Float.floatToIntBits(this.z) != Float.floatToIntBits(other.z)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Float.floatToIntBits(this.x);
+        hash = 97 * hash + Float.floatToIntBits(this.y);
+        hash = 97 * hash + Float.floatToIntBits(this.z);
+        return hash;
     }
 }

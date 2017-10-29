@@ -21,6 +21,9 @@ import ioScene.InputScene;
 import ioScene.OutputScene;
 import java.awt.Color;
 import java.awt.Cursor;
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
@@ -62,6 +65,8 @@ public class MainV extends javax.swing.JFrame {
     private Vertice previousDrag;
     private Vertice firstActionPoint = null;
     private boolean invertSlope = false;
+    
+    private boolean controlFLAG = false;
     
     private void resetPaint(){
         panelCp.repaint();
@@ -211,10 +216,13 @@ public class MainV extends javax.swing.JFrame {
                         }
                         if (toAdd){
                             boolean isVert=VMath.isLineVertical(closeLine), isHori=VMath.isLineHorizontal(closeLine);
-                            if (isVert && !isHori){
+                                
+                            if (isVert && !isHori && controlFLAG){
                                 paneMs.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-                            } else if (isHori && !isVert){
+                            } else if (isHori && !isVert && controlFLAG){
                                 paneMs.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
+                            } else if (!controlFLAG){
+                                paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
                             } else {
                                 if (Math.abs(VMath.lineSlope(closeLine)) == 1.0)
                                     paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
@@ -372,6 +380,19 @@ public class MainV extends javax.swing.JFrame {
         LOG.log(Level.INFO, "Cena inicializada...");
         LOG.info("O botão \"Cancelar\" pode servir para forçar a atualização da pintura da cena.");
         buttonGroup1.add(ghost); //Para "deselecionar" os botões
+        
+        KeyboardFocusManager.getCurrentKeyboardFocusManager()
+            .addKeyEventDispatcher(new KeyEventDispatcher() {
+                @Override
+                public boolean dispatchKeyEvent(KeyEvent e) {
+                    if (e.isControlDown()){
+                        controlFLAG = true;
+                    } else {
+                        controlFLAG = false;
+                    }
+                  return false;
+                }
+          });
     }
 
     /**
@@ -423,6 +444,8 @@ public class MainV extends javax.swing.JFrame {
         jMenu3 = new javax.swing.JMenu();
         defaultColorRadio = new javax.swing.JRadioButtonMenuItem();
         setColorRadio = new javax.swing.JRadioButtonMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        jMenuItem2 = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         addFocusListener(new java.awt.event.FocusAdapter() {
@@ -438,6 +461,14 @@ public class MainV extends javax.swing.JFrame {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowDeiconified(java.awt.event.WindowEvent evt) {
                 formWindowDeiconified(evt);
+            }
+        });
+        addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                formKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                formKeyReleased(evt);
             }
         });
 
@@ -593,6 +624,15 @@ public class MainV extends javax.swing.JFrame {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
         );
+
+        paneMs.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                paneMsKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                paneMsKeyReleased(evt);
+            }
+        });
 
         jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Ferramentas"));
         jPanel5.setToolTipText("");
@@ -777,6 +817,18 @@ public class MainV extends javax.swing.JFrame {
         jMenu3.add(setColorRadio);
 
         jMenuBar1.add(jMenu3);
+
+        jMenu4.setText("Opções");
+
+        jMenuItem2.setText("Controles");
+        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu4.add(jMenuItem2);
+
+        jMenuBar1.add(jMenu4);
 
         setJMenuBar(jMenuBar1);
 
@@ -1051,23 +1103,23 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_paintBtActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if (bordaBox.isSelected()){
+        /*if (bordaBox.isSelected()){
             currentBorda = null;
             bordaColor.setBackground(currentBorda);
             bordaColor.setForeground(currentBorda);
             bordaColor.setText("null");
-        }
+        }*/ //Borda não pode ser transparente mesmo...
         
-        if (fundoBox.isSelected()){
+        //if (fundoBox.isSelected()){
             currentFundo = null;
             fundoColor.setBackground(currentFundo);
             fundoColor.setForeground(currentFundo);
             fundoColor.setText("null");
-        }
+        //}
         
-        if (bordaBox.isSelected() && fundoBox.isSelected()){
+        /*if (bordaBox.isSelected() && fundoBox.isSelected()){
             LOG.warning("Selecione um campo para colocar a cor como transparente (Fundo ou Borda)");
-        }
+        }*/
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void fundoColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fundoColorActionPerformed
@@ -1079,6 +1131,44 @@ public class MainV extends javax.swing.JFrame {
             fundoColor.setText("");
         }
     }//GEN-LAST:event_fundoColorActionPerformed
+
+    private void paneMsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_paneMsKeyPressed
+        if(evt.getKeyCode()==KeyEvent.VK_CONTROL){
+            controlFLAG=true;
+            System.out.println("INN");
+        }
+        System.out.println("CONTROL");
+    }//GEN-LAST:event_paneMsKeyPressed
+
+    private void paneMsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_paneMsKeyReleased
+        if(evt.getKeyCode()==KeyEvent.VK_CONTROL){
+            controlFLAG=true;
+            System.out.println("OUTTTTT");
+        }
+        System.out.println("REEEEEEE");
+    }//GEN-LAST:event_paneMsKeyReleased
+
+    private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
+        if (evt.isControlDown()){
+            controlFLAG = true;
+            System.out.println("CONTROL");
+        }
+    }//GEN-LAST:event_formKeyPressed
+
+    private void formKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyReleased
+        if (!evt.isControlDown()){
+            controlFLAG = false;
+        }
+    }//GEN-LAST:event_formKeyReleased
+
+    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
+        
+        ControlsSplash splash = new ControlsSplash();
+        splash.setVisible(true);
+        this.setEnabled(false);
+        //splash.
+        this.setEnabled(true);
+    }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1133,8 +1223,10 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu3;
+    private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
+    private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -1188,7 +1280,7 @@ public class MainV extends javax.swing.JFrame {
             if (bordaBox.isSelected() && currentBorda!=null)
                 borda = currentBorda;
             if (fundoBox.isSelected())
-                fundo = currentBorda; 
+                fundo = currentFundo; 
             
             return new Poligono(temporaryList, borda, fundo);
         }
@@ -1203,7 +1295,7 @@ public class MainV extends javax.swing.JFrame {
             if (bordaBox.isSelected() && currentBorda!=null)
                 borda = currentBorda;
             if (fundoBox.isSelected())
-                fundo = currentBorda; 
+                fundo = currentFundo; 
             return new Nregular(jSlider1.getValue(), radius, temporaryList.get(0), borda, fundo);
         }
     }

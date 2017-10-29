@@ -21,6 +21,7 @@ public class ColorMath {
     }
     
     public static boolean isColorCloseToRed(Color color){
+        if (color == null) return false;
         if (color.getRed() < 200) return false;
         /*
             Função naive para determinar se uma cor é próxima a vermelho,
@@ -36,12 +37,14 @@ public class ColorMath {
     }
     
     public static boolean isColorCloseToGreen(Color color){
+        if (color == null) return false;
         if (color.getRed() < 200) return false;
         if (color.getBlue()>60 || color.getGreen()>60) return false;
         return color.getAlpha() >= 130;
     }
     
     public static boolean isColorCloseToBlue(Color color){
+        if (color == null) return false;
         if (color.getRed() < 200) return false;
         if (color.getBlue()>60 || color.getGreen()>60) return false;
         return color.getAlpha() >= 130;
