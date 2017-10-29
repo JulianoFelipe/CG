@@ -83,7 +83,6 @@ public class ScanLineFill {
             double x1, x2, y1, y2;
             double deltax, deltay, x;
             
-            System.out.println("SCAN: " + yScan);
             for (int ps = 0; ps <activeEdge.size(); ps++) {
                 Aresta a = activeEdge.get(ps);
                 x1 = a.getvInicial().getX();
@@ -100,8 +99,6 @@ public class ScanLineFill {
                 
                 if ((y1 <= yScan && y2 > yScan) || (y2 <= yScan && y1 > yScan)) {
                     points.add(new Vertice(roundedX, yScan));
-                    //System.out.println("SCAN: " + yScan);
-                    System.out.println("POINT: " + new Vertice(roundedX, yScan));
                 }
             }
             

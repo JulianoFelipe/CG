@@ -34,6 +34,7 @@ import javax.swing.JToggleButton;
 import javax.swing.SwingUtilities;
 import utils.PMath;
 import utils.VMath;
+
 /**
  *
  * @author Anderson
@@ -63,7 +64,6 @@ public class MainV extends javax.swing.JFrame {
     private boolean invertSlope = false;
     
     private void resetPaint(){
-        //panelCp.nullTemps();
         panelCp.repaint();
     }
     
@@ -388,10 +388,11 @@ public class MainV extends javax.swing.JFrame {
         buttonGroup4 = new javax.swing.ButtonGroup();
         jPanel2 = new javax.swing.JPanel();
         paintBt = new javax.swing.JButton();
-        colorChooser = new javax.swing.JButton();
+        bordaColor = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         bordaBox = new javax.swing.JCheckBox();
         fundoBox = new javax.swing.JCheckBox();
+        fundoColor = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         irregularPoligonBt = new javax.swing.JToggleButton();
@@ -451,12 +452,12 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        colorChooser.setBackground(new java.awt.Color(51, 51, 255));
-        colorChooser.setForeground(new java.awt.Color(51, 51, 255));
-        colorChooser.setToolTipText("Seleção de cores");
-        colorChooser.addActionListener(new java.awt.event.ActionListener() {
+        bordaColor.setBackground(new java.awt.Color(0, 0, 0));
+        bordaColor.setForeground(new java.awt.Color(0, 0, 0));
+        bordaColor.setToolTipText("Seleção de cores");
+        bordaColor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                colorChooserActionPerformed(evt);
+                bordaColorActionPerformed(evt);
             }
         });
 
@@ -472,6 +473,14 @@ public class MainV extends javax.swing.JFrame {
 
         fundoBox.setText("Fundo");
 
+        fundoColor.setText("null");
+        fundoColor.setToolTipText("Seleção de cores");
+        fundoColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                fundoColorActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -479,18 +488,21 @@ public class MainV extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(colorChooser, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(bordaBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(bordaColor, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE))
+                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addGap(15, 15, 15)
+                                .addComponent(fundoBox, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel2Layout.createSequentialGroup()
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(fundoColor, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(bordaBox)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(fundoBox))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
-                                .addComponent(paintBt, javax.swing.GroupLayout.DEFAULT_SIZE, 68, Short.MAX_VALUE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton1)))
-                        .addGap(4, 4, 4)))
+                        .addComponent(paintBt, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -504,7 +516,9 @@ public class MainV extends javax.swing.JFrame {
                     .addComponent(bordaBox)
                     .addComponent(fundoBox))
                 .addGap(10, 10, 10)
-                .addComponent(colorChooser, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(fundoColor, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
+                    .addComponent(bordaColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -754,11 +768,11 @@ public class MainV extends javax.swing.JFrame {
         jMenu3.setText("Pintura");
 
         buttonGroup4.add(defaultColorRadio);
-        defaultColorRadio.setSelected(true);
         defaultColorRadio.setText("Criar polígonos com cor padrão");
         jMenu3.add(defaultColorRadio);
 
         buttonGroup4.add(setColorRadio);
+        setColorRadio.setSelected(true);
         setColorRadio.setText("Criar polígonos com cor da área de pintura");
         jMenu3.add(setColorRadio);
 
@@ -796,12 +810,12 @@ public class MainV extends javax.swing.JFrame {
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(paneMs))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(2, 2, 2))
+                .addContainerGap())
         );
 
         pack();
@@ -1005,29 +1019,30 @@ public class MainV extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_scaleBt1ActionPerformed
 
-    private Color current = Color.BLUE;
+    private Color currentBorda = Color.BLACK;
+    private Color currentFundo = null;
     
-    private void colorChooserActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_colorChooserActionPerformed
-        Color newColor = JColorChooser.showDialog(null, "Escolha uma cor", current);
+    private void bordaColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bordaColorActionPerformed
+        Color newColor = JColorChooser.showDialog(null, "Escolha uma cor", currentBorda);
         if(newColor != null){
-            current = newColor;
-            colorChooser.setBackground(current);
-            colorChooser.setForeground(current);
-            colorChooser.setText("");
+            currentBorda = newColor;
+            bordaColor.setBackground(currentBorda);
+            bordaColor.setForeground(currentBorda);
+            bordaColor.setText("");
         }
-    }//GEN-LAST:event_colorChooserActionPerformed
+    }//GEN-LAST:event_bordaColorActionPerformed
 
     private void paintBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_paintBtActionPerformed
         if (selectedPolygon == null){
             LOG.info("Selecione um polígono com a ferramenta de seleção para poder pintar.");
         } else {
             if (bordaBox.isSelected()){
-                selectedPolygon.setCorBorda(current);
-                if (current != null) LOG.info("Borda do polígono pintada.");
+                selectedPolygon.setCorBorda(currentBorda);
+                if (currentBorda != null) LOG.info("Borda do polígono pintada.");
             } 
             
             if (fundoBox.isSelected()){
-                selectedPolygon.setCorFundo(current);
+                selectedPolygon.setCorFundo(currentFundo);
                 LOG.info("Fundo do polígono pintado.");
             }
             
@@ -1036,11 +1051,34 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_paintBtActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        current = null;
-        colorChooser.setBackground(current);
-        colorChooser.setForeground(current);
-        colorChooser.setText("Transparente");
+        if (bordaBox.isSelected()){
+            currentBorda = null;
+            bordaColor.setBackground(currentBorda);
+            bordaColor.setForeground(currentBorda);
+            bordaColor.setText("null");
+        }
+        
+        if (fundoBox.isSelected()){
+            currentFundo = null;
+            fundoColor.setBackground(currentFundo);
+            fundoColor.setForeground(currentFundo);
+            fundoColor.setText("null");
+        }
+        
+        if (bordaBox.isSelected() && fundoBox.isSelected()){
+            LOG.warning("Selecione um campo para colocar a cor como transparente (Fundo ou Borda)");
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void fundoColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_fundoColorActionPerformed
+        Color newColor = JColorChooser.showDialog(null, "Escolha uma cor", currentFundo);
+        if(newColor != null){
+            currentFundo = newColor;
+            fundoColor.setBackground(currentFundo);
+            fundoColor.setForeground(currentFundo);
+            fundoColor.setText("");
+        }
+    }//GEN-LAST:event_fundoColorActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1078,16 +1116,17 @@ public class MainV extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox bordaBox;
+    private javax.swing.JButton bordaColor;
     private javax.swing.ButtonGroup buttonGroup1;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.ButtonGroup buttonGroup4;
     private javax.swing.JButton cancelBt;
     private javax.swing.JCheckBox centerAnchorBox;
-    private javax.swing.JButton colorChooser;
     private javax.swing.JTextPane consolePane;
     private javax.swing.JRadioButtonMenuItem defaultColorRadio;
     private javax.swing.JButton deleteBt;
     private javax.swing.JCheckBox fundoBox;
+    private javax.swing.JButton fundoColor;
     private javax.swing.JToggleButton irregularPoligonBt;
     private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel2;
@@ -1146,10 +1185,10 @@ public class MainV extends javax.swing.JFrame {
             return new Poligono(temporaryList);
         } else {
             Color borda=Poligono.DEFAULT_BORDA, fundo=null;
-            if (bordaBox.isSelected() && current!=null)
-                borda = current;
+            if (bordaBox.isSelected() && currentBorda!=null)
+                borda = currentBorda;
             if (fundoBox.isSelected())
-                fundo = current; 
+                fundo = currentBorda; 
             
             return new Poligono(temporaryList, borda, fundo);
         }
@@ -1161,10 +1200,10 @@ public class MainV extends javax.swing.JFrame {
            return new Nregular(jSlider1.getValue(), radius, temporaryList.get(0)); 
         } else {
             Color borda=Poligono.DEFAULT_BORDA, fundo=null;
-            if (bordaBox.isSelected() && current!=null)
-                borda = current;
+            if (bordaBox.isSelected() && currentBorda!=null)
+                borda = currentBorda;
             if (fundoBox.isSelected())
-                fundo = current; 
+                fundo = currentBorda; 
             return new Nregular(jSlider1.getValue(), radius, temporaryList.get(0), borda, fundo);
         }
     }

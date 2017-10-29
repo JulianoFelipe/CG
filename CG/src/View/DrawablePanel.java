@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
+import utils.ColorMath;
 import utils.ManualPaint;
 import utils.NaiveScanLineFill;
 
@@ -25,9 +26,8 @@ import utils.NaiveScanLineFill;
 public class DrawablePanel extends JPanel {
     private static final Logger LOG = Logger.getLogger("CG");
     public static final int SELECTED_RADIUS = 5;
-    public static final Color SELECTED_COLOR = Color.RED;
-    public static final Color ANCHOR_COLOR1 = Color.BLUE;
-    public static final Color ANCHOR_COLOR2 = Color.MAGENTA;
+    public static final Color SELECTED_COLOR  = Color.RED;
+    public static final Color SELECTED_COLOR2 = Color.BLUE;
     
     private final List<Poligono> objetos;
     private final Graphics graphics;
@@ -142,7 +142,12 @@ public class DrawablePanel extends JPanel {
     public void paintSelectedPolygon(){
         if (selectedPolygon == null) return;
         Color prev = graphics.getColor();
-        graphics.setColor(SELECTED_COLOR);
+        
+        if (ColorMath.isThisColorCloseToThatOne(SELECTED_COLOR, selectedPolygon.getCorFundo())) 
+            graphics.setColor(SELECTED_COLOR2);
+        else 
+            graphics.setColor(SELECTED_COLOR);
+        //graphics.setColor(SELECTED_COLOR);
         
         selectedPolygon.getVertices().forEach((ponto) -> {
             graphics.drawOval((int) ponto.getX() - SELECTED_RADIUS,
@@ -155,10 +160,10 @@ public class DrawablePanel extends JPanel {
         
         
         if (centerAnchor != null){
-            if (selectedPolygon.getCorFundo() == ANCHOR_COLOR1) 
+            /*if (ColorMath.isThisColorCloseToThatOne(SELECTED_COLOR2, selectedPolygon.getCorFundo())) 
                 graphics.setColor(ANCHOR_COLOR2);
             else 
-                graphics.setColor(ANCHOR_COLOR1);
+                graphics.setColor(SELECTED_COLOR2);*/
             
             graphics.fillOval((int) centerAnchor.getX() - SELECTED_RADIUS,
                               (int) centerAnchor.getY() - SELECTED_RADIUS,
