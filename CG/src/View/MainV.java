@@ -67,6 +67,7 @@ public class MainV extends javax.swing.JFrame {
     private boolean invertSlope = false;
     
     private boolean controlFLAG = false;
+    private boolean shiftFLAG = false;
     
     private void resetPaint(){
         panelCp.repaint();
@@ -215,7 +216,7 @@ public class MainV extends javax.swing.JFrame {
                             }
                         }
                         if (toAdd){
-                            boolean isVert=VMath.isLineVertical(closeLine), isHori=VMath.isLineHorizontal(closeLine);
+                            /*boolean isVert=VMath.isLineVertical(closeLine), isHori=VMath.isLineHorizontal(closeLine);
                                 
                             if (isVert && !isHori && controlFLAG){
                                 paneMs.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
@@ -228,7 +229,11 @@ public class MainV extends javax.swing.JFrame {
                                     paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
                                 else
                                     paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                            }
+                            }*/
+                                 if ( controlFLAG && !shiftFLAG) paneMs.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                            else if (!controlFLAG &&  shiftFLAG) paneMs.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
+                            //else if ( controlFLAG &&  shiftFLAG) paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+                            else                                 paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
                         } else {
                             paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         }
@@ -385,11 +390,8 @@ public class MainV extends javax.swing.JFrame {
             .addKeyEventDispatcher(new KeyEventDispatcher() {
                 @Override
                 public boolean dispatchKeyEvent(KeyEvent e) {
-                    if (e.isControlDown()){
-                        controlFLAG = true;
-                    } else {
-                        controlFLAG = false;
-                    }
+                    controlFLAG = e.isControlDown();
+                    shiftFLAG = e.isShiftDown();
                   return false;
                 }
           });
@@ -547,9 +549,9 @@ public class MainV extends javax.swing.JFrame {
                     .addComponent(bordaBox)
                     .addComponent(fundoBox))
                 .addGap(10, 10, 10)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(fundoColor, javax.swing.GroupLayout.DEFAULT_SIZE, 66, Short.MAX_VALUE)
-                    .addComponent(bordaColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(bordaColor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(fundoColor))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -818,7 +820,7 @@ public class MainV extends javax.swing.JFrame {
 
         jMenuBar1.add(jMenu3);
 
-        jMenu4.setText("Opções");
+        jMenu4.setText("Ajuda");
 
         jMenuItem2.setText("Controles");
         jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
@@ -855,19 +857,19 @@ public class MainV extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(paneMs))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
