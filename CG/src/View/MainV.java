@@ -11,6 +11,11 @@ import Model.Aresta;
 import Model.Eixo;
 import Model.Movimento;
 import Model.Poligono;
+
+//https://en.wikipedia.org/wiki/Orthographic_projection
+//https://www.google.com.br/search?client=firefox-b-ab&dcr=0&ei=RUj-WffCIIOawAS5goyYCQ&q=projection+plane&oq=projection+plane&gs_l=psy-ab.3..0i19k1l10.1801.3934.0.4075.16.13.0.0.0.0.318.1788.0j5j3j1.9.0....0...1.1.64.psy-ab..7.9.1782...0j0i131k1j0i67k1j0i3k1j0i22i30k1j0i22i10i30k1.0.mhXAfFimwHE
+
+
 import Model.Vertice;
 import Model.Nregular;
 import Model.Transformações.Cisalhamento;
@@ -503,6 +508,12 @@ public class MainV extends javax.swing.JFrame {
         });
 
         bordaBox.setText("Borda");
+        bordaBox.setToolTipText("");
+        bordaBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bordaBoxActionPerformed(evt);
+            }
+        });
 
         fundoBox.setText("Fundo");
 
@@ -550,9 +561,11 @@ public class MainV extends javax.swing.JFrame {
                     .addComponent(fundoBox))
                 .addGap(10, 10, 10)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(bordaColor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(fundoColor))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(bordaColor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(fundoColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Objetos"));
@@ -787,7 +800,6 @@ public class MainV extends javax.swing.JFrame {
         jMenu2.setText("Algoritmo de Preenchimento");
 
         buttonGroup2.add(javaFillRadio);
-        javaFillRadio.setSelected(true);
         javaFillRadio.setText("Fill Java");
         javaFillRadio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -797,6 +809,7 @@ public class MainV extends javax.swing.JFrame {
         jMenu2.add(javaFillRadio);
 
         buttonGroup2.add(jRadioButtonMenuItem2);
+        jRadioButtonMenuItem2.setSelected(true);
         jRadioButtonMenuItem2.setText("Fill CG (Manual)");
         jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -1171,6 +1184,10 @@ public class MainV extends javax.swing.JFrame {
         //splash.
         this.setEnabled(true);
     }//GEN-LAST:event_jMenuItem2ActionPerformed
+
+    private void bordaBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bordaBoxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_bordaBoxActionPerformed
 
     /**
      * @param args the command line arguments

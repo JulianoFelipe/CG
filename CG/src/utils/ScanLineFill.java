@@ -18,8 +18,8 @@ import java.util.List;
  * @author JFPS
  */
 public class ScanLineFill {
-    private Poligono p;
-    private List<Aresta> activeEdge;
+    private final Poligono p;
+    private final List<Aresta> activeEdge;
     private List<Aresta> nonProcessedEdges;
 
     public ScanLineFill(Poligono poligono) {
@@ -79,27 +79,29 @@ public class ScanLineFill {
             //http://www.geeksforgeeks.org/scan-line-polygon-filling-using-opengl-c/
             //https://stackoverflow.com/questions/13807343/pixel-overlap-with-polygon-efficient-scanline-type-algorithm?rq=1
             
-            HashSet<Vertice> points = new HashSet();
-            double x1, x2, y1, y2;
-            double deltax, deltay, x;
+            HashSet<Vertice> points = new HashSet();           
             
+            byte parity = 0;
             for (int ps = 0; ps <activeEdge.size(); ps++) {
-                Aresta a = activeEdge.get(ps);
-                x1 = a.getvInicial().getX();
-                y1 = a.getvInicial().getY();
-                x2 = a.getvFinal().getX();
-                y2 = a.getvFinal().getY();
-
-                deltax = x2 - x1;
-                deltay = y2 - y1;
-
+                                
+                Aresta current = activeEdge.get(ps);
+                double x = current.getInterceptX();
                 int roundedX;
-                x = x1 + deltax / deltay * (yScan - y1);
-                roundedX = (int) Math.round(x);
+
                 
+                          
+                roundedX = (int) Math.round(x);                
+                double y1=current.getvInicial().getY(), y2=current.getvFinal().getY();
                 if ((y1 <= yScan && y2 > yScan) || (y2 <= yScan && y1 > yScan)) {
                     points.add(new Vertice(roundedX, yScan));
                 }
+                
+                double inverseSlope = Math.abs(1/current.getSlope());
+                if (Double.isFinite(inverseSlope)){
+                    x += inverseSlope;
+                    current.setInterceptX(x);
+                }
+                parity = 1;
             }
             
             List<Vertice> copyPoints = new ArrayList(points);

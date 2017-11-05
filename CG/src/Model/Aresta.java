@@ -1,7 +1,9 @@
 package Model;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Objects;
+import utils.VMath;
 
 /**
  * Classe da estrutura e manipulacao de arestas
@@ -24,6 +26,11 @@ public class Aresta implements Serializable{
     
     private final long ID;
     
+    private boolean changed;
+    private double slope;
+    private double b;    //this ->   y= slope*x + b;
+    private double interceptX; //"Double" so it can be null
+     
     //<editor-fold defaultstate="collapsed" desc="Construtores">
     /**
      * Construtor Default vInicial e vFinal = (0,0,0,1)
@@ -61,6 +68,9 @@ public class Aresta implements Serializable{
             minY = I.getY();
         }
         
+        interceptX = minX;
+        changed = true;
+        
         ID = INSTANCES;
         INSTANCES++;
     }
@@ -83,6 +93,8 @@ public class Aresta implements Serializable{
             maxY = vInicial.getY();
         if (vInicial.getY() < minY)
             minY = vInicial.getY();
+        
+        changed = true;
     }
     
     public Vertice getvFinal() {
@@ -101,6 +113,8 @@ public class Aresta implements Serializable{
             maxY = vFinal.getY();
         if (vFinal.getY() < minY)
             minY = vFinal.getY();
+        
+        changed = true;
     }
 
     public float getMaxY() {
@@ -126,7 +140,34 @@ public class Aresta implements Serializable{
     public static long getINSTANCES() {
         return INSTANCES;
     }
-    
+
+    public double getSlope() {
+        if (changed){
+            double[] props = VMath.slopeInterceptForm(this);
+            slope = props[0];
+            b     = props[1];
+            changed = false;
+        }
+        return slope;
+    }
+
+    public double getB() {
+        if (changed){
+            double[] props = VMath.slopeInterceptForm(this);
+            slope = props[0];
+            b     = props[1];
+            changed = false;
+        }
+        return b;
+    }
+
+    public Double getInterceptX() {
+        return interceptX;
+    }
+
+    public void setInterceptX(Double interceptX) {
+        this.interceptX = interceptX;
+    }
 //</editor-fold>
     
     @Override

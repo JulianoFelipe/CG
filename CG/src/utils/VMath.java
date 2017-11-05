@@ -8,6 +8,7 @@ package utils;
 import Model.Aresta;
 import Model.Movimento;
 import Model.Vertice;
+import java.util.Arrays;
 
 /**
  * Vector/Vertice math
@@ -88,6 +89,17 @@ public class VMath {
         return shortestDistance(new Aresta(lineA, lineB), point);
     }
     
+    public static double[] slopeInterceptForm(Aresta line){
+        double slope = (line.getvFinal().getY() - line.getvInicial().getY()) / 
+                       (line.getvFinal().getX() - line.getvInicial().getX());
+        
+        double b = line.getvInicial().getY() + 
+                  (line.getvInicial().getX()*slope);
+        
+        double[] ret = {slope, b};
+        return ret;
+    }
+    
     public static double lineSlope(Aresta line){
         return (line.getvFinal().getY() - line.getvInicial().getY()) / 
                (line.getvFinal().getX() - line.getvInicial().getX());
@@ -126,8 +138,8 @@ public class VMath {
     }
     
     public static void main(String...args){
-        Vertice a = new Vertice((float) 1, (float)1);
-        Vertice b = new Vertice((float) 2, (float)2);
+        Vertice a = new Vertice((float) 2, (float)3);
+        Vertice b = new Vertice((float) 8, (float)1);
         /*Vertice c = new Vertice( 2, 2);
         Vertice d = new Vertice( 3, 4);
         
@@ -145,7 +157,8 @@ public class VMath {
         
         System.out.println(lista);*/
         
-        System.out.println("SLOPE: " + lineSlope(new Aresta(a, b)));
+        System.out.println("SLOPE INTER: " + Arrays.toString(slopeInterceptForm(new Aresta(a, b))));
+        //System.out.println("SLOPE: " + lineSlope(new Aresta(a, b)));
         System.out.println("Is Hor: " + isLineHorizontal(a, b));
         System.out.println("Is Ver: " + isLineVertical(a, b));
         
