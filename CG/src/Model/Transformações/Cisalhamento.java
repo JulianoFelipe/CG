@@ -20,6 +20,8 @@ public class Cisalhamento {
                 return cisalhamentoX(fator, p);
             case Eixo_Y:
                 return cisalhamentoY(fator, p);
+            case Eixo_Z:
+                return cisalhamentoZ(fator, p);
             default:
                 throw new UnsupportedOperationException("Não implementado");
         }
@@ -31,6 +33,8 @@ public class Cisalhamento {
                 return cisalhamentoX(fator, p, pontoFixo);
             case Eixo_Y:
                 return cisalhamentoY(fator, p, pontoFixo);
+            case Eixo_Z:
+                return cisalhamentoZ(fator, p, pontoFixo);
             default:
                 throw new UnsupportedOperationException("Não implementado");
         }
@@ -54,21 +58,39 @@ public class Cisalhamento {
         return p;
     }
     
+    public Poligono cisalhamentoZ(double fator, Poligono p){
+        int vertices = p.getVertices().size();
+        for (int i=0; i<vertices; i++){
+            Vertice copy = p.getVertices().get(i);
+            p.getVertices().get(i).setZ((float) (copy.getY() + (fator*copy.getX())));
+        }
+        return p;
+    }
+    
     public Poligono cisalhamentoX(double graus, Poligono p, final Vertice pontoFixo){    
         if (pontoFixo == null) return cisalhamentoX(graus, p);
         Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), 0, p);
+        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
         p = cisalhamentoX(graus, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), 0, p);
+        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         return p;
     }
         
     public Poligono cisalhamentoY(double graus, Poligono p, final Vertice pontoFixo){
         if (pontoFixo == null) return cisalhamentoY(graus, p);
         Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), 0, p);
+        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
         p = cisalhamentoY(graus, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), 0, p);
+        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        return p;
+    }
+    
+    public Poligono cisalhamentoZ(double graus, Poligono p, final Vertice pontoFixo){
+        if (pontoFixo == null) return cisalhamentoZ(graus, p);
+        Translacao t = new Translacao();
+        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        p = cisalhamentoY(graus, p);
+        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         return p;
     }
         

@@ -17,13 +17,13 @@ import java.util.List;
  */
 public class Translacao{
     
-    public Poligono transladar(int unidadesX, int unidadesY, int unidadesZ, Poligono p){
+   public Poligono transladar(int unidadesX, int unidadesY, int unidadesZ, Poligono p){
         int vertices = p.getVertices().size();
         for (int i=0; i<vertices; i++){
             Vertice copy = p.getVertices().get(i);
             p.getVertices().get(i).setX((float) (copy.getX() + unidadesX));
             p.getVertices().get(i).setY((float) (copy.getY() + unidadesY));
-            //p.getVertices().get(i).setZ((float) (copy.getZ() + unidadesZ));
+            p.getVertices().get(i).setZ((float) (copy.getZ() + unidadesZ));
         }
         
         return p;

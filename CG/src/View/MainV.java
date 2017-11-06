@@ -360,9 +360,9 @@ public class MainV extends javax.swing.JFrame {
                         Movimento m = VMath.movimentoHorizontal(previousDrag, curr);
                         Rotacao r = new Rotacao();
                         if (m == Movimento.Direita)
-                            selectedPolygon = r.rotacao(0.05, selectedPolygon, rotAxis);
+                            selectedPolygon = r.rotacaoZ(0.05, selectedPolygon, rotAxis);
                         else if (m == Movimento.Esquerda)
-                            selectedPolygon = r.rotacao(-0.05, selectedPolygon, rotAxis);
+                            selectedPolygon = r.rotacaoZ(-0.05, selectedPolygon, rotAxis);
                     }
                     //</editor-fold>
                 }

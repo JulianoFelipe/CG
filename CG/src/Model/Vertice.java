@@ -72,6 +72,14 @@ public class Vertice implements Serializable{
         this.y = y;
     }
 
+    public float getZ() {
+        return z;
+    }
+
+    public void setZ(float z) {
+        this.z = z;
+    }
+    
     public float getW() {
         return w;
     }
