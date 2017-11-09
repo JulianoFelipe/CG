@@ -18,6 +18,7 @@ import Model.Poligono;
 
 import Model.Vertice;
 import Model.Nregular;
+import Model.Projections.OrtographicProjection;
 import Model.Transformações.Cisalhamento;
 import Model.Transformações.Escala;
 import Model.Transformações.Rotacao;
@@ -52,7 +53,7 @@ public class MainV extends javax.swing.JFrame {
     private static final double LINE_PROXIMITY_THRESHOLD = 3.9;
     private static final Logger LOG = Logger.getLogger("CG");
     private final JToggleButton ghost = new JToggleButton();
-    private DrawablePanel panelCp;
+    private World panelCp;
 
     private int noPointsToCreate = -2;
     private boolean pendingCreating = false;
@@ -61,6 +62,7 @@ public class MainV extends javax.swing.JFrame {
     private List<Vertice> temporaryList = new ArrayList();  
     private Poligono selectedPolygon = null;
     
+    //<editor-fold defaultstate="collapsed" desc="Actions and controls">
     private static final byte NO_ACTION        = 0;
     private static final byte ROTATE_ACTION    = 1;
     private static final byte TRANSLATE_ACTION = 2;
@@ -73,9 +75,19 @@ public class MainV extends javax.swing.JFrame {
     
     private boolean controlFLAG = false;
     private boolean shiftFLAG = false;
+//</editor-fold>
+    
+    private ProjectionPlane topo;
+    private ProjectionPlane lateral;
+    private final ProjectionPlane frente;
+    private ProjectionPlane persp;
     
     private void resetPaint(){
-        panelCp.repaint();
+        //topo.repaint();
+        lateral.repaint();
+        frente.repaint();
+        //persp.repaint();
+        //topoPane.getGraphics().draw3DRect(50, 50, 100, 100, true);
     }
     
     private void resetDrawingState(){
@@ -88,22 +100,37 @@ public class MainV extends javax.swing.JFrame {
     }
     
     //https://en.wikipedia.org/wiki/Z-order_curve // Para armazenar "texture maps"?
-    private void addMouseListeners(){
-        paneMs.addMouseListener(new java.awt.event.MouseAdapter() {           
+    
+    //<editor-fold defaultstate="collapsed" desc="All 3 Listeners">
+    private void addAllListeners(){
+        //addTopoListeners();
+        addLateralListeners();
+        addFrenteListeners();
+    }
+    
+    /* esquema de coords
+    Frente  XY
+    Lateral YZ (Y é Y, e X é Z)
+    Topo    XZ (X é X e Y é Z)
+    */
+    
+    private void addTopoListeners(){
+        topoPane.addMouseListener(new java.awt.event.MouseAdapter() {           
             @Override
             public void mousePressed(java.awt.event.MouseEvent evt) {                               
                 int x = evt.getX();
-                int y = evt.getY();
+                int y = 0;
+                int z = evt.getY();
                 
                 if (currentAction != NO_ACTION){
-                    previousDrag = new Vertice(x, y);
+                    previousDrag = new Vertice(x, y, z);
                     return;
                 }
 
                 //<editor-fold defaultstate="collapsed" desc="Select Action">
                 if(selectBt.isSelected()){
-                    List<Poligono> lista = panelCp.getListaPoligonos();
-                    Vertice point = new Vertice(x, y);
+                    List<Poligono> lista = topo.getListaPoligonos();
+                    Vertice point = new Vertice(x, y, z);
 
                     for(int i=0; i<lista.size(); i++){
                         List<Vertice> vertices = lista.get(i).getVertices();
@@ -124,7 +151,7 @@ public class MainV extends javax.swing.JFrame {
                         if (toAdd){
                             LOG.info("Polígono selecionado.");
                             selectedPolygon = lista.get(i);
-                            panelCp.setSelectedPolygon(selectedPolygon);
+                            topo.setSelectedPolygon(selectedPolygon);
                             resetPaint();
                             return;
                         }
@@ -146,13 +173,13 @@ public class MainV extends javax.swing.JFrame {
                 }
 
                 if (regularSidedLock){   
-                    Vertice radiusPnt = new Vertice((float) x, (float)y);
+                    Vertice radiusPnt = new Vertice(x, y, z);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.addPoligono(localPolygonBuilder(dist));  //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
-                    panelCp.cleanTempRegular();
+                    topo.addPoligono(localPolygonBuilder(dist));  //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
+                    topo.cleanTempRegular();
                     
                     resetDrawingState();
-                    panelCp.repaint();
+                    topo.repaint();
                     regularSidedLock = false;
                     regularSidedPolygon = false;
                     return ;
@@ -162,23 +189,23 @@ public class MainV extends javax.swing.JFrame {
                     if (temporaryList.size() < 3){
                         temporaryList.clear();
                         resetDrawingState();
-                        panelCp.cleanTempoLines();
+                        topo.cleanTempoLines();
                     } else {
-                        panelCp.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));          
+                        topo.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));          
                         resetDrawingState();
-                        panelCp.cleanTempoLines();
+                        topo.cleanTempoLines();
                     }
                 } else if (noPointsToCreate == 1){
-                    temporaryList.add(new Vertice((float) x, (float)y));
-                    panelCp.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));        
+                    temporaryList.add(new Vertice(x, y, z));
+                    topo.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));        
                     resetDrawingState();
-                    panelCp.cleanTempoLines();
+                    topo.cleanTempoLines();
                 } else {
-                    temporaryList.add(new Vertice((float) x, (float)y));
+                    temporaryList.add(new Vertice(x, y, z));
                     --noPointsToCreate;
                     if (temporaryList.size() >= 2){
                         int size = temporaryList.size();
-                        panelCp.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
+                        topo.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
                     }    
                     
                     if (regularSidedPolygon){
@@ -186,24 +213,25 @@ public class MainV extends javax.swing.JFrame {
                     }
                     LOG.info("Ponto capturado.");
                 }
-                panelCp.repaint();
+                topo.repaint();
             } 
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                panelCp.setAnchor(null);
+                topo.setAnchor(null);
                 resetPaint();
             }            
         });
         
-        paneMs.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+        topoPane.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
             @Override
             public void mouseMoved(MouseEvent e) {
                 int x = e.getX();
-                int y = e.getY();
+                int y = 0;
+                int z = e.getY();
                 
                 if (currentAction != NO_ACTION){
-                    Vertice v = new Vertice((float) x, (float)y);
+                    Vertice v = new Vertice(x, y, z);
                     //<editor-fold defaultstate="collapsed" desc="Escala e Cisalhamento Move">
                     if (currentAction==SHEAR_ACTION || currentAction==SCALE_ACTION){
                         int selSize = selectedPolygon.getVertices().size();
@@ -221,26 +249,12 @@ public class MainV extends javax.swing.JFrame {
                             }
                         }
                         if (toAdd){
-                            /*boolean isVert=VMath.isLineVertical(closeLine), isHori=VMath.isLineHorizontal(closeLine);
-                                
-                            if (isVert && !isHori && controlFLAG){
-                                paneMs.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-                            } else if (isHori && !isVert && controlFLAG){
-                                paneMs.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
-                            } else if (!controlFLAG){
-                                paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
-                            } else {
-                                if (Math.abs(VMath.lineSlope(closeLine)) == 1.0)
-                                    paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
-                                else
-                                    paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-                            }*/
-                                 if ( controlFLAG && !shiftFLAG) paneMs.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-                            else if (!controlFLAG &&  shiftFLAG) paneMs.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
+                                 if ( controlFLAG && !shiftFLAG) topo.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                            else if (!controlFLAG &&  shiftFLAG) topo.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
                             //else if ( controlFLAG &&  shiftFLAG) paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
-                            else                                 paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+                            else                                 topo.setCursor(new Cursor(Cursor.MOVE_CURSOR));
                         } else {
-                            paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                            topo.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
                         }
                     //</editor-fold>
                     //<editor-fold defaultstate="collapsed" desc="Resto Move">
@@ -260,22 +274,26 @@ public class MainV extends javax.swing.JFrame {
                 //paneMs.repaint();
                                
                 if (regularSidedLock){
-                    Vertice radiusPnt = new Vertice((float) x, (float)y);
+                    Vertice radiusPnt = new Vertice(x, y, z);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.setTempRegular(localPolygonBuilder(dist));
+                    topo.setTempRegular(localPolygonBuilder(dist));
                 } else {
                     //panelCp.cleanTempoLines();
                     Vertice last = temporaryList.get(temporaryList.size()-1);
-                    panelCp.setMovable(new Aresta(new Vertice((float) x, (float) y), last));
+                    topo.setMovable(new Aresta(new Vertice(x, y, z), last));
                 }
-                panelCp.repaint();
+                topo.repaint();
                 
                 //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
             
             @Override
             public void mouseDragged(MouseEvent e) {
-                Vertice curr = new Vertice(e.getX(), e.getY());
+                int x = e.getX();
+                int y = 0;
+                int z = e.getY();
+                
+                Vertice curr = new Vertice(x, y, z);
                 if (selectedPolygon!=null && currentAction!=NO_ACTION){
                     boolean anchor = centerAnchorBox.isSelected();
                     Vertice center = null;
@@ -327,7 +345,7 @@ public class MainV extends javax.swing.JFrame {
                         Movimento v = VMath.movimentoVertical(previousDrag, curr);
                         Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
                         
-                        switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
+                        switch (topo.getCursor().getType()) {   //Invertido!!!!!
                             case Cursor.N_RESIZE_CURSOR: //Vertical
                                 if (v == Movimento.Cima)
                                     selectedPolygon = sc.escala(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
@@ -366,12 +384,567 @@ public class MainV extends javax.swing.JFrame {
                     }
                     //</editor-fold>
                 }
-                panelCp.setSelectedPolygon(selectedPolygon);
+                topo.setSelectedPolygon(selectedPolygon);
                 resetPaint();
                 previousDrag = curr;
             }
         });
     }
+    
+    private void addLateralListeners(){
+        lateralPane.addMouseListener(new java.awt.event.MouseAdapter() {           
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {                               
+                int x = 0;
+                int y = evt.getY();
+                int z = evt.getX();
+                
+                if (currentAction != NO_ACTION){
+                    previousDrag = new Vertice(x, y, z);
+                    return;
+                }
+
+                //<editor-fold defaultstate="collapsed" desc="Select Action">
+                if(selectBt.isSelected()){
+                    List<Poligono> lista = lateral.getListaPoligonos();
+                    Vertice point = new Vertice(x, y, z);
+
+                    for(int i=0; i<lista.size(); i++){
+                        List<Vertice> vertices = lista.get(i).getVertices();
+                        boolean toAdd = false;
+
+                        innerFor: for(int j=0; j<vertices.size(); j++){
+                            Vertice a = vertices.get(j), b;
+                            if (j == vertices.size()-1) b=vertices.get(0);
+                            else b=vertices.get(j+1);
+                            
+                            //System.out.println(VMath.shortestDistance(a, b, point));
+                            if (VMath.shortestDistance(a, b, point) < LINE_PROXIMITY_THRESHOLD){
+                                toAdd = true;
+                                break innerFor;
+                            }
+                        }
+
+                        if (toAdd){
+                            LOG.info("Polígono selecionado.");
+                            selectedPolygon = lista.get(i);
+                            lateral.setSelectedPolygon(selectedPolygon);
+                            resetPaint();
+                            return;
+                        }
+                    }
+                    return;
+                }
+                //</editor-fold>
+                
+                if(!pendingCreating){
+                    int noTyped = getNumberOfSidesFromBtSelected();
+                    if (noTyped == -1){
+                        LOG.warning("Selecione um tipo de polígono para desenhar.");
+                        return;
+                    } else {
+                        pendingCreating = true;
+                        noPointsToCreate = noTyped;
+                        temporaryList = new ArrayList<>();
+                    }
+                }
+
+                if (regularSidedLock){   
+                    Vertice radiusPnt = new Vertice(x, y, z);
+                    int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                    lateral.addPoligono(localPolygonBuilder(dist));  //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
+                    lateral.cleanTempRegular();
+                    
+                    resetDrawingState();
+                    lateral.repaint();
+                    regularSidedLock = false;
+                    regularSidedPolygon = false;
+                    return ;
+                }
+                
+                if (SwingUtilities.isRightMouseButton(evt)){
+                    if (temporaryList.size() < 3){
+                        temporaryList.clear();
+                        resetDrawingState();
+                        lateral.cleanTempoLines();
+                    } else {
+                        lateral.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));          
+                        resetDrawingState();
+                        lateral.cleanTempoLines();
+                    }
+                } else if (noPointsToCreate == 1){
+                    temporaryList.add(new Vertice(x, y, z));
+                    lateral.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));        
+                    resetDrawingState();
+                    lateral.cleanTempoLines();
+                } else {
+                    temporaryList.add(new Vertice(x, y, z));
+                    --noPointsToCreate;
+                    if (temporaryList.size() >= 2){
+                        int size = temporaryList.size();
+                        lateral.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
+                    }    
+                    
+                    if (regularSidedPolygon){
+                        regularSidedLock = true;
+                    }
+                    LOG.info("Ponto capturado.");
+                }
+                lateral.repaint();
+            } 
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                lateral.setAnchor(null);
+                resetPaint();
+            }            
+        });
+        
+        lateralPane.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int x = 0;
+                int y = e.getY();
+                int z = e.getX();
+                
+                if (currentAction != NO_ACTION){
+                    Vertice v = new Vertice(x, y, z);
+                    //<editor-fold defaultstate="collapsed" desc="Escala e Cisalhamento Move">
+                    if (currentAction==SHEAR_ACTION || currentAction==SCALE_ACTION){
+                        int selSize = selectedPolygon.getVertices().size();
+                        boolean toAdd=false;
+                        Aresta closeLine = null;
+                        for(int j=0; j<selSize; j++){
+                            Vertice a = selectedPolygon.getVertices().get(j), b;
+                            if (j == selSize-1) b=selectedPolygon.getVertices().get(0);
+                            else b=selectedPolygon.getVertices().get(j+1);
+
+                            if (VMath.shortestDistance(a, b, v) < LINE_PROXIMITY_THRESHOLD){
+                                toAdd = true;
+                                closeLine = new Aresta(a,b);
+                                break;
+                            }
+                        }
+                        if (toAdd){
+                                 if ( controlFLAG && !shiftFLAG) lateral.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                            else if (!controlFLAG &&  shiftFLAG) lateral.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
+                            //else if ( controlFLAG &&  shiftFLAG) paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+                            else                                 lateral.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+                        } else {
+                            lateral.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Resto Move">
+                    } else {
+                        Vertice prox = PMath.verticeProximoDeQualquerVerticeDoPoligono(selectedPolygon, v);
+                        if (prox != null){
+                            paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                            firstActionPoint = prox;
+                        } else
+                            paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                    //</editor-fold>
+                }
+                
+                if (temporaryList.size() < 1) return;
+                if (!pendingCreating) return;
+                //paneMs.repaint();
+                               
+                if (regularSidedLock){
+                    Vertice radiusPnt = new Vertice(x, y, z);
+                    int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                    panelCp.setTempRegular(localPolygonBuilder(dist));
+                } else {
+                    //panelCp.cleanTempoLines();
+                    Vertice last = temporaryList.get(temporaryList.size()-1);
+                    panelCp.setMovable(new Aresta(new Vertice(x, y, z), last));
+                }
+                panelCp.repaint();
+                
+                //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int x = 0;
+                int y = e.getY();
+                int z = e.getX();
+                
+                Vertice curr = new Vertice(x, y, z);
+                if (selectedPolygon!=null && currentAction!=NO_ACTION){
+                    boolean anchor = centerAnchorBox.isSelected();
+                    Vertice center = null;
+                    if (anchor){
+                        center = selectedPolygon.getCentroideDaMedia();
+                        panelCp.setAnchor(center);
+                    }
+                    //<editor-fold defaultstate="collapsed" desc="Cisalhamento Drag">
+                    if (currentAction == SHEAR_ACTION){
+                        Cisalhamento c = new Cisalhamento();
+                        Movimento v = VMath.movimentoVertical(previousDrag, curr);
+                        Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                            
+                        switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
+                            case Cursor.N_RESIZE_CURSOR: //Vertical
+                                if (v == Movimento.Cima) 
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y,  0.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, -0.01, selectedPolygon, center);
+                                break;
+                            case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                if (h == Movimento.Direita)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X,  0.01, selectedPolygon, center);
+                                else if (h == Movimento.Esquerda)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, -0.01, selectedPolygon, center);
+                                break;
+                            case Cursor.MOVE_CURSOR:
+                                if (h == Movimento.Direita)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X,  0.01, selectedPolygon, center);
+                                else if (h == Movimento.Esquerda)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, -0.01, selectedPolygon, center);
+                                if (v == Movimento.Cima) 
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y,  0.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, -0.01, selectedPolygon, center);
+                                break;
+                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Translação Drag">
+                        } else if (currentAction == TRANSLATE_ACTION){
+                            Translacao t = new Translacao();
+                            selectedPolygon = t.transladar((int) -(previousDrag.getX() - curr.getX()),
+                                                           (int) -(previousDrag.getY() - curr.getY()),
+                                                           0, selectedPolygon);
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Escala Drag">
+                    } else if (currentAction == SCALE_ACTION){
+                        Escala sc = new Escala();
+                        Movimento v = VMath.movimentoVertical(previousDrag, curr);
+                        Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                        
+                        switch (lateral.getCursor().getType()) {   //Invertido!!!!!
+                            case Cursor.N_RESIZE_CURSOR: //Vertical
+                                if (v == Movimento.Cima)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 0.99, selectedPolygon, center);
+                                break;
+                            case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                if (h == Movimento.Esquerda)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 1.01, selectedPolygon, center);
+                                else if (h == Movimento.Direita)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 0.99, selectedPolygon, center);
+                                break;
+                            case Cursor.MOVE_CURSOR:
+                                if (v == Movimento.Cima)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 0.99, selectedPolygon, center);
+                                if (h == Movimento.Esquerda)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 1.01, selectedPolygon, center);
+                                else if (h == Movimento.Direita)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 0.99, selectedPolygon, center);
+                                break;
+                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Rotação Drag">
+                    } else if (currentAction == ROTATE_ACTION){
+                        Vertice rotAxis = null;
+                        if (center != null) rotAxis = center;
+                        else rotAxis = new Vertice(firstActionPoint);
+                        Movimento m = VMath.movimentoHorizontal(previousDrag, curr);
+                        Rotacao r = new Rotacao();
+                        if (m == Movimento.Direita)
+                            selectedPolygon = r.rotacaoZ(0.05, selectedPolygon, rotAxis);
+                        else if (m == Movimento.Esquerda)
+                            selectedPolygon = r.rotacaoZ(-0.05, selectedPolygon, rotAxis);
+                    }
+                    //</editor-fold>
+                }
+                lateral.setSelectedPolygon(selectedPolygon);
+                resetPaint();
+                previousDrag = curr;
+            }
+        });
+    }
+    
+    private void addFrenteListeners(){
+        frentePane.addMouseListener(new java.awt.event.MouseAdapter() {           
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {                               
+                int x = evt.getX();
+                int y = evt.getY();
+                int z = 0;
+                
+                if (currentAction != NO_ACTION){
+                    previousDrag = new Vertice(x, y, z);
+                    return;
+                }
+
+                //<editor-fold defaultstate="collapsed" desc="Select Action">
+                if(selectBt.isSelected()){
+                    List<Poligono> lista = frente.getListaPoligonos();
+                    Vertice point = new Vertice(x, y, z);
+
+                    for(int i=0; i<lista.size(); i++){
+                        List<Vertice> vertices = lista.get(i).getVertices();
+                        boolean toAdd = false;
+
+                        innerFor: for(int j=0; j<vertices.size(); j++){
+                            Vertice a = vertices.get(j), b;
+                            if (j == vertices.size()-1) b=vertices.get(0);
+                            else b=vertices.get(j+1);
+                            
+                            //System.out.println(VMath.shortestDistance(a, b, point));
+                            if (VMath.shortestDistance(a, b, point) < LINE_PROXIMITY_THRESHOLD){
+                                toAdd = true;
+                                break innerFor;
+                            }
+                        }
+
+                        if (toAdd){
+                            LOG.info("Polígono selecionado.");
+                            selectedPolygon = lista.get(i);
+                            frente.setSelectedPolygon(selectedPolygon);
+                            resetPaint();
+                            return;
+                        }
+                    }
+                    return;
+                }
+                //</editor-fold>
+                
+                if(!pendingCreating){
+                    int noTyped = getNumberOfSidesFromBtSelected();
+                    if (noTyped == -1){
+                        LOG.warning("Selecione um tipo de polígono para desenhar.");
+                        return;
+                    } else {
+                        pendingCreating = true;
+                        noPointsToCreate = noTyped;
+                        temporaryList = new ArrayList<>();
+                    }
+                }
+
+                if (regularSidedLock){   
+                    Vertice radiusPnt = new Vertice(x, y, z);
+                    int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                    frente.addPoligono(localPolygonBuilder(dist));  //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
+                    frente.cleanTempRegular();
+                    
+                    resetDrawingState();
+                    frente.repaint();
+                    regularSidedLock = false;
+                    regularSidedPolygon = false;
+                    return ;
+                }
+                
+                if (SwingUtilities.isRightMouseButton(evt)){
+                    if (temporaryList.size() < 3){
+                        temporaryList.clear();
+                        resetDrawingState();
+                        frente.cleanTempoLines();
+                    } else {
+                        frente.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));          
+                        resetDrawingState();
+                        frente.cleanTempoLines();
+                    }
+                } else if (noPointsToCreate == 1){
+                    temporaryList.add(new Vertice(x, y, z));
+                    frente.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));        
+                    resetDrawingState();
+                    frente.cleanTempoLines();
+                } else {
+                    temporaryList.add(new Vertice(x, y, z));
+                    --noPointsToCreate;
+                    if (temporaryList.size() >= 2){
+                        int size = temporaryList.size();
+                        frente.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
+                    }    
+                    
+                    if (regularSidedPolygon){
+                        regularSidedLock = true;
+                    }
+                    LOG.info("Ponto capturado.");
+                }
+                frente.repaint();
+            } 
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                frente.setAnchor(null);
+                resetPaint();
+            }            
+        });
+        
+        frentePane.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int x = e.getX();
+                int y = e.getY();
+                int z = 0;
+                
+                if (currentAction != NO_ACTION){
+                    Vertice v = new Vertice( x, y, z);
+                    //<editor-fold defaultstate="collapsed" desc="Escala e Cisalhamento Move">
+                    if (currentAction==SHEAR_ACTION || currentAction==SCALE_ACTION){
+                        int selSize = selectedPolygon.getVertices().size();
+                        boolean toAdd=false;
+                        Aresta closeLine = null;
+                        for(int j=0; j<selSize; j++){
+                            Vertice a = selectedPolygon.getVertices().get(j), b;
+                            if (j == selSize-1) b=selectedPolygon.getVertices().get(0);
+                            else b=selectedPolygon.getVertices().get(j+1);
+
+                            if (VMath.shortestDistance(a, b, v) < LINE_PROXIMITY_THRESHOLD){
+                                toAdd = true;
+                                closeLine = new Aresta(a,b);
+                                break;
+                            }
+                        }
+                        if (toAdd){
+                                 if ( controlFLAG && !shiftFLAG) frente.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                            else if (!controlFLAG &&  shiftFLAG) frente.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
+                            //else if ( controlFLAG &&  shiftFLAG) paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+                            else                                 frente.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+                        } else {
+                            frente.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Resto Move">
+                    } else {
+                        Vertice prox = PMath.verticeProximoDeQualquerVerticeDoPoligono(selectedPolygon, v);
+                        if (prox != null){
+                            paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                            firstActionPoint = prox;
+                        } else
+                            paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                    //</editor-fold>
+                }
+                
+                if (temporaryList.size() < 1) return;
+                if (!pendingCreating) return;
+                //paneMs.repaint();
+                               
+                if (regularSidedLock){
+                    Vertice radiusPnt = new Vertice(x, y, z);
+                    int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                    panelCp.setTempRegular(localPolygonBuilder(dist));
+                } else {
+                    //panelCp.cleanTempoLines();
+                    Vertice last = temporaryList.get(temporaryList.size()-1);
+                    panelCp.setMovable(new Aresta(new Vertice( x, y, z), last));
+                }
+                panelCp.repaint();
+                
+                //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int x = e.getX();
+                int y = e.getY();
+                int z = 0;
+                
+                Vertice curr = new Vertice(x, y, z);
+                if (selectedPolygon!=null && currentAction!=NO_ACTION){
+                    boolean anchor = centerAnchorBox.isSelected();
+                    Vertice center = null;
+                    if (anchor){
+                        center = selectedPolygon.getCentroideDaMedia();
+                        panelCp.setAnchor(center);
+                    }
+                    //<editor-fold defaultstate="collapsed" desc="Cisalhamento Drag">
+                    if (currentAction == SHEAR_ACTION){
+                        Cisalhamento c = new Cisalhamento();
+                        Movimento v = VMath.movimentoVertical(previousDrag, curr);
+                        Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                            
+                        switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
+                            case Cursor.N_RESIZE_CURSOR: //Vertical
+                                if (v == Movimento.Cima) 
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y,  0.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, -0.01, selectedPolygon, center);
+                                break;
+                            case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                if (h == Movimento.Direita)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X,  0.01, selectedPolygon, center);
+                                else if (h == Movimento.Esquerda)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, -0.01, selectedPolygon, center);
+                                break;
+                            case Cursor.MOVE_CURSOR:
+                                if (h == Movimento.Direita)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X,  0.01, selectedPolygon, center);
+                                else if (h == Movimento.Esquerda)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, -0.01, selectedPolygon, center);
+                                if (v == Movimento.Cima) 
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y,  0.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, -0.01, selectedPolygon, center);
+                                break;
+                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Translação Drag">
+                        } else if (currentAction == TRANSLATE_ACTION){
+                            Translacao t = new Translacao();
+                            selectedPolygon = t.transladar((int) -(previousDrag.getX() - curr.getX()),
+                                                           (int) -(previousDrag.getY() - curr.getY()),
+                                                           0, selectedPolygon);
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Escala Drag">
+                    } else if (currentAction == SCALE_ACTION){
+                        Escala sc = new Escala();
+                        Movimento v = VMath.movimentoVertical(previousDrag, curr);
+                        Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                        
+                        switch (frente.getCursor().getType()) {   //Invertido!!!!!
+                            case Cursor.N_RESIZE_CURSOR: //Vertical
+                                if (v == Movimento.Cima)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 0.99, selectedPolygon, center);
+                                break;
+                            case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                if (h == Movimento.Esquerda)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 1.01, selectedPolygon, center);
+                                else if (h == Movimento.Direita)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 0.99, selectedPolygon, center);
+                                break;
+                            case Cursor.MOVE_CURSOR:
+                                if (v == Movimento.Cima)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 0.99, selectedPolygon, center);
+                                if (h == Movimento.Esquerda)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 1.01, selectedPolygon, center);
+                                else if (h == Movimento.Direita)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 0.99, selectedPolygon, center);
+                                break;
+                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Rotação Drag">
+                    } else if (currentAction == ROTATE_ACTION){
+                        Vertice rotAxis = null;
+                        if (center != null) rotAxis = center;
+                        else rotAxis = new Vertice(firstActionPoint);
+                        Movimento m = VMath.movimentoHorizontal(previousDrag, curr);
+                        Rotacao r = new Rotacao();
+                        if (m == Movimento.Direita)
+                            selectedPolygon = r.rotacaoZ(0.05, selectedPolygon, rotAxis);
+                        else if (m == Movimento.Esquerda)
+                            selectedPolygon = r.rotacaoZ(-0.05, selectedPolygon, rotAxis);
+                    }
+                    //</editor-fold>
+                }
+                frente.setSelectedPolygon(selectedPolygon);
+                resetPaint();
+                previousDrag = curr;
+            }
+        });
+    }
+//</editor-fold>
     
     /**
      * Creates new form Principal
@@ -379,9 +952,9 @@ public class MainV extends javax.swing.JFrame {
     public MainV() {  
         //Toolkit.getDefaultToolkit().setDynamicLayout(false);
         initComponents();
-        panelCp = new DrawablePanel(paneMs.getGraphics());
+        panelCp = new World(paneMs.getGraphics());
         paneMs.add(panelCp);
-        addMouseListeners();
+        //addMouseListeners();
 
         consolePane.setEditable(false);
         BufferedPaneOutputStream oStream = new BufferedPaneOutputStream(consolePane);
@@ -400,6 +973,19 @@ public class MainV extends javax.swing.JFrame {
                   return false;
                 }
           });
+        
+        //topo    = new ProjectionPlane(topoPane.getGraphics(), new OrtographicProjection(OrtographicProjection.Orientation.Topo), panelCp);
+        lateral = new ProjectionPlane(lateralPane.getGraphics(), new OrtographicProjection(OrtographicProjection.Orientation.Lateral), panelCp);
+        frente  = new ProjectionPlane(frentePane.getGraphics(), new OrtographicProjection(OrtographicProjection.Orientation.Frente), panelCp);
+        //persp   = new ProjectionPlane(perspPane.getGraphics(), new OrtographicProjection(OrtographicProjection.Orientation.Topo), panelCp);
+        
+        panelCp.setProjectionPlaneList(frente);//topo, lateral, frente, persp);
+        //topoPane.setViewportView(topo);
+        lateralPane.setViewportView(lateral);
+        frentePane.setViewportView(frente);
+        //perspPane.setViewportView(persp);
+        
+        addAllListeners();
     }
 
     /**
@@ -414,32 +1000,37 @@ public class MainV extends javax.swing.JFrame {
         buttonGroup1 = new javax.swing.ButtonGroup();
         buttonGroup2 = new javax.swing.ButtonGroup();
         buttonGroup4 = new javax.swing.ButtonGroup();
-        jPanel2 = new javax.swing.JPanel();
+        pinturaPanel = new javax.swing.JPanel();
         paintBt = new javax.swing.JButton();
         bordaColor = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
         bordaBox = new javax.swing.JCheckBox();
         fundoBox = new javax.swing.JCheckBox();
         fundoColor = new javax.swing.JButton();
-        jPanel3 = new javax.swing.JPanel();
+        objetosPanel = new javax.swing.JPanel();
         jLabel2 = new javax.swing.JLabel();
         irregularPoligonBt = new javax.swing.JToggleButton();
         regularNsided = new javax.swing.JToggleButton();
         jSlider1 = new javax.swing.JSlider();
-        jPanel1 = new javax.swing.JPanel();
+        consolePanel = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         consolePane = new javax.swing.JTextPane();
         paneMs = new javax.swing.JScrollPane();
-        jPanel5 = new javax.swing.JPanel();
+        ferramentasPanel = new javax.swing.JPanel();
         selectBt = new javax.swing.JToggleButton();
         cancelBt = new javax.swing.JButton();
         deleteBt = new javax.swing.JButton();
-        jPanel4 = new javax.swing.JPanel();
+        transformacoesPanel = new javax.swing.JPanel();
         translateBt1 = new javax.swing.JToggleButton();
         rotateBt1 = new javax.swing.JToggleButton();
         shearBt1 = new javax.swing.JToggleButton();
         scaleBt1 = new javax.swing.JToggleButton();
         centerAnchorBox = new javax.swing.JCheckBox();
+        panelOfPanels = new javax.swing.JPanel();
+        frentePane = new javax.swing.JScrollPane();
+        lateralPane = new javax.swing.JScrollPane();
+        topoPane = new javax.swing.JScrollPane();
+        perspPane = new javax.swing.JScrollPane();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         saveMenu = new javax.swing.JMenuItem();
@@ -479,8 +1070,8 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Pintura"));
-        jPanel2.setToolTipText("");
+        pinturaPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Pintura"));
+        pinturaPanel.setToolTipText("");
 
         paintBt.setText("Pintar");
         paintBt.setToolTipText("Pintar polígono selecionado na cor exibida");
@@ -525,50 +1116,50 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout pinturaPanelLayout = new javax.swing.GroupLayout(pinturaPanel);
+        pinturaPanel.setLayout(pinturaPanelLayout);
+        pinturaPanelLayout.setHorizontalGroup(
+            pinturaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pinturaPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(pinturaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pinturaPanelLayout.createSequentialGroup()
+                        .addGroup(pinturaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(bordaBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(bordaColor, javax.swing.GroupLayout.DEFAULT_SIZE, 88, Short.MAX_VALUE))
-                        .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addGroup(pinturaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(pinturaPanelLayout.createSequentialGroup()
                                 .addGap(15, 15, 15)
                                 .addComponent(fundoBox, javax.swing.GroupLayout.PREFERRED_SIZE, 81, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel2Layout.createSequentialGroup()
+                            .addGroup(pinturaPanelLayout.createSequentialGroup()
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(fundoColor, javax.swing.GroupLayout.PREFERRED_SIZE, 88, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pinturaPanelLayout.createSequentialGroup()
                         .addComponent(paintBt, javax.swing.GroupLayout.DEFAULT_SIZE, 71, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 111, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+        pinturaPanelLayout.setVerticalGroup(
+            pinturaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pinturaPanelLayout.createSequentialGroup()
+                .addGroup(pinturaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(paintBt)
                     .addComponent(jButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGroup(pinturaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bordaBox)
                     .addComponent(fundoBox))
                 .addGap(10, 10, 10)
-                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGroup(pinturaPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pinturaPanelLayout.createSequentialGroup()
                         .addComponent(bordaColor, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addComponent(fundoColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
-        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Objetos"));
+        objetosPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Objetos"));
 
         jLabel2.setText("Lados para polígono regular");
 
@@ -597,25 +1188,25 @@ public class MainV extends javax.swing.JFrame {
         jSlider1.setToolTipText("");
         jSlider1.setValue(3);
 
-        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        javax.swing.GroupLayout objetosPanelLayout = new javax.swing.GroupLayout(objetosPanel);
+        objetosPanel.setLayout(objetosPanelLayout);
+        objetosPanelLayout.setHorizontalGroup(
+            objetosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(objetosPanelLayout.createSequentialGroup()
                 .addComponent(irregularPoligonBt, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(regularNsided, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
-            .addGroup(jPanel3Layout.createSequentialGroup()
+            .addGroup(objetosPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(objetosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jSlider1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
         );
-        jPanel3Layout.setVerticalGroup(
-            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
+        objetosPanelLayout.setVerticalGroup(
+            objetosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(objetosPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(objetosPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(irregularPoligonBt)
                     .addComponent(regularNsided))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -625,18 +1216,18 @@ public class MainV extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Console"));
+        consolePanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Console"));
 
         jScrollPane1.setViewportView(consolePane);
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        javax.swing.GroupLayout consolePanelLayout = new javax.swing.GroupLayout(consolePanel);
+        consolePanel.setLayout(consolePanelLayout);
+        consolePanelLayout.setHorizontalGroup(
+            consolePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        consolePanelLayout.setVerticalGroup(
+            consolePanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 112, Short.MAX_VALUE)
         );
 
@@ -649,8 +1240,8 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Ferramentas"));
-        jPanel5.setToolTipText("");
+        ferramentasPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Ferramentas"));
+        ferramentasPanel.setToolTipText("");
 
         buttonGroup1.add(selectBt);
         selectBt.setText("Selecionar");
@@ -674,21 +1265,21 @@ public class MainV extends javax.swing.JFrame {
             }
         });
 
-        javax.swing.GroupLayout jPanel5Layout = new javax.swing.GroupLayout(jPanel5);
-        jPanel5.setLayout(jPanel5Layout);
-        jPanel5Layout.setHorizontalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        javax.swing.GroupLayout ferramentasPanelLayout = new javax.swing.GroupLayout(ferramentasPanel);
+        ferramentasPanel.setLayout(ferramentasPanelLayout);
+        ferramentasPanelLayout.setHorizontalGroup(
+            ferramentasPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ferramentasPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(ferramentasPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(selectBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(cancelBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(deleteBt, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
-        jPanel5Layout.setVerticalGroup(
-            jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel5Layout.createSequentialGroup()
+        ferramentasPanelLayout.setVerticalGroup(
+            ferramentasPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(ferramentasPanelLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(selectBt)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -697,8 +1288,8 @@ public class MainV extends javax.swing.JFrame {
                 .addComponent(cancelBt))
         );
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Transformações"));
-        jPanel4.setToolTipText("");
+        transformacoesPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)), "Transformações"));
+        transformacoesPanel.setToolTipText("");
 
         buttonGroup1.add(translateBt1);
         translateBt1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/Images/translacao.png"))); // NOI18N
@@ -736,38 +1327,63 @@ public class MainV extends javax.swing.JFrame {
         centerAnchorBox.setText("Ancorar centróide");
         centerAnchorBox.setToolTipText("Torna invariante em relação ao centróide.");
 
-        javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
-        jPanel4.setLayout(jPanel4Layout);
-        jPanel4Layout.setHorizontalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
+        javax.swing.GroupLayout transformacoesPanelLayout = new javax.swing.GroupLayout(transformacoesPanel);
+        transformacoesPanel.setLayout(transformacoesPanelLayout);
+        transformacoesPanelLayout.setHorizontalGroup(
+            transformacoesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(transformacoesPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(transformacoesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(centerAnchorBox, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(transformacoesPanelLayout.createSequentialGroup()
+                        .addGroup(transformacoesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(rotateBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(scaleBt1, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(transformacoesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(translateBt1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(shearBt1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 66, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap())
         );
-        jPanel4Layout.setVerticalGroup(
-            jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel4Layout.createSequentialGroup()
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+        transformacoesPanelLayout.setVerticalGroup(
+            transformacoesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(transformacoesPanelLayout.createSequentialGroup()
+                .addGroup(transformacoesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(translateBt1)
                     .addComponent(rotateBt1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(transformacoesPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scaleBt1)
                     .addComponent(shearBt1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(centerAnchorBox)
                 .addContainerGap())
         );
+
+        panelOfPanels.setLayout(new java.awt.GridLayout(2, 2));
+
+        frentePane.setViewportBorder(javax.swing.BorderFactory.createTitledBorder("Frente"));
+        frentePane.setPreferredSize(new java.awt.Dimension(200, 200));
+        panelOfPanels.add(frentePane);
+
+        lateralPane.setViewportBorder(javax.swing.BorderFactory.createTitledBorder("Lateral"));
+        lateralPane.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lateralPaneMouseClicked(evt);
+            }
+        });
+        panelOfPanels.add(lateralPane);
+
+        topoPane.setViewportBorder(javax.swing.BorderFactory.createTitledBorder("Topo"));
+        topoPane.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                topoPaneMouseClicked(evt);
+            }
+        });
+        panelOfPanels.add(topoPane);
+
+        perspPane.setViewportBorder(javax.swing.BorderFactory.createTitledBorder("Perspectiva"));
+        panelOfPanels.add(perspPane);
 
         jMenu1.setText("Arquivo");
 
@@ -800,6 +1416,7 @@ public class MainV extends javax.swing.JFrame {
         jMenu2.setText("Algoritmo de Preenchimento");
 
         buttonGroup2.add(javaFillRadio);
+        javaFillRadio.setSelected(true);
         javaFillRadio.setText("Fill Java");
         javaFillRadio.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -809,7 +1426,6 @@ public class MainV extends javax.swing.JFrame {
         jMenu2.add(javaFillRadio);
 
         buttonGroup2.add(jRadioButtonMenuItem2);
-        jRadioButtonMenuItem2.setSelected(true);
         jRadioButtonMenuItem2.setText("Fill CG (Manual)");
         jRadioButtonMenuItem2.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -851,18 +1467,19 @@ public class MainV extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(paneMs, javax.swing.GroupLayout.DEFAULT_SIZE, 788, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(paneMs)
+                    .addComponent(consolePanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                        .addComponent(panelOfPanels, javax.swing.GroupLayout.DEFAULT_SIZE, 788, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(ferramentasPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(pinturaPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(objetosPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(transformacoesPanel, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(2, 2, 2)))
                 .addContainerGap())
         );
@@ -872,16 +1489,18 @@ public class MainV extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(ferramentasPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(objetosPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(transformacoesPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(paneMs))
+                        .addComponent(pinturaPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(panelOfPanels, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(consolePanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(paneMs, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -902,7 +1521,7 @@ public class MainV extends javax.swing.JFrame {
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
         List<Poligono> lista = panelCp.getListaPoligonos();
         paneMs.remove(panelCp);
-        panelCp = new DrawablePanel(paneMs.getGraphics());
+        panelCp = new World(paneMs.getGraphics());
         panelCp.setSize(paneMs.getSize());
         panelCp.addAllPoligonos(lista);
         panelCp.setSelectedPolygon(selectedPolygon);
@@ -969,7 +1588,7 @@ public class MainV extends javax.swing.JFrame {
             //Vertice max = VProperties.getMaxVertex(loaded);
             
             paneMs.remove(panelCp);
-            panelCp = new DrawablePanel(paneMs.getGraphics());
+            panelCp = new World(paneMs.getGraphics());
             //panelCp.setSize(new Dimension((int) max.getX(), (int) max.getY()));
             panelCp.setSize(paneMs.getSize());
             panelCp.addAllPoligonos(loaded);
@@ -1147,22 +1766,6 @@ public class MainV extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_fundoColorActionPerformed
 
-    private void paneMsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_paneMsKeyPressed
-        if(evt.getKeyCode()==KeyEvent.VK_CONTROL){
-            controlFLAG=true;
-            System.out.println("INN");
-        }
-        System.out.println("CONTROL");
-    }//GEN-LAST:event_paneMsKeyPressed
-
-    private void paneMsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_paneMsKeyReleased
-        if(evt.getKeyCode()==KeyEvent.VK_CONTROL){
-            controlFLAG=true;
-            System.out.println("OUTTTTT");
-        }
-        System.out.println("REEEEEEE");
-    }//GEN-LAST:event_paneMsKeyReleased
-
     private void formKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_formKeyPressed
         if (evt.isControlDown()){
             controlFLAG = true;
@@ -1188,6 +1791,30 @@ public class MainV extends javax.swing.JFrame {
     private void bordaBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bordaBoxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_bordaBoxActionPerformed
+
+    private void paneMsKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_paneMsKeyReleased
+        if(evt.getKeyCode()==KeyEvent.VK_CONTROL){
+            controlFLAG=true;
+            System.out.println("OUTTTTT");
+        }
+        System.out.println("REEEEEEE");
+    }//GEN-LAST:event_paneMsKeyReleased
+
+    private void paneMsKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_paneMsKeyPressed
+        if(evt.getKeyCode()==KeyEvent.VK_CONTROL){
+            controlFLAG=true;
+            System.out.println("INN");
+        }
+        System.out.println("CONTROL");
+    }//GEN-LAST:event_paneMsKeyPressed
+
+    private void lateralPaneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lateralPaneMouseClicked
+        System.out.println("LATERAL: " + evt.getX() + "," + evt.getY());
+    }//GEN-LAST:event_lateralPaneMouseClicked
+
+    private void topoPaneMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_topoPaneMouseClicked
+        System.out.println("TOPO: " + evt.getX() + "," + evt.getY());
+    }//GEN-LAST:event_topoPaneMouseClicked
 
     /**
      * @param args the command line arguments
@@ -1232,8 +1859,11 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JButton cancelBt;
     private javax.swing.JCheckBox centerAnchorBox;
     private javax.swing.JTextPane consolePane;
+    private javax.swing.JPanel consolePanel;
     private javax.swing.JRadioButtonMenuItem defaultColorRadio;
     private javax.swing.JButton deleteBt;
+    private javax.swing.JPanel ferramentasPanel;
+    private javax.swing.JScrollPane frentePane;
     private javax.swing.JCheckBox fundoBox;
     private javax.swing.JButton fundoColor;
     private javax.swing.JToggleButton irregularPoligonBt;
@@ -1246,18 +1876,18 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
-    private javax.swing.JPanel jPanel5;
     private javax.swing.JRadioButtonMenuItem jRadioButtonMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JSlider jSlider1;
     private javax.swing.JRadioButtonMenuItem javaFillRadio;
+    private javax.swing.JScrollPane lateralPane;
     private javax.swing.JMenuItem loadMenu;
+    private javax.swing.JPanel objetosPanel;
     private javax.swing.JButton paintBt;
     private javax.swing.JScrollPane paneMs;
+    private javax.swing.JPanel panelOfPanels;
+    private javax.swing.JScrollPane perspPane;
+    private javax.swing.JPanel pinturaPanel;
     private javax.swing.JToggleButton regularNsided;
     private javax.swing.JToggleButton rotateBt1;
     private javax.swing.JMenuItem saveMenu;
@@ -1265,6 +1895,8 @@ public class MainV extends javax.swing.JFrame {
     private javax.swing.JToggleButton selectBt;
     private javax.swing.JRadioButtonMenuItem setColorRadio;
     private javax.swing.JToggleButton shearBt1;
+    private javax.swing.JScrollPane topoPane;
+    private javax.swing.JPanel transformacoesPanel;
     private javax.swing.JToggleButton translateBt1;
     // End of variables declaration//GEN-END:variables
     

@@ -1,23 +1,21 @@
 package Model;
 
 import java.awt.Color;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import utils.ScanLineFill;
-import utils.VProperties;
 
 /**
  *
  * @author 
  */
-public class Poligono implements Serializable{
+public class Poligono implements CGObject{
     public static final Color DEFAULT_BORDA = Color.BLACK;
     public static final Color DEFAULT_FUNDO = null;
     private static final Logger LOG = Logger.getLogger("CG");
     private static long INSTANCES;
-    private final long ID;
+    private long ID;
     
     private List<Aresta> scanlines = null;
     private ArrayList<Vertice> vertices = new ArrayList();
@@ -93,6 +91,16 @@ public class Poligono implements Serializable{
         }
         this.corFundo = corFundo;
     }    
+    
+    public Poligono(Poligono p){
+        if (p != null){
+            ID = p.getID();
+            this.vertices = new ArrayList(p.getVertices());
+            this.corBorda = p.getCorBorda();
+            this.corFundo = p.getCorFundo();
+        }
+        
+    }
 //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">   
@@ -140,6 +148,16 @@ public class Poligono implements Serializable{
         else
             LOG.warning("Borda não pode ser transparente!");
     }
+
+    public long getID() {
+        return ID;
+    }
+
+    public void setID(long ID) {
+        this.ID = ID;
+    }
+    
+    
 //</editor-fold>
  
     public int[] getXpoints(){

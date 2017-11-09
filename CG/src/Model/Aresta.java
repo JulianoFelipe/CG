@@ -1,7 +1,5 @@
 package Model;
 
-import java.io.Serializable;
-import java.util.Arrays;
 import java.util.Objects;
 import utils.VMath;
 
@@ -10,7 +8,7 @@ import utils.VMath;
  *
  * @author Anderson
  */
-public class Aresta implements Serializable{
+public class Aresta implements CGObject{
     private static long INSTANCES;
     
     /**

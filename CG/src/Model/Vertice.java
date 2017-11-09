@@ -1,12 +1,10 @@
 package Model;
 
-import java.io.Serializable;
-
 /**
  * Classe da estrutura e manipulacao de vertices
  * @author Anderson
  */
-public class Vertice implements Serializable{
+public class Vertice implements CGObject{
     private static long INSTANCES;
     private final long ID;
     
@@ -22,7 +20,7 @@ public class Vertice implements Serializable{
     /**
      * Construtor padrao (0,0,0,1)
      */
-    public Vertice() { this(0,0);}
+    public Vertice() { this(0,0,0);}
     
     /**
      * Construtor de vertice
@@ -40,19 +38,17 @@ public class Vertice implements Serializable{
         INSTANCES++;
     }
     
-    public Vertice(float x, float y){
-        this(x,y,0);
-    }
+    public Vertice(int x, int y, int z) { this((float)x, (float)y, (float)z); }
     
-    public Vertice(int x, int y){
-        this((float) x, (float) y);
-    }
+    public Vertice(float x, float y){ this(x,y,0);   }
+    
+    public Vertice(int x, int y){  this((float) x, (float) y);   }
     
     /**
      * Construtor de copia
      * @param A Vertice a ser copiado
      */
-    public Vertice(Vertice A){ this(A.x, A.y); }
+    public Vertice(Vertice A){ this(A.x, A.y, A.z); }
 //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">

@@ -29,7 +29,7 @@ public class Nregular extends Poligono {
             y = center.getY() + ( radius * Math.sin(angulo));
             
             lista.add(new Vertice((float) x, 
-                                  (float) y));
+                                  (float) y, 0));
         }
         
         return lista;
@@ -62,7 +62,26 @@ public class Nregular extends Poligono {
         super.setCorBorda(corBorda);
         super.setCorFundo(corFundo);
     }
+
+    public Nregular(Nregular nregular){
+        this(nregular.getNoLados(), nregular.getRadius(), nregular.getCenter(), nregular.getCorBorda(), nregular.getCorFundo()); 
+        this.setID(nregular.getID()); //Ugly stuff
+    }
+    
+    public int getNoLados() {
+        return noLados;
+    }
+
+    public int getRadius() {
+        return radius;
+    }
+
+    public Vertice getCenter() {
+        return center;
+    }
        
+    
+    
     @Override
     public String toString() {
         return "Polígono Regular {Lados=" + super.getVertices().size() + ", Centro=" + center + ", Raio=" + radius + '}';

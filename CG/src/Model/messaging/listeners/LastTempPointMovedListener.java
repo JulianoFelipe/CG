@@ -3,12 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package View;
+package Model.messaging.listeners;
+
+import Model.Vertice;
+import View.ProjectionPlane;
 
 /**
  *
  * @author JFPS
  */
-public class OrtographicProjection extends ProjectionPlane{
-    
+public interface LastTempPointMovedListener {
+    public void lastPointMoved(Vertice newLocation, ProjectionPlane plane);
 }
