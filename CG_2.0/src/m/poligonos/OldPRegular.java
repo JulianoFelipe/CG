@@ -13,7 +13,7 @@ import javafx.scene.shape.Path;
  *
  * @author JFPS
  */
-public class PRegular extends Poligono{
+public class OldPRegular extends OldPoligono{
 
 
     

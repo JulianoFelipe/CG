@@ -28,6 +28,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import resource.description.Ferramentas;
 import resource.description.Poligonos;
@@ -40,8 +41,6 @@ import resource.description.Transformacoes;
 public class MainController implements Initializable {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
     //https://www.youtube.com/watch?v=RY_Rb2UVQKQ
-    @FXML
-    private BorderPane borderPane;
     
     @FXML
     private TreeView<String> tools;
@@ -50,9 +49,18 @@ public class MainController implements Initializable {
     @FXML
     private TextArea console;
     @FXML
-    private Group panel;
-    @FXML
     private AnchorPane options;
+    @FXML
+    private GridPane grid;
+    
+    @FXML
+    private ImageView frente;
+    @FXML
+    private ImageView topo;
+    @FXML
+    private ImageView lateral;
+    @FXML
+    private ImageView perspectiva;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -60,7 +68,9 @@ public class MainController implements Initializable {
         initializeMenuBar();
         initializeConsole();
         
-        borderPane.setCenter( new CanvasPane(this) );
+        //borderPane.setCenter( new CanvasPane(this) );
+        
+        //grid.add(new , NOTHING_SEL, NOTHING_SEL);
     }
     
     private void initializeTools(){
@@ -102,6 +112,10 @@ public class MainController implements Initializable {
         
     }
 
+    private void initViews(){
+        
+    }
+    
     public static final byte NOTHING_SEL       = -1;
     public static final byte FERRAMENTA_SEL    = 0;
     public static final byte POLIGONO_SEL      = 1;

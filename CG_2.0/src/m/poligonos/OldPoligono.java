@@ -8,47 +8,72 @@ package m.poligonos;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
+import javafx.beans.property.ListProperty;
 import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleListProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Shape;
-import m.Ponto2D;
 
 /**
  *
  * @author JFPS
  */
-public class Poligono implements Serializable{
-    private ObservableList<Ponto2D> vertices = FXCollections.observableArrayList();
-    //private ObservableList<Line> arestas;
+public class OldPoligono implements Serializable{
+    //https://stackoverflow.com/questions/15457814/using-listproperty-in-javafx
+    private ListProperty<Point3D> vertices;
 
+    protected static long INSTANCES;
+    protected long ID;
+    
     private boolean changedState = false;
     private Shape toDraw;
         
-    public Poligono() {}
+    public OldPoligono() {
+        ObservableList<Point3D> obsPontos = FXCollections.observableArrayList();
+        this.vertices = new SimpleListProperty(obsPontos);
+        
+        ID = INSTANCES++;
+    }
 
-    public Poligono(List<Ponto2D> vertices) {
-        this.vertices = FXCollections.observableArrayList();
-        this.vertices.addAll(vertices);
+    public OldPoligono(List<Point3D> vertices) {
+        ObservableList<Point3D> obsPontos = FXCollections.observableArrayList(vertices);
+        this.vertices = new SimpleListProperty(obsPontos);
+        
+        ID = INSTANCES++;
+    }
+
+    public long getID() {
+        return ID;
+    }
+
+    public void setID(long ID) {
+        this.ID = ID;
     }
     
-    public void addPonto(Ponto2D point){
+    public void addPonto(Point3D point){
         vertices.add(point);
         changedState = true;
     }
 
-    public void addAllPontos(Collection<Ponto2D> colectionOfPoints){
+    public void addAllPontos(Collection<Point3D> colectionOfPoints){
         vertices.addAll(colectionOfPoints);
     }
     
-    public ObservableList<Ponto2D> getPontos() {
+    public ListProperty<Point3D> pontosProperty() {
         return vertices;
+    }
+    
+    public void addPoligonoListener(ListChangeListener listener){
+        vertices.addListener(listener);
     }
     
     protected void buildShape(){

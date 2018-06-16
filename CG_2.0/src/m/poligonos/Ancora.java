@@ -10,12 +10,12 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeType;
-import m.Ponto2D;
 
 /**
  * Âncora para arastar um polígono selecionado
@@ -80,25 +80,25 @@ public class Ancora extends Circle{
         });
     }
     
-    public static ObservableList<Ancora> criarAncorasSelecionaveis(final ObservableList<Ponto2D> points) {
+    public static ObservableList<Ancora> criarAncorasSelecionaveis(final ObservableList<Point2D> points) {
         ObservableList<Ancora> anchors = FXCollections.observableArrayList();
 
         for (int i = 0; i <points.size(); i++) {
             final int idx = i;
-            Ponto2D idxPt = points.get(i);
+            Point2D idxPt = points.get(i);
 
             DoubleProperty xProperty = new SimpleDoubleProperty(idxPt.getX());
             DoubleProperty yProperty = new SimpleDoubleProperty(idxPt.getY());
 
             ///Weird behavior because coordinates are separated?
             xProperty.addListener((ObservableValue<? extends Number> ov, Number oldX, Number x1) -> {
-                Ponto2D toChange = points.get(idx);
-                points.set(idx, new Ponto2D((int)x1, toChange.getY()));
+                Point2D toChange = points.get(idx);
+                points.set(idx, new Point2D((int)x1, toChange.getY()));
             });
 
             yProperty.addListener((ObservableValue<? extends Number> ov, Number oldY, Number y1) -> {
-                Ponto2D toChange = points.get(idx);
-                points.set(idx, new Ponto2D(toChange.getX(), (int)y1));
+                Point2D toChange = points.get(idx);
+                points.set(idx, new Point2D(toChange.getX(), (int)y1));
             });
 
             anchors.add(new Ancora(Color.GOLD, xProperty, yProperty));

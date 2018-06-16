@@ -10,6 +10,15 @@ import Model.Nregular;
 import Model.Poligono;
 import Model.Projections.Projection;
 import Model.Vertice;
+import Model.messaging.events.AnchorEvent;
+import Model.messaging.events.CancelTemporaryEvent;
+import Model.messaging.events.DeleteEvent;
+import Model.messaging.events.InputEvent;
+import Model.messaging.events.LastTempPointMovedEvent;
+import Model.messaging.events.SelectedEvent;
+import Model.messaging.events.TemporaryPointEvent;
+import Model.messaging.events.TemporaryRegularEvent;
+import Model.messaging.events.TransformEvent;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
@@ -33,11 +42,16 @@ public class ProjectionPlane extends JPanel{
     //Objects to draw
     private final List<Poligono> projectionList;
     private Nregular projectionTempRegular;
-    private final List<Aresta> projectionTempLines;
+    private final List<Vertice> projectionTemp;
     private Poligono selectedPolygon;
     private Vertice selectedPolygonCenter;
-    private Aresta movable;
+    private Vertice movable;
 
+    //private short changedVertices = 0;
+    //private boolean lastChanged = false;
+    private final ArrayList<Integer> coordsX = new ArrayList();
+    private final ArrayList<Integer> coordsY = new ArrayList();
+    
     /* Problemas notados:
     - São 3 planos "clicáveis", se alterar um objeto em um, ele manda as alterações para o "mundo"
       que então propaga as alterações para as projeções que "escutam" o mundo (as 4), então o que manda
@@ -45,36 +59,37 @@ public class ProjectionPlane extends JPanel{
     
     */
     
-    private final World world;
-    private final Graphics graphics;
+    private Graphics graphics;
     private final Projection projectionMethod;
     private final short ID;
     
-    private boolean useJavaFill = true;
+    //private boolean useJavaFill = true;
     //https://stackoverflow.com/questions/937302/simple-java-message-dispatching-system
             
-    public ProjectionPlane(Graphics g, Projection projectionMethod, World world){
-        this.graphics = g;
+    public ProjectionPlane(Projection projectionMethod){
         //objetos = FXCollections.observableArrayList();
         projectionList = new ArrayList();
-        projectionTempLines = new ArrayList();
+        projectionTemp = new ArrayList();
         this.projectionMethod = projectionMethod;
-        this.world =  world;
         ID = INSTANCES++;
     }
 
-    public boolean isUseJavaFill() {
+    /*public boolean isUseJavaFill() {
         return useJavaFill;
     }
 
     public void setUseJavaFill(boolean useJavaFill) {
         this.useJavaFill = useJavaFill;
-    }
+    }*/
         
     public List<Poligono> getListaPoligonos(){
         return projectionList;
     }
 
+    public Poligono getSelectedPoligon(){
+        return selectedPolygon;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 5;
@@ -106,8 +121,10 @@ public class ProjectionPlane extends JPanel{
             System.out.println(" Null");
             return;
         }
+        graphics = g;
+        
         //System.out.println("PAINTING");
-        //graphics.drawRect(0, 0, 100, 100);
+        g.drawRect(0, 0, 100, 100);
         //this.revalidate();
         //this.getGraphics().fillRect(0, 0, 300, 300);
         //if (projectionList == null) return;        
@@ -116,23 +133,38 @@ public class ProjectionPlane extends JPanel{
             paintPolygon(p);
         });
 
-        projectionTempLines.forEach((a) -> {
-            Vertice um = a.getvInicial();
-            Vertice dois = a.getvFinal();
-            g.drawLine((int)um.getX(), (int)um.getY(), (int)dois.getX(), (int)dois.getY());
-        });
-        
-        if (movable != null){
-            Vertice um = movable.getvInicial();
-            Vertice dois = movable.getvFinal();
-            g.drawLine((int)um.getX(), (int)um.getY(), (int)dois.getX(), (int)dois.getY());
-        }
+        paintTemporaryPoints();
 
         if (projectionTempRegular != null){
             paintPolygon(projectionTempRegular);
         }
         
         paintSelectedPolygon();
+    }
+    
+    private void paintTemporaryPoints(){
+        /*if (changedVertices > 0){
+            lastChanged = false;
+        }
+        
+        if (lastChanged){
+            
+        }*/
+        
+        if (projectionTemp.isEmpty())
+            return;
+        
+        coordsX.add((int)movable.x);
+        coordsY.add((int)movable.y);
+        
+        //https://stackoverflow.com/questions/718554/how-to-convert-an-arraylist-containing-integers-to-primitive-int-array
+        int[] xCoords = coordsX.stream().mapToInt(i -> i).toArray();
+        int[] yCoords = coordsY.stream().mapToInt(i -> i).toArray();
+        
+        graphics.drawPolyline(xCoords, yCoords, yCoords.length);
+        
+        coordsX.remove(coordsX.size()-1);
+        coordsY.remove(coordsY.size()-1);
     }
     
     public void paintPolygon(Poligono p){
@@ -150,12 +182,12 @@ public class ProjectionPlane extends JPanel{
         
         if (p.getCorFundo() != null){
             graphics.setColor(p.getCorFundo());
-            if(useJavaFill)
+            //if(useJavaFill)
                 graphics.fillPolygon(xs, ys, len);
-            else{                
+            /*else{                
                 NaiveScanLineFill scn = new NaiveScanLineFill(graphics);
                 scn.scanLineFill(p);
-            }
+            }*/
         }
         
         graphics.setColor(previousColor);
@@ -204,76 +236,114 @@ public class ProjectionPlane extends JPanel{
     
     //<editor-fold defaultstate="collapsed" desc="From Clicks">
     public void clear(){
-        world.clear();
+        NOUPDTclear();
+        StaticConfig.EVENTS.notify(new CancelTemporaryEvent(this));
     }
     
-    public void setMovable(Aresta movable){
-        world.setMovable(projectionMethod.transformBack(movable));
+    public void setMovable(Vertice movable){
+        this.movable = movable;
+        StaticConfig.EVENTS.notify(
+            new LastTempPointMovedEvent(movable, this)
+        );
     }
     
-    public void addTempoLine(Aresta aresta) {
-        //projectionTempLines.add(aresta);
-        world.addTempoLine(projectionMethod.transformBack(movable));
+    public void addVertice(Vertice vertice) {
+        if(vertice != null){
+            if (movable != null){
+                projectionTemp.add(movable);
+                coordsX.add((int)movable.x);
+                coordsY.add((int)movable.y);
+            }
+
+            movable = vertice;
+            StaticConfig.EVENTS.notify(
+                new TemporaryPointEvent(vertice, this)
+            );
+        }
     }
     
     public void setTempRegular(Nregular regularPolygon){
-        //projectionTempRegular = regularPolygon;
-        world.setTempRegular(projectionMethod.transformBack(regularPolygon));
+        projectionTempRegular = regularPolygon;
+        StaticConfig.EVENTS.notify(
+            new TemporaryRegularEvent(regularPolygon, this)
+        );
     }
-    
-    public void cleanTempoLines(){
-        //projectionTempLines.clear();
-        world.cleanTempoLines();
-    }
-    
-    public void cleanTempRegular(){
-        //projectionTempRegular = null;
-        world.cleanTempRegular();
-    }
-    
-    public void nullTemps(){
-        //cleanTempRegular();
-        //cleanTempoLines();
-        world.nullTemps();
-    }
-    
+        
     public void setSelectedPolygon(Poligono selectedPolygon) {
-        //this.selectedPolygon = selectedPolygon;
-        world.setSelectedPolygon(projectionMethod.transformBack(selectedPolygon));
+        this.selectedPolygon = selectedPolygon;
+        StaticConfig.EVENTS.notify(
+            new SelectedEvent(selectedPolygon, this)
+        );
     }
     
     public void remove(Poligono p){
-        //projectionList.remove(p);
-        world.remove(p);
+        projectionList.remove(p);
+        StaticConfig.EVENTS.notify(
+            new DeleteEvent(p, this)
+        );
     }
     
     public void setAnchor(Vertice v){
-        //selectedPolygonCenter = v;
-        world.setAnchor(projectionMethod.transformBack(v));
+        this.selectedPolygonCenter = v;
+        StaticConfig.EVENTS.notify(
+            new AnchorEvent(v, this)
+        );
     }
     
     public void addPoligono(Poligono p){
-        world.addPoligono(projectionMethod.transformBack(p));
+        if (p != null){
+            projectionList.add(p);
+        }
+        StaticConfig.EVENTS.notify(
+            new InputEvent(p, this)
+        );
+    }
+    
+    public void changePoligono(Poligono p){
+        if (p != null){
+            for (int i=0; i<projectionList.size(); i++){
+                Poligono proje = projectionList.get(i);
+                if (proje.equals(p)){
+                    proje.setID(p.getID());
+                    projectionList.set(i, proje); //Weird, but equals compares IDs, so it kinda makes sense
+                    break;
+                }
+            }
+        }
+        
+        StaticConfig.EVENTS.notify(
+            new TransformEvent(p, this)
+        );
     }
 //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="No Updt">    
     public void NOUPDTclear(){
-        throw new IllegalAccessError("IDUNNO");
+        NOUPDTnullTemps();
+        coordsX.clear();
+        coordsY.clear();
+        //changedVertices = 0;
     }
     
-    public void NOUPDTsetMovable(Aresta movable){
-        if (movable != null)
+    public void NOUPDTchangeLastPoint(Vertice movable){
+        if (movable != null){
+            //lastChanged = true;
             this.movable = projectionMethod.project(movable);
-        else
+        } else
             this.movable = null;
     }
     
-    public void NOUPDTaddTempoLine(Aresta aresta) {
-        Aresta toAdd;
-        if (aresta != null){
-            toAdd = projectionMethod.project(aresta);
-            projectionTempLines.add(toAdd);
+    public void NOUPDTaddTempPoint(Vertice point) {
+        Vertice toAdd;
+        if (point != null){
+            toAdd = projectionMethod.project(point);
+            if(movable != null){
+                projectionTemp.add(movable);
+                coordsX.add((int)movable.x);
+                coordsY.add((int)movable.y);
+            }
+            movable = toAdd;
+            //changedVertices ++;
         }
     }
     
@@ -284,15 +354,15 @@ public class ProjectionPlane extends JPanel{
             projectionTempRegular = null;
     }
     
-    public void NOUPDTcleanTempoLines(){
-        projectionTempLines.clear();
+    private void NOUPDTcleanTempoLines(){
+        projectionTemp.clear();
     }
     
-    public void NOUPDTcleanTempRegular(){
+    private void NOUPDTcleanTempRegular(){
         projectionTempRegular = null;
     }
     
-    public void NOUPDTnullTemps(){
+    private void NOUPDTnullTemps(){
         NOUPDTcleanTempRegular();
         NOUPDTcleanTempoLines();
     }
@@ -306,6 +376,19 @@ public class ProjectionPlane extends JPanel{
     
     public void NOUPDTremove(Poligono p){
         projectionList.remove(p);
+    }
+    
+    public void NOUPDTchangePoligono(Poligono p){
+        if (p != null){
+            for (int i=0; i<projectionList.size(); i++){
+                if (projectionList.get(i).equals(p)){
+                    Poligono proje = projectionMethod.project(p);
+                    proje.setID(p.getID());
+                    projectionList.set(i, proje); //Weird, but equals compares IDs, so it kinda makes sense
+                    break;
+                }
+            }
+        }
     }
     
     public void NOUPDTsetAnchor(Vertice v){
@@ -322,7 +405,7 @@ public class ProjectionPlane extends JPanel{
     //<editor-fold defaultstate="collapsed" desc="Doodad">
     /* UGLY "PSEUDO LISTENTER" THINGAMAJIGS FULL OF  ... */
     
-    public void remLines(){
+    /*public void remLines(){
         projectionTempLines.clear();
     }
     
@@ -332,7 +415,7 @@ public class ProjectionPlane extends JPanel{
     
     public void remPolygon(Poligono p){
         projectionList.remove(p);
-    }
+    }*/
     
     /*... BUGS AND DOODADS*/
     

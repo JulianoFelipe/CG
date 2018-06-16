@@ -3,12 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package m.poligonos;
+package Model.messaging.listeners;
+
+import Model.Vertice;
+import View.ProjectionPlane;
 
 /**
  *
  * @author JFPS
  */
-public class PIrregular extends Poligono{
-    
+public interface AnchorListener {
+    public void anchorChanged(Vertice anchor, ProjectionPlane plane);
 }

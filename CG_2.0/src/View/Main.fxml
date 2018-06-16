@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.chart.*?>
@@ -48,6 +49,40 @@
                </children>
             </VBox>
          </left>
+         <center>
+            <GridPane fx:id="grid" BorderPane.alignment="CENTER">
+              <columnConstraints>
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+                <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+              </columnConstraints>
+              <rowConstraints>
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+              </rowConstraints>
+               <children>
+                  <TitledPane animated="false" collapsible="false" prefHeight="460.0" prefWidth="544.0" text="Frente">
+                     <content>
+                        <ImageView fx:id="frente" fitHeight="329.0" fitWidth="541.0" pickOnBounds="true" preserveRatio="true" />
+                     </content>
+                  </TitledPane>
+                  <TitledPane animated="false" collapsible="false" prefHeight="461.0" prefWidth="543.0" text="Lateral" GridPane.columnIndex="1">
+                     <content>
+                        <ImageView fx:id="lateral" fitHeight="326.0" fitWidth="540.0" pickOnBounds="true" preserveRatio="true" />
+                     </content>
+                  </TitledPane>
+                  <TitledPane animated="false" collapsible="false" prefHeight="612.0" prefWidth="544.0" text="Topo" GridPane.rowIndex="1">
+                     <content>
+                        <ImageView fx:id="topo" fitHeight="327.0" fitWidth="542.0" pickOnBounds="true" preserveRatio="true" />
+                     </content>
+                  </TitledPane>
+                  <TitledPane animated="false" collapsible="false" prefHeight="581.0" prefWidth="543.0" text="Perspectiva" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <content>
+                        <ImageView fx:id="perspectiva" fitHeight="326.0" fitWidth="541.0" pickOnBounds="true" preserveRatio="true" />
+                     </content>
+                  </TitledPane>
+               </children>
+            </GridPane>
+         </center>
       </BorderPane>
    </children>
 </AnchorPane>

@@ -17,20 +17,20 @@ public final class ClassWideEventDispatcher {
     //https://stackoverflow.com/questions/937302/simple-java-message-dispatching-system
     
     /** mapping of class events to active listeners **/
-   private final HashMap<Class,ArrayList> map = new HashMap< >( 10 );
+   private final HashMap<Class,ArrayList> map = new HashMap<>(10);
 
    /** Add a listener to an event class
      * @param <L>
      * @param evtClass
      * @param listener **/
-   public <L> void listen( Class<? extends CGEvent<L>> evtClass, L listener) {
+    public <L> void listen( Class<? extends CGEvent<L>> evtClass, L listener) {
         final ArrayList<L> listeners = listenersOf( evtClass );
         synchronized( listeners ) {
             if ( !listeners.contains( listener ) ) {
                 listeners.add( listener );
             }
         }
-   }
+    }
 
     /** Stop sending an event class to a given listener
      * @param <L>

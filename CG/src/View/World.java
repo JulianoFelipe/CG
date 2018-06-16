@@ -6,17 +6,34 @@
 package View;
 
 import Model.Aresta;
+import Model.CGObject;
 import Model.Poligono;
 import Model.Vertice;
 import Model.Nregular;
+import Model.messaging.events.AnchorEvent;
+import Model.messaging.events.CancelTemporaryEvent;
+import Model.messaging.events.DeleteEvent;
+import Model.messaging.events.InputEvent;
+import Model.messaging.events.LastTempPointMovedEvent;
+import Model.messaging.events.SelectedEvent;
+import Model.messaging.events.TemporaryPointEvent;
+import Model.messaging.events.TemporaryRegularEvent;
+import Model.messaging.events.TransformEvent;
+import Model.messaging.listeners.AnchorListener;
+import Model.messaging.listeners.CancelTemporaryListener;
+import Model.messaging.listeners.DeletePoligonoListener;
+import Model.messaging.listeners.InputListener;
+import Model.messaging.listeners.LastTempPointMovedListener;
+import Model.messaging.listeners.SelectedChangedListener;
+import Model.messaging.listeners.TemporaryPointListener;
+import Model.messaging.listeners.TemporaryRegularListener;
+import Model.messaging.listeners.TransformListener;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javax.swing.JPanel;
 import utils.ColorMath;
 import utils.NaiveScanLineFill;
@@ -33,9 +50,7 @@ public class World extends JPanel {
     
     private List<ProjectionPlane> projPlanes = new ArrayList();
     private final List<Poligono> objetos;
-    private final Graphics graphics;
 
-    private boolean useJavaFill = true;
     private List<Aresta> tempoLines = new ArrayList<>();
     private Aresta movable = null;
     private Nregular tempRegular = null;
@@ -46,169 +61,108 @@ public class World extends JPanel {
     public World(List<Poligono> objetos) {
         //this.objetos = FXCollections.observableArrayList(objetos);
         this.objetos = new ArrayList(objetos);
-        this.graphics = null;
+        
+        CancelTemporaryListener cancelTemp = (ProjectionPlane plane) -> {
+            projPlanes.stream().filter((pla) -> (!plane.equals(pla))).forEachOrdered((pla) -> {
+                pla.NOUPDTclear();
+            });
+        };
+        
+        InputListener inputListen = (InputListener) (CGObject object, ProjectionPlane planeOfOrigin) -> {
+            projPlanes.stream().filter((pla) -> (!planeOfOrigin.equals(pla))).forEachOrdered((pla) -> {
+                pla.NOUPDTaddPoligono((Poligono) object);
+            });
+        };
+        
+        LastTempPointMovedListener lastTempPoint = (Vertice newLocation, ProjectionPlane plane) -> {
+            projPlanes.stream().filter((pla) -> (!plane.equals(pla))).forEachOrdered((pla) -> {
+                pla.NOUPDTchangeLastPoint(newLocation);
+            });
+        };
+        
+        TemporaryPointListener tempPoint = (Vertice newPoint, ProjectionPlane plane) -> {
+            projPlanes.stream().filter((pla) -> (!plane.equals(pla))).forEachOrdered((pla) -> {
+                pla.NOUPDTaddTempPoint(newPoint);
+            });
+        };
+        
+        TemporaryRegularListener tempRegularListen = (Nregular newTempRegular, ProjectionPlane plane) -> {
+            projPlanes.stream().filter((pla) -> (!plane.equals(pla))).forEachOrdered((pla) -> {
+                pla.NOUPDTsetTempRegular(newTempRegular);
+            });
+        };
+        
+        TransformListener transformListen = (TransformListener) (CGObject object, ProjectionPlane planeOfOrigin) -> {
+            projPlanes.stream().filter((pla) -> (!planeOfOrigin.equals(pla))).forEachOrdered((pla) -> {
+                pla.NOUPDTchangePoligono((Poligono) object);
+            });
+        };
+        
+        SelectedChangedListener selectedPolygonListen = (Poligono newSelected, ProjectionPlane plane) -> {
+            projPlanes.stream().filter((pla) -> (!plane.equals(pla))).forEachOrdered((pla) -> {
+                pla.NOUPDTsetSelectedPolygon(newSelected);
+            });
+        };
+        
+        DeletePoligonoListener deleteListen = (Poligono p, ProjectionPlane plane) -> {
+            projPlanes.stream().filter((pla) -> (!plane.equals(pla))).forEachOrdered((pla) -> {
+                pla.NOUPDTremove(p);
+            });
+        };
+        
+        AnchorListener anchor = (Vertice anchor1, ProjectionPlane plane) -> {
+            projPlanes.stream().filter((pla) -> (!plane.equals(pla))).forEachOrdered((pla) -> {
+                pla.NOUPDTsetAnchor(anchor1);
+            });
+        };
+        
+        StaticConfig.EVENTS.listen(CancelTemporaryEvent.class, cancelTemp);
+        StaticConfig.EVENTS.listen(InputEvent.class, inputListen);
+        StaticConfig.EVENTS.listen(LastTempPointMovedEvent.class, lastTempPoint);
+        StaticConfig.EVENTS.listen(TemporaryPointEvent.class, tempPoint);
+        StaticConfig.EVENTS.listen(TemporaryRegularEvent.class, tempRegularListen);
+        StaticConfig.EVENTS.listen(TransformEvent.class, transformListen);
+        StaticConfig.EVENTS.listen(SelectedEvent.class, selectedPolygonListen);
+        StaticConfig.EVENTS.listen(DeleteEvent.class, deleteListen);
+        StaticConfig.EVENTS.listen(AnchorEvent.class, anchor);
     }
     
-    /*public World(){
-        this(new ArrayList<>());
-    }*/
-    
-    public World(Graphics g){
-        this.graphics = g;
-        this.objetos = new ArrayList();
-    }
+    public World(){ this(new ArrayList());}
 
     public void setProjectionPlaneList(ProjectionPlane...planes){
         projPlanes = new ArrayList();
         projPlanes.addAll(Arrays.asList(planes));
     }
     
-    public void setUseJavaFill(boolean useJavaFill) {
-        this.useJavaFill = useJavaFill;
-    }
-    
-    public void addPoligono(Poligono p){
-        LOG.info("Adicionado: " + p);
-        objetos.add(p);
-        
-        projPlanes.forEach((pla) -> {
-            pla.NOUPDTaddPoligono(new Poligono(p));
-        });
-    }
-    
-    public void addAllPoligonos(List<Poligono> lista){
-        lista.forEach((p) -> {
-            addPoligono(p);
-        }); 
-        //objetos.addAll(lista);
-        //throw new IllegalArgumentException("SOMETHING HERE");
-    }
-    
-    public Poligono getPoligono(int index){
-        return objetos.get(index);
-    }
-    
-    public void removePoligono(int index){
-        projPlanes.forEach((pla) -> {
-            pla.remPolygon(objetos.get(index));
-        });
-        objetos.remove(index);
-    }
-    
     public List<Poligono> getListaPoligonos(){
         return new ArrayList<>(objetos);
     }
     
-    @Override
-    protected void paintComponent(Graphics g){      
-        if (objetos == null) return;        
-        //System.out.println("PAINT");
-        int xs[], ys[];
-        int len;
-
-        objetos.forEach((p) -> {
-            paintPolygon(p);
+    public void addPoligono(Poligono p, ProjectionPlane plane){
+        LOG.info("Adicionado: " + p);
+        objetos.add(p);
+        
+        projPlanes.stream().filter((pla) -> (!pla.equals(plane))).forEachOrdered((pla) -> {
+            pla.NOUPDTaddPoligono(new Poligono(p));
         });
-
-        for (Aresta a : tempoLines){
-            Vertice um = a.getvInicial();
-            Vertice dois = a.getvFinal();
-            g.drawLine((int)um.getX(), (int)um.getY(), (int)dois.getX(), (int)dois.getY());
-        }
-        
-        if (movable != null){
-            Vertice um = movable.getvInicial();
-            Vertice dois = movable.getvFinal();
-            g.drawLine((int)um.getX(), (int)um.getY(), (int)dois.getX(), (int)dois.getY());
-        }
-        
-        if (tempRegular != null){
-            paintPolygon(tempRegular);
-        }
-        
-        paintSelectedPolygon();
     }
     
-    public void paintPolygon(Poligono p){
-        Color previousColor = graphics.getColor();
-        
-        int xs[], ys[];
-        int len;
-        
-        xs = p.getXpoints();
-        ys = p.getYpoints();
-        len = xs.length;
-  
-        graphics.setColor(p.getCorBorda());
-        graphics.drawPolygon(xs, ys, len);
-        
-        if (p.getCorFundo() != null){
-            graphics.setColor(p.getCorFundo());
-            if(useJavaFill)
-                graphics.fillPolygon(xs, ys, len);
-            else{
-                //ManualPaint m = new ManualPaint(1280,720);
-                //m.floodFill(graphics, p);
-                //System.out.println("NOT JAVA FILL");
-                
-                NaiveScanLineFill scn = new NaiveScanLineFill(graphics);
-                scn.scanLineFill(p);
-            }
-        }
-        
-        graphics.setColor(previousColor);
+    public void addAllPoligonos(List<Poligono> lista, ProjectionPlane plane){
+        lista.forEach((p) -> {
+            addPoligono(p, plane);
+        }); 
     }
     
-    public void paintSelectedPolygon(){
-        if (selectedPolygon == null) return;
-        Color prev = graphics.getColor();
-        
-        if (ColorMath.isThisColorCloseToThatOne(SELECTED_COLOR, selectedPolygon.getCorFundo())) 
-            graphics.setColor(SELECTED_COLOR2);
-        else 
-            graphics.setColor(SELECTED_COLOR);
-        //graphics.setColor(SELECTED_COLOR);
-        
-        selectedPolygon.getVertices().forEach((ponto) -> {
-            graphics.drawOval((int) ponto.getX() - SELECTED_RADIUS,
-                              (int) ponto.getY() - SELECTED_RADIUS,
-                              SELECTED_RADIUS*2, SELECTED_RADIUS*2);
-            graphics.fillOval((int) ponto.getX() - SELECTED_RADIUS,
-                              (int) ponto.getY() - SELECTED_RADIUS,
-                              SELECTED_RADIUS*2, SELECTED_RADIUS*2);
+    /*public Poligono getPoligono(int index){
+        return objetos.get(index);
+    }
+    
+    public void removePoligono(int index, ProjectionPlane plane){        
+        projPlanes.stream().filter((pla) -> (!pla.equals(plane))).forEachOrdered((pla) -> {
+            pla.NOUPDTremove(objetos.get(index));
         });
         
-        
-        if (centerAnchor != null){
-            /*if (ColorMath.isThisColorCloseToThatOne(SELECTED_COLOR2, selectedPolygon.getCorFundo())) 
-                graphics.setColor(ANCHOR_COLOR2);
-            else 
-                graphics.setColor(SELECTED_COLOR2);*/
-            
-            graphics.fillOval((int) centerAnchor.getX() - SELECTED_RADIUS,
-                              (int) centerAnchor.getY() - SELECTED_RADIUS,
-                              SELECTED_RADIUS*2, SELECTED_RADIUS*2);
-        }
-        
-        graphics.setColor(prev);
-    }
-    
-    public void paintPolygons(){
-        paintComponent(graphics);
-    }
-    
-    @Override
-    public void repaint(){
-        if (graphics != null)
-            super.paintComponent(graphics);
-        paintComponent(graphics);
-    }
-
-    public void addTempoLine(Aresta aresta) {
-        tempoLines.add(aresta);
-        projPlanes.forEach((pla) -> {
-            pla.NOUPDTaddTempoLine(new Aresta(aresta));
-        });
+        objetos.remove(index);
     }
 
     public void setMovable(Aresta movable) {
@@ -216,16 +170,20 @@ public class World extends JPanel {
         projPlanes.forEach((pla) -> {
             pla.NOUPDTsetMovable(new Aresta(movable));
         });
+        
+        projPlanes.stream().filter((pla) -> (!pla.equals(plane))).forEachOrdered((pla) -> {
+            pla.NOUPDTremove(objetos.get(index));
+        });
     }
     
-    public void setTempRegular(Nregular regularPolygon){
+    public void setTempRegular(Nregular regularPolygon, ProjectionPlane plane){
         tempRegular = regularPolygon;
         projPlanes.forEach((pla) -> {
             pla.NOUPDTsetTempRegular(new Nregular(regularPolygon));
         });
     }
     
-    public void cleanTempoLines(){
+    public void clearTemporary(){
         tempoLines = new ArrayList<>();
         movable = null;
         projPlanes.forEach((pla) -> {
@@ -242,8 +200,8 @@ public class World extends JPanel {
     }
     
     public void nullTemps(){
-        cleanTempRegular();
-        cleanTempoLines();
+        //cleanTempRegular();
+        //cleanTempoLines();
         projPlanes.forEach((pla) -> {
             pla.NOUPDTnullTemps();
         });
@@ -268,7 +226,7 @@ public class World extends JPanel {
     public void remove(Poligono p){
         objetos.remove(p);
         projPlanes.forEach((pla) -> {
-            pla.remPolygon(p);
+            pla.NOUPDTremove(p);
         });
     }
     
@@ -280,5 +238,17 @@ public class World extends JPanel {
             else
                 pla.NOUPDTsetAnchor(null);
         });
-    }
+    }*/
 }
+
+/*
+Change poligono
+add Poligono
+setAnchor
+remove
+set selected
+set temp regular
+addVertice
+setMovable
+clear
+*/

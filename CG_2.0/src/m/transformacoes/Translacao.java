@@ -6,9 +6,9 @@
 package m.transformacoes;
 
 import java.util.List;
+import javafx.geometry.Point2D;
 import m.Eixo;
-import m.Ponto2D;
-import m.poligonos.Poligono;
+import m.poligonos.OldPoligono;
 
 /**
  *
@@ -24,7 +24,7 @@ public class Translacao{
      * @param listaDePontos Lista de pontos para transladar.
      * @return lista De pontos com a translação aplicada.
      */
-    public List<Ponto2D> transladar(Eixo axis, int unidades, List<Ponto2D> listaDePontos){
+    public List<Point2D> transladar(Eixo axis, int unidades, List<Point2D> listaDePontos){
         int unidadesX=0, unidadesY=0, unidadesZ=0;
         switch(axis){
             case Eixo_X:   unidadesX = unidades; break;
@@ -40,11 +40,11 @@ public class Translacao{
     }
     
     /*
-    public Poligono transladar(Eixo axis, int unidades, Poligono poligono){
+    public OldPoligono transladar(Eixo axis, int unidades, OldPoligono poligono){
         
     }
     
-    public Poligono transladar(int unidadesX, int unidadesY, int unidadesZ, Poligono poligono){
+    public OldPoligono transladar(int unidadesX, int unidadesY, int unidadesZ, OldPoligono poligono){
         
     }*/
     
@@ -57,7 +57,7 @@ public class Translacao{
      * @param listaDePontos Pontos para transladar.
      * @return pontos transladados.
      */
-    public List<Ponto2D> transladar(int unidadesX, int unidadesY, int unidadesZ, List<Ponto2D> listaDePontos){
+    public List<Point2D> transladar(int unidadesX, int unidadesY, int unidadesZ, List<Point2D> listaDePontos){
         ///FAÇA AQUI
         return null; //So coloquei para tirar o aviso de "sem return".
     }

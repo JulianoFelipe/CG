@@ -53,7 +53,7 @@ public class MainV extends javax.swing.JFrame {
     private static final double LINE_PROXIMITY_THRESHOLD = 3.9;
     private static final Logger LOG = Logger.getLogger("CG");
     private final JToggleButton ghost = new JToggleButton();
-    private World panelCp;
+    private World world;
 
     private int noPointsToCreate = -2;
     private boolean pendingCreating = false;
@@ -94,7 +94,7 @@ public class MainV extends javax.swing.JFrame {
         regularSidedLock = false;
         pendingCreating = false;
         noPointsToCreate = -1;
-        panelCp.nullTemps();
+        //panelCp.nullTemps();
         //unToggle();
         temporaryList = new ArrayList<>();
     }
@@ -176,7 +176,7 @@ public class MainV extends javax.swing.JFrame {
                     Vertice radiusPnt = new Vertice(x, y, z);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
                     topo.addPoligono(localPolygonBuilder(dist));  //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
-                    topo.cleanTempRegular();
+                    topo.setTempRegular(null);
                     
                     resetDrawingState();
                     topo.repaint();
@@ -189,24 +189,25 @@ public class MainV extends javax.swing.JFrame {
                     if (temporaryList.size() < 3){
                         temporaryList.clear();
                         resetDrawingState();
-                        topo.cleanTempoLines();
+                        topo.clear();
                     } else {
                         topo.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));          
                         resetDrawingState();
-                        topo.cleanTempoLines();
+                        topo.clear();
                     }
                 } else if (noPointsToCreate == 1){
                     temporaryList.add(new Vertice(x, y, z));
                     topo.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));        
                     resetDrawingState();
-                    topo.cleanTempoLines();
+                    topo.clear();
                 } else {
                     temporaryList.add(new Vertice(x, y, z));
                     --noPointsToCreate;
-                    if (temporaryList.size() >= 2){
+                    topo.addVertice(new Vertice(x, y, z));
+                    /*if (temporaryList.size() >= 2){
                         int size = temporaryList.size();
                         topo.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
-                    }    
+                    }    */
                     
                     if (regularSidedPolygon){
                         regularSidedLock = true;
@@ -279,8 +280,8 @@ public class MainV extends javax.swing.JFrame {
                     topo.setTempRegular(localPolygonBuilder(dist));
                 } else {
                     //panelCp.cleanTempoLines();
-                    Vertice last = temporaryList.get(temporaryList.size()-1);
-                    topo.setMovable(new Aresta(new Vertice(x, y, z), last));
+                    //Vertice last = temporaryList.get(temporaryList.size()-1);
+                    topo.setMovable(new Vertice(x, y, z));
                 }
                 topo.repaint();
                 
@@ -299,7 +300,7 @@ public class MainV extends javax.swing.JFrame {
                     Vertice center = null;
                     if (anchor){
                         center = selectedPolygon.getCentroideDaMedia();
-                        panelCp.setAnchor(center);
+                        topo.setAnchor(center);
                     }
                     //<editor-fold defaultstate="collapsed" desc="Cisalhamento Drag">
                     if (currentAction == SHEAR_ACTION){
@@ -453,7 +454,7 @@ public class MainV extends javax.swing.JFrame {
                     Vertice radiusPnt = new Vertice(x, y, z);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
                     lateral.addPoligono(localPolygonBuilder(dist));  //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
-                    lateral.cleanTempRegular();
+                    lateral.setTempRegular(null);
                     
                     resetDrawingState();
                     lateral.repaint();
@@ -466,24 +467,25 @@ public class MainV extends javax.swing.JFrame {
                     if (temporaryList.size() < 3){
                         temporaryList.clear();
                         resetDrawingState();
-                        lateral.cleanTempoLines();
+                        lateral.clear();
                     } else {
                         lateral.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));          
                         resetDrawingState();
-                        lateral.cleanTempoLines();
+                        lateral.clear();
                     }
                 } else if (noPointsToCreate == 1){
                     temporaryList.add(new Vertice(x, y, z));
                     lateral.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));        
                     resetDrawingState();
-                    lateral.cleanTempoLines();
+                    lateral.clear();
                 } else {
                     temporaryList.add(new Vertice(x, y, z));
                     --noPointsToCreate;
-                    if (temporaryList.size() >= 2){
+                    lateral.addVertice(new Vertice(x, y, z));
+                    /*if (temporaryList.size() >= 2){
                         int size = temporaryList.size();
-                        lateral.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
-                    }    
+                        topo.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
+                    }    */  
                     
                     if (regularSidedPolygon){
                         regularSidedLock = true;
@@ -553,13 +555,13 @@ public class MainV extends javax.swing.JFrame {
                 if (regularSidedLock){
                     Vertice radiusPnt = new Vertice(x, y, z);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.setTempRegular(localPolygonBuilder(dist));
+                    lateral.setTempRegular(localPolygonBuilder(dist));
                 } else {
                     //panelCp.cleanTempoLines();
                     Vertice last = temporaryList.get(temporaryList.size()-1);
-                    panelCp.setMovable(new Aresta(new Vertice(x, y, z), last));
+                    lateral.setMovable(new Vertice(x, y, z));
                 }
-                panelCp.repaint();
+                world.repaint();
                 
                 //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
@@ -576,7 +578,7 @@ public class MainV extends javax.swing.JFrame {
                     Vertice center = null;
                     if (anchor){
                         center = selectedPolygon.getCentroideDaMedia();
-                        panelCp.setAnchor(center);
+                        lateral.setAnchor(center);
                     }
                     //<editor-fold defaultstate="collapsed" desc="Cisalhamento Drag">
                     if (currentAction == SHEAR_ACTION){
@@ -730,7 +732,7 @@ public class MainV extends javax.swing.JFrame {
                     Vertice radiusPnt = new Vertice(x, y, z);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
                     frente.addPoligono(localPolygonBuilder(dist));  //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
-                    frente.cleanTempRegular();
+                    frente.setTempRegular(null);
                     
                     resetDrawingState();
                     frente.repaint();
@@ -743,24 +745,25 @@ public class MainV extends javax.swing.JFrame {
                     if (temporaryList.size() < 3){
                         temporaryList.clear();
                         resetDrawingState();
-                        frente.cleanTempoLines();
+                        frente.clear();
                     } else {
                         frente.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));          
                         resetDrawingState();
-                        frente.cleanTempoLines();
+                        frente.clear();
                     }
                 } else if (noPointsToCreate == 1){
                     temporaryList.add(new Vertice(x, y, z));
                     frente.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));        
                     resetDrawingState();
-                    frente.cleanTempoLines();
+                    frente.clear();
                 } else {
                     temporaryList.add(new Vertice(x, y, z));
                     --noPointsToCreate;
-                    if (temporaryList.size() >= 2){
+                    frente.addVertice(new Vertice(x, y, z));
+                    /*if (temporaryList.size() >= 2){
                         int size = temporaryList.size();
-                        frente.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
-                    }    
+                        topo.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
+                    }    */ 
                     
                     if (regularSidedPolygon){
                         regularSidedLock = true;
@@ -830,13 +833,13 @@ public class MainV extends javax.swing.JFrame {
                 if (regularSidedLock){
                     Vertice radiusPnt = new Vertice(x, y, z);
                     int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
-                    panelCp.setTempRegular(localPolygonBuilder(dist));
+                    frente.setTempRegular(localPolygonBuilder(dist));
                 } else {
                     //panelCp.cleanTempoLines();
                     Vertice last = temporaryList.get(temporaryList.size()-1);
-                    panelCp.setMovable(new Aresta(new Vertice( x, y, z), last));
+                    frente.setMovable(new Vertice( x, y, z));
                 }
-                panelCp.repaint();
+                world.repaint();
                 
                 //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
             }
@@ -853,7 +856,7 @@ public class MainV extends javax.swing.JFrame {
                     Vertice center = null;
                     if (anchor){
                         center = selectedPolygon.getCentroideDaMedia();
-                        panelCp.setAnchor(center);
+                        frente.setAnchor(center);
                     }
                     //<editor-fold defaultstate="collapsed" desc="Cisalhamento Drag">
                     if (currentAction == SHEAR_ACTION){
@@ -946,14 +949,292 @@ public class MainV extends javax.swing.JFrame {
     }
 //</editor-fold>
     
+    private void addTopoThings(){
+        topoPane.addMouseListener(new java.awt.event.MouseAdapter() {           
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent evt) {                               
+                int x = evt.getX();
+                int y = 0;
+                int z = evt.getY();
+                
+                if (currentAction != NO_ACTION){
+                    previousDrag = new Vertice(x, y, z);
+                    return;
+                }
+
+                //<editor-fold defaultstate="collapsed" desc="Select Action">
+                if(selectBt.isSelected()){
+                    List<Poligono> lista = topo.getListaPoligonos();
+                    Vertice point = new Vertice(x, y, z);
+
+                    for(int i=0; i<lista.size(); i++){
+                        List<Vertice> vertices = lista.get(i).getVertices();
+                        boolean toAdd = false;
+
+                        innerFor: for(int j=0; j<vertices.size(); j++){
+                            Vertice a = vertices.get(j), b;
+                            if (j == vertices.size()-1) b=vertices.get(0);
+                            else b=vertices.get(j+1);
+                            
+                            //System.out.println(VMath.shortestDistance(a, b, point));
+                            if (VMath.shortestDistance(a, b, point) < LINE_PROXIMITY_THRESHOLD){
+                                toAdd = true;
+                                break innerFor;
+                            }
+                        }
+
+                        if (toAdd){
+                            LOG.info("Polígono selecionado.");
+                            selectedPolygon = lista.get(i);
+                            topo.setSelectedPolygon(selectedPolygon);
+                            resetPaint();
+                            return;
+                        }
+                    }
+                    return;
+                }
+                //</editor-fold>
+                
+                if(!pendingCreating){
+                    int noTyped = getNumberOfSidesFromBtSelected();
+                    if (noTyped == -1){
+                        LOG.warning("Selecione um tipo de polígono para desenhar.");
+                        return;
+                    } else {
+                        pendingCreating = true;
+                        noPointsToCreate = noTyped;
+                        temporaryList = new ArrayList<>();
+                    }
+                }
+
+                if (regularSidedLock){   
+                    Vertice radiusPnt = new Vertice(x, y, z);
+                    int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                    topo.addPoligono(localPolygonBuilder(dist));  //new Nregular(jSlider1.getValue(), dist, temporaryList.get(0), 0.));
+                    topo.setTempRegular(null);
+                    
+                    resetDrawingState();
+                    topo.repaint();
+                    regularSidedLock = false;
+                    regularSidedPolygon = false;
+                    return ;
+                }
+                
+                if (SwingUtilities.isRightMouseButton(evt)){
+                    if (temporaryList.size() < 3){
+                        temporaryList.clear();
+                        resetDrawingState();
+                        topo.clear();
+                    } else {
+                        topo.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));          
+                        resetDrawingState();
+                        topo.clear();
+                    }
+                } else if (noPointsToCreate == 1){
+                    temporaryList.add(new Vertice(x, y, z));
+                    topo.addPoligono(localPolygonBuilder()); ///new Poligono(temporaryList));        
+                    resetDrawingState();
+                    topo.clear();
+                } else {
+                    temporaryList.add(new Vertice(x, y, z));
+                    --noPointsToCreate;
+                    topo.addVertice(new Vertice(x, y, z));
+                    /*if (temporaryList.size() >= 2){
+                        int size = temporaryList.size();
+                        topo.addTempoLine(new Aresta(temporaryList.get(size-2), temporaryList.get(size-1)));
+                    }    */
+                    
+                    if (regularSidedPolygon){
+                        regularSidedLock = true;
+                    }
+                    LOG.info("Ponto capturado.");
+                }
+                topo.repaint();
+            } 
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                topo.setAnchor(null);
+                resetPaint();
+            }            
+        });
+        
+        topoPane.addMouseMotionListener(new java.awt.event.MouseMotionAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                int x = e.getX();
+                int y = 0;
+                int z = e.getY();
+                
+                if (currentAction != NO_ACTION){
+                    Vertice v = new Vertice(x, y, z);
+                    //<editor-fold defaultstate="collapsed" desc="Escala e Cisalhamento Move">
+                    if (currentAction==SHEAR_ACTION || currentAction==SCALE_ACTION){
+                        int selSize = selectedPolygon.getVertices().size();
+                        boolean toAdd=false;
+                        Aresta closeLine = null;
+                        for(int j=0; j<selSize; j++){
+                            Vertice a = selectedPolygon.getVertices().get(j), b;
+                            if (j == selSize-1) b=selectedPolygon.getVertices().get(0);
+                            else b=selectedPolygon.getVertices().get(j+1);
+
+                            if (VMath.shortestDistance(a, b, v) < LINE_PROXIMITY_THRESHOLD){
+                                toAdd = true;
+                                closeLine = new Aresta(a,b);
+                                break;
+                            }
+                        }
+                        if (toAdd){
+                                 if ( controlFLAG && !shiftFLAG) topo.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
+                            else if (!controlFLAG &&  shiftFLAG) topo.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
+                            //else if ( controlFLAG &&  shiftFLAG) paneMs.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+                            else                                 topo.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+                        } else {
+                            topo.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Resto Move">
+                    } else {
+                        Vertice prox = PMath.verticeProximoDeQualquerVerticeDoPoligono(selectedPolygon, v);
+                        if (prox != null){
+                            paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                            firstActionPoint = prox;
+                        } else
+                            paneMs.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+                    }
+                    //</editor-fold>
+                }
+                
+                if (temporaryList.size() < 1) return;
+                if (!pendingCreating) return;
+                //paneMs.repaint();
+                               
+                if (regularSidedLock){
+                    Vertice radiusPnt = new Vertice(x, y, z);
+                    int dist = (int) VMath.distancia(temporaryList.get(0), radiusPnt);
+                    topo.setTempRegular(localPolygonBuilder(dist));
+                } else {
+                    //panelCp.cleanTempoLines();
+                    //Vertice last = temporaryList.get(temporaryList.size()-1);
+                    topo.setMovable(new Vertice(x, y, z));
+                }
+                topo.repaint();
+                
+                //paneMs.setCursor(new Cursor(Cursor.HAND_CURSOR));
+            }
+            
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int x = e.getX();
+                int y = 0;
+                int z = e.getY();
+                
+                Vertice curr = new Vertice(x, y, z);
+                if (selectedPolygon!=null && currentAction!=NO_ACTION){
+                    boolean anchor = centerAnchorBox.isSelected();
+                    Vertice center = null;
+                    if (anchor){
+                        center = selectedPolygon.getCentroideDaMedia();
+                        topo.setAnchor(center);
+                    }
+                    //<editor-fold defaultstate="collapsed" desc="Cisalhamento Drag">
+                    if (currentAction == SHEAR_ACTION){
+                        Cisalhamento c = new Cisalhamento();
+                        Movimento v = VMath.movimentoVertical(previousDrag, curr);
+                        Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                            
+                        switch (paneMs.getCursor().getType()) {   //Invertido!!!!!
+                            case Cursor.N_RESIZE_CURSOR: //Vertical
+                                if (v == Movimento.Cima) 
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y,  0.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, -0.01, selectedPolygon, center);
+                                break;
+                            case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                if (h == Movimento.Direita)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X,  0.01, selectedPolygon, center);
+                                else if (h == Movimento.Esquerda)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, -0.01, selectedPolygon, center);
+                                break;
+                            case Cursor.MOVE_CURSOR:
+                                if (h == Movimento.Direita)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X,  0.01, selectedPolygon, center);
+                                else if (h == Movimento.Esquerda)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_X, -0.01, selectedPolygon, center);
+                                if (v == Movimento.Cima) 
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y,  0.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = c.cisalhamento(Eixo.Eixo_Y, -0.01, selectedPolygon, center);
+                                break;
+                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Translação Drag">
+                        } else if (currentAction == TRANSLATE_ACTION){
+                            Translacao t = new Translacao();
+                            selectedPolygon = t.transladar((int) -(previousDrag.getX() - curr.getX()),
+                                                           (int) -(previousDrag.getY() - curr.getY()),
+                                                           0, selectedPolygon);
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Escala Drag">
+                    } else if (currentAction == SCALE_ACTION){
+                        Escala sc = new Escala();
+                        Movimento v = VMath.movimentoVertical(previousDrag, curr);
+                        Movimento h = VMath.movimentoHorizontal(previousDrag, curr);
+                        
+                        switch (topo.getCursor().getType()) {   //Invertido!!!!!
+                            case Cursor.N_RESIZE_CURSOR: //Vertical
+                                if (v == Movimento.Cima)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 0.99, selectedPolygon, center);
+                                break;
+                            case Cursor.E_RESIZE_CURSOR: //Horizontal
+                                if (h == Movimento.Esquerda)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 1.01, selectedPolygon, center);
+                                else if (h == Movimento.Direita)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 0.99, selectedPolygon, center);
+                                break;
+                            case Cursor.MOVE_CURSOR:
+                                if (v == Movimento.Cima)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 1.01, selectedPolygon, center);
+                                else if (v == Movimento.Baixo)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_Y, 0.99, selectedPolygon, center);
+                                if (h == Movimento.Esquerda)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 1.01, selectedPolygon, center);
+                                else if (h == Movimento.Direita)
+                                    selectedPolygon = sc.escala(Eixo.Eixo_X, 0.99, selectedPolygon, center);
+                                break;
+                        }
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="Rotação Drag">
+                    } else if (currentAction == ROTATE_ACTION){
+                        Vertice rotAxis = null;
+                        if (center != null) rotAxis = center;
+                        else rotAxis = new Vertice(firstActionPoint);
+                        Movimento m = VMath.movimentoHorizontal(previousDrag, curr);
+                        Rotacao r = new Rotacao();
+                        if (m == Movimento.Direita)
+                            selectedPolygon = r.rotacaoZ(0.05, selectedPolygon, rotAxis);
+                        else if (m == Movimento.Esquerda)
+                            selectedPolygon = r.rotacaoZ(-0.05, selectedPolygon, rotAxis);
+                    }
+                    //</editor-fold>
+                }
+                topo.setSelectedPolygon(selectedPolygon);
+                resetPaint();
+                previousDrag = curr;
+            }
+        });
+    }
+    
     /**
      * Creates new form Principal
      */
     public MainV() {  
         //Toolkit.getDefaultToolkit().setDynamicLayout(false);
         initComponents();
-        panelCp = new World(paneMs.getGraphics());
-        paneMs.add(panelCp);
+        world = new World(new ArrayList<Poligono>());
+        //paneMs.add(world);
         //addMouseListeners();
 
         consolePane.setEditable(false);
@@ -974,18 +1255,20 @@ public class MainV extends javax.swing.JFrame {
                 }
           });
         
-        //topo    = new ProjectionPlane(topoPane.getGraphics(), new OrtographicProjection(OrtographicProjection.Orientation.Topo), panelCp);
-        lateral = new ProjectionPlane(lateralPane.getGraphics(), new OrtographicProjection(OrtographicProjection.Orientation.Lateral), panelCp);
-        frente  = new ProjectionPlane(frentePane.getGraphics(), new OrtographicProjection(OrtographicProjection.Orientation.Frente), panelCp);
-        //persp   = new ProjectionPlane(perspPane.getGraphics(), new OrtographicProjection(OrtographicProjection.Orientation.Topo), panelCp);
+        topo    = new ProjectionPlane(new OrtographicProjection(OrtographicProjection.Orientation.Topo));
+        lateral = new ProjectionPlane(new OrtographicProjection(OrtographicProjection.Orientation.Lateral));
+        frente  = new ProjectionPlane(new OrtographicProjection(OrtographicProjection.Orientation.Frente));
+        //persp   = new ProjectionPlane(new OrtographicProjection(OrtographicProjection.Orientation.Topo), world);
         
-        panelCp.setProjectionPlaneList(frente);//topo, lateral, frente, persp);
-        //topoPane.setViewportView(topo);
+        world.setProjectionPlaneList(frente, topo, lateral);//topo, lateral, frente, persp);
+        topoPane.setViewportView(topo);
         lateralPane.setViewportView(lateral);
         frentePane.setViewportView(frente);
         //perspPane.setViewportView(persp);
         
-        addAllListeners();
+        //addAllListeners();
+        
+        addTopoThings();
     }
 
     /**
@@ -1513,25 +1796,26 @@ public class MainV extends javax.swing.JFrame {
         noPointsToCreate = getNumberOfSidesFromBtSelected();
         temporaryList = new ArrayList<>();
         selectedPolygon = null;
-        panelCp.setSelectedPolygon(selectedPolygon);
+        topo.setSelectedPolygon(selectedPolygon);
         currentAction = NO_ACTION;
         resetPaint();
     }//GEN-LAST:event_irregularPoligonBtActionPerformed
 
     private void formComponentResized(java.awt.event.ComponentEvent evt) {//GEN-FIRST:event_formComponentResized
-        List<Poligono> lista = panelCp.getListaPoligonos();
-        paneMs.remove(panelCp);
-        panelCp = new World(paneMs.getGraphics());
-        panelCp.setSize(paneMs.getSize());
-        panelCp.addAllPoligonos(lista);
-        panelCp.setSelectedPolygon(selectedPolygon);
+        /*List<Poligono> lista = world.getListaPoligonos();
+        paneMs.remove(world);
+        world = new World(paneMs.getGraphics());
+        world.setSize(paneMs.getSize());
+        world.addAllPoligonos(lista);
+        world.setSelectedPolygon(selectedPolygon);
         ///panelCp.addTempoLine(aresta); //Problema ser der resize no meio da operação
-        paneMs.add(panelCp);
+        paneMs.add(world);
         
         //paneMs.repaint();
         //panelCp.revalidate();
         //panelCp.repaint();
-        resetPaint();
+        resetPaint();*/
+        System.out.println("Arruma o resize");
     }//GEN-LAST:event_formComponentResized
 
     private void regularNsidedActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_regularNsidedActionPerformed
@@ -1541,7 +1825,7 @@ public class MainV extends javax.swing.JFrame {
         temporaryList = new ArrayList<>();
         //regularSidedPolygon = regularNsided.isSelected();
         selectedPolygon = null;
-        panelCp.setSelectedPolygon(selectedPolygon);
+        topo.setSelectedPolygon(selectedPolygon);
         currentAction = NO_ACTION;
         resetPaint();
     }//GEN-LAST:event_regularNsidedActionPerformed
@@ -1555,7 +1839,7 @@ public class MainV extends javax.swing.JFrame {
         if (result == JFileChooser.APPROVE_OPTION) {
             File selectedFile = fileChooser.getSelectedFile();
                        
-            List<Poligono> toSave = panelCp.getListaPoligonos();
+            List<Poligono> toSave = world.getListaPoligonos();
             //System.out.println(toSave);
             try {
                 OutputScene.outputToFile(toSave, selectedFile);
@@ -1568,7 +1852,7 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_saveMenuActionPerformed
 
     private void loadMenuActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_loadMenuActionPerformed
-        JFileChooser fileChooser = new JFileChooser();
+        /*JFileChooser fileChooser = new JFileChooser();
         fileChooser.setCurrentDirectory(new File(System.getProperty("user.home")));
         fileChooser.setDialogTitle("Escolha um arquivo ." + OutputScene.FILE_EXTENSION + " para abrir");
         fileChooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -1587,16 +1871,16 @@ public class MainV extends javax.swing.JFrame {
             
             //Vertice max = VProperties.getMaxVertex(loaded);
             
-            paneMs.remove(panelCp);
-            panelCp = new World(paneMs.getGraphics());
+            paneMs.remove(world);
+            world = new World();
             //panelCp.setSize(new Dimension((int) max.getX(), (int) max.getY()));
-            panelCp.setSize(paneMs.getSize());
-            panelCp.addAllPoligonos(loaded);
-            paneMs.add(panelCp);
-            resetPaint();
+            world.setSize(paneMs.getSize());
+            world.addAllPoligonos(loaded);
+            paneMs.add(world);
+            resetPaint();*/
             
             LOG.info("Cena carregada!");
-        }
+        //}
     }//GEN-LAST:event_loadMenuActionPerformed
 
     private void formWindowDeiconified(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowDeiconified
@@ -1614,7 +1898,7 @@ public class MainV extends javax.swing.JFrame {
 
     private void cancelBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelBtActionPerformed
         selectedPolygon = null;
-        panelCp.setSelectedPolygon(null);
+        topo.setSelectedPolygon(null);
         resetDrawingState();
         resetPaint();
         LOG.info("Criação cancelada");
@@ -1623,28 +1907,28 @@ public class MainV extends javax.swing.JFrame {
     }//GEN-LAST:event_cancelBtActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        panelCp.clear();
+        topo.clear();
         resetDrawingState();
         resetPaint();
         LOG.info("Cena limpa");
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jRadioButtonMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButtonMenuItem2ActionPerformed
-        if (javaFillRadio.isSelected()){
-            panelCp.setUseJavaFill(true);
+        /*if (javaFillRadio.isSelected()){
+            world.setUseJavaFill(true);
         } else {
-            panelCp.setUseJavaFill(false);
+            world.setUseJavaFill(false);
         }
-        repaint();
+        repaint();*/
     }//GEN-LAST:event_jRadioButtonMenuItem2ActionPerformed
 
     private void javaFillRadioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_javaFillRadioActionPerformed
-        if (javaFillRadio.isSelected()){
-            panelCp.setUseJavaFill(true);
+        /*if (javaFillRadio.isSelected()){
+            world.setUseJavaFill(true);
         } else {
-            panelCp.setUseJavaFill(false);
+            world.setUseJavaFill(false);
         }
-        repaint();
+        repaint();*/
     }//GEN-LAST:event_javaFillRadioActionPerformed
 
     private void deleteBtActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deleteBtActionPerformed
@@ -1653,8 +1937,8 @@ public class MainV extends javax.swing.JFrame {
             unToggle();
             //selectBt.doClick();
         } else {
-            panelCp.remove(selectedPolygon);
-            panelCp.setSelectedPolygon(null);
+            topo.remove(selectedPolygon);
+            topo.setSelectedPolygon(null);
             repaint();
             cancelBt.doClick();
         }

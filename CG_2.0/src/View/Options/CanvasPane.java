@@ -9,11 +9,11 @@ import View.MainController;
 import java.util.List;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.geometry.Point2D;
 import javafx.scene.Group;
 import javafx.scene.input.MouseEvent;
-import m.Ponto2D;
 import m.poligonos.Ancora;
-import m.poligonos.Poligono;
+import m.poligonos.OldPoligono;
 import resource.description.Ferramentas;
 import resource.description.Poligonos;
 import resource.description.Transformacoes;
@@ -24,11 +24,11 @@ import resource.description.Transformacoes;
  */
 public class CanvasPane extends Group{
     private MainController main;
-    private List<Poligono> lista;
+    private List<OldPoligono> lista;
     
-    private Poligono selectedPolygon;
+    private OldPoligono selectedPolygon;
     private ObservableList<Ancora> selectedPolygonAnchors;
-    private ObservableValue<Ponto2D> firstPoint;
+    private ObservableValue<Point2D> firstPoint;
     
     public CanvasPane(MainController main) {
         this.main = main;

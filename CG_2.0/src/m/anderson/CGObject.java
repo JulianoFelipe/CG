@@ -3,12 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Model;
+package m.anderson;
+
+import java.io.Serializable;
 
 /**
  *
  * @author JFPS
  */
-public class Camera {
+public interface CGObject extends Serializable{
     
 }
