@@ -17,11 +17,14 @@ import m.anderson.Vertice;
 public class VMath {
     public static void normalizar(Vertice v) {
         double norma;
-        norma = Math.sqrt((v.getX() * v.getX()) + (v.getY() * v.getY()));
+        norma = Math.sqrt((v.getX() * v.getX()) + 
+                          (v.getY() * v.getY()) +
+                          (v.getZ() * v.getZ()));
 
         if (norma != 0) {
             v.setX((float) (v.getX() / norma));
             v.setY((float) (v.getY() / norma));
+            v.setZ((float) (v.getZ() / norma));
         }
     }
     
@@ -32,15 +35,15 @@ public class VMath {
      * @param v2
      * @return
      */
-    public static double produtoVetorial(Vertice v1, Vertice v2) {
+    public static Vertice produtoVetorial(Vertice v1, Vertice v2) {
         // i = v1.y * v2.z - (v2.y * v1.z)
-        double i = v1.getY() * 0 - v2.getY() * 0;
+        double i = v1.getY() * v2.getZ() - v2.getY() * v1.getZ();
         // j = v1.z * v2.x - (v2.z * v1.x)
-        double j = 0 * v2.getX() - 0 * v1.getX();
+        double j = v1.getZ() * v2.getX() - v2.getZ() * v1.getX();
         // k = v1.x * v2.y - (v2.x * v1.y)
         double k = v1.getX() * v2.getY() - v2.getX() * v1.getY();
-
-        return k;
+        
+        return new Vertice ((float) i, (float) j, (float) k);
     }
     
     /**
@@ -50,22 +53,30 @@ public class VMath {
      * @param escalar
      * @return
      */
-    public static Vertice produtoEscalar(Vertice v1, float escalar) {
+    public static Vertice produto(Vertice v1, double escalar) {
         double x = v1.getX() * escalar;
         double y = v1.getY() * escalar;
+        double z = v1.getZ() * escalar;
 
-        return new Vertice((float) x, (float) y);
+        return new Vertice((float) x, (float) y, (float) z);
+    }
+    
+    public static double produtoEscalar (Vertice v1, Vertice v2){
+        return (v1.getX() * v2.getX()) +
+               (v1.getY() * v2.getY()) +
+               (v1.getZ() * v2.getZ());
     }
     
     public static double distancia(Vertice v1, Vertice v2){
         double firstT = Math.pow((v1.getX() - v2.getX()),2);
         double secndT = Math.pow((v1.getY() - v2.getY()),2);
+        double thirdT = Math.pow((v1.getZ() - v2.getZ()),2);
         
-        return Math.sqrt(firstT + secndT);
+        return Math.sqrt(firstT + secndT + thirdT);
     }
     
     //https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
-    public static double shortestDistance(Aresta a, Vertice p) {
+    public static double shortestDistance2D(Aresta a, Vertice p) {
         float px=a.getvFinal().getX() - a.getvInicial().getX();
         float py=a.getvFinal().getY() - a.getvInicial().getY();
         float temp=(px*px)+(py*py);
@@ -85,8 +96,8 @@ public class VMath {
         return dist;
     }
     
-    public static double shortestDistance(Vertice lineA, Vertice lineB, Vertice point){
-        return shortestDistance(new Aresta(lineA, lineB), point);
+    public static double shortestDistance2D(Vertice lineA, Vertice lineB, Vertice point){
+        return shortestDistance2D(new Aresta(lineA, lineB), point);
     }
     
     public static double[] slopeInterceptForm(Aresta line){

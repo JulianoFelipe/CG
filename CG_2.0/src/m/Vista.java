@@ -5,14 +5,14 @@
  */
 package m;
 
-import m.poligonos.OldPoligono;
+import m.pipeline.Pipeline;
 
 /**
  *
  * @author JFPS
  */
-public interface WorldToRasterConverter {
+public class Vista {
+    private final Camera cam;
+    private final Pipeline pipe;
     
-    public void convertToRaster(OldPoligono p);
-    public void convertFromRaster(OldPoligono p);
 }
