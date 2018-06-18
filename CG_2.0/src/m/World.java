@@ -24,7 +24,7 @@ import m.poligonos.OldPoligono;
 public class World {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
     private final ListProperty<OldPoligono> objetos;
-    private List<Plane> planes;
+    private List<Vista> planes;
     
     public World() {       
         ObservableList<OldPoligono> oobjetos = FXCollections.observableArrayList(new Callback<OldPoligono, Observable[]>() {
@@ -50,9 +50,9 @@ public class World {
         objetos.addAll(lista);
     }
     
-    public void setPlanes(Plane...planes){
+    public void setPlanes(Vista...planes){
         this.planes = new ArrayList<>();
-        for (Plane p : planes){
+        for (Vista p : planes){
             this.planes.add(p);
             //<editor-fold defaultstate="collapsed" desc="Not to be added">
             p.addPoligonoListener((ListChangeListener) new ListChangeListener<OldPoligono>() {
@@ -72,7 +72,7 @@ public class World {
                                 objetos.remove(removedItem);
                             });
                             c.getAddedSubList().forEach((addedItem) -> {
-                                p.getConverter().convertFromRaster(addedItem);
+                                //p.getConverter().convertFromRaster(addedItem);
                                 objetos.add(addedItem);
                             });
                         }

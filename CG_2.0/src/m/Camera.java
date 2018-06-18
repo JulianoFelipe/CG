@@ -29,6 +29,7 @@ public class Camera extends Observable{
         this.ViewUp = ViewUp;
         this.VRP = VRP;
         this.P = P;
+        calculateNVU();
     }
 
     public void setViewUp(Vertice ViewUp) {
@@ -54,7 +55,7 @@ public class Camera extends Observable{
     }
 
     public Vertice getVetorN() {
-        if (changed == true){
+        if (changed == true){      
             calculateNVU();
             changed = false;
         }

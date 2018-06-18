@@ -282,6 +282,6 @@ public class Poligono implements CGObject{
     private List<Face> pontosParaFaces(){
         List<Face> listaDeFaces = new ArrayList<>();
         //vertices = lista De Vertices
-        //return null;
+        return null;
     }
 }

@@ -6,6 +6,10 @@
 package utils.math;
 
 //import Model.Poligono;
+
+import m.anderson.Poligono;
+import m.anderson.Vertice;
+
 //import Model.Vertice;
 
 /**

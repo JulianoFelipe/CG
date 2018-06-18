@@ -5,7 +5,7 @@
  */
 package utils.math;
 
-import Model.Vertice;
+import m.anderson.Vertice;
 
 /**
  * Mix de MMath e VMath

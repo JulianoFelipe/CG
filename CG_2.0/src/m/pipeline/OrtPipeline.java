@@ -8,8 +8,11 @@ package m.pipeline;
 import java.util.List;
 import java.util.Observable;
 import m.Camera;
-import m.Vista;
+import m.Viewport;
+import m.VistaNEW;
+import m.Window;
 import m.anderson.CGObject;
+import utils.math.MMath;
 
 /**
  *
@@ -19,28 +22,46 @@ public class OrtPipeline extends CGPipeline{
     private final VistaOrtografica vista;
     private float[][] matrizVistaOrt;
 
-    private boolean changed = false;
+    private boolean changed = true;
     
-    public OrtPipeline(VistaOrtografica vista, Camera cam) {
-        super(cam);
+    public OrtPipeline(VistaOrtografica vista, Camera cam, Window win, Viewport view) {
+        super(cam, win, view);
         this.vista = vista;
         matrizVistaOrt = MatrizOrtografica.getMatrizOrt(vista);
     }
 
     @Override
-    public List<CGObject> convert2D(List<CGObject> lista, Vista vista) {
+    public List<CGObject> convert2D(List<CGObject> lista, VistaNEW vista) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public void update(Observable o, Object arg) {
+        //if observable is window ou viewport, update matrix jp
+        
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    protected float[][] getPipelineMatrix(){
+    public float[][] getPipelineMatrix(){
         //Retorna a matriz final do pipeline
         //Se receber update de camera, alterar changed e calc tudo de novo
         //Concatena as budega
+        
+        if (changed == false){
+            return matrizVistaOrt;
+        } else {
+            ///Matriz vista = Msru,src * Mvista * Mjp
+            //Concatena por multiplicar ao contrário
+            
+            float[][] tmp  = MMath.multiplicar(matrixJP, MatrizOrtografica.getMatrizOrt(vista));
+            matrizVistaOrt = MMath.multiplicar(tmp, super.getMatrizSRUsrc());
+            
+            return matrizVistaOrt;
+        }
+    }
+    
+    public float[][] getMatrizProj(){
+        return MatrizOrtografica.getMatrizOrt(vista);
     }
     
     public static enum VistaOrtografica{
@@ -49,27 +70,27 @@ public class OrtPipeline extends CGPipeline{
     
     protected static final class MatrizOrtografica{
         protected static final float[][] MAT_TOPO = {
+            { 1, 0, 0, 0},
             { 0, 0, 0, 0},
-            { 0, 0, 0, 0},  ESSAS 3 AQUI ANDER
-            { 0, 0, 0, 0},
-            { 0, 0, 0, 0}
+            { 0, 0, 1, 0},
+            { 0, 0, 0, 1}
         };
         
         protected static final float[][] MAT_LATERAL = {
             { 0, 0, 0, 0},
-            { 0, 0, 0, 0},
-            { 0, 0, 0, 0},
-            { 0, 0, 0, 0}
+            { 0, 1, 0, 0},
+            { 0, 0, 1, 0},
+            { 0, 0, 0, 1}
         };
         
         protected static final float[][] MAT_FRENTE = {
+            { 1, 0, 0, 0},
+            { 0, 1, 0, 0},
             { 0, 0, 0, 0},
-            { 0, 0, 0, 0},
-            { 0, 0, 0, 0},
-            { 0, 0, 0, 0}
+            { 0, 0, 0, 1}
         };
         
-        protected static float[][] getMatrizOrt(VistaOrtografica vista){
+        protected static float[][] getMatrizOrt(VistaOrtografica vista){            
             switch(vista){
                 case Frontal:
                     return MAT_FRENTE;

@@ -8,7 +8,9 @@ package m.pipeline;
 import java.util.List;
 import java.util.Observable;
 import m.Camera;
-import m.Vista;
+import m.Viewport;
+import m.VistaNEW;
+import m.Window;
 import m.anderson.CGObject;
 
 /**
@@ -18,8 +20,9 @@ import m.anderson.CGObject;
 public class PersPipeline extends CGPipeline{
     protected float DP;
 
-    public PersPipeline(Camera cam) {
-        super(cam);
+    public PersPipeline(float DP, Camera cam, Window win, Viewport view) {
+        super(cam, win, view);
+        this.DP = DP;
     }
     
     protected float[][] getPersMatrix(){
@@ -32,7 +35,7 @@ public class PersPipeline extends CGPipeline{
     }
 
     @Override
-    public List<CGObject> convert2D(List<CGObject> lista, Vista vista) {
+    public List<CGObject> convert2D(List<CGObject> lista, VistaNEW vista) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

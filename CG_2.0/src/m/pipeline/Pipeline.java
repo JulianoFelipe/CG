@@ -7,7 +7,7 @@ package m.pipeline;
 
 import java.util.List;
 import java.util.Observer;
-import m.Vista;
+import m.VistaNEW;
 import m.anderson.CGObject;
 
 /**
@@ -16,5 +16,5 @@ import m.anderson.CGObject;
  */
 public interface Pipeline extends Observer{
     //Toma os objetos + vista (Para obter informações).
-    public List<CGObject> convert2D(List<CGObject> lista, Vista vista);
+    public List<CGObject> convert2D(List<CGObject> lista, VistaNEW vista);
 }
