@@ -9,6 +9,7 @@ import m.Camera;
 import m.Viewport;
 import m.Window;
 import m.anderson.Vertice;
+import utils.math.VMath;
 
 /**
  *
@@ -54,18 +55,28 @@ public abstract class CGPipeline implements Pipeline{
         Vertice n   = cam.getVetorN();
         Vertice VRP = cam.getVRP();
            
+        Vertice minusVRP = new Vertice(-VRP.getX(), -VRP.getY(), -VRP.getZ());
+        
         return new float[][] {
-            {u.getX(), u.getY(), u.getZ(), -VRP.getX()},
-            {v.getX(), v.getY(), v.getZ(), -VRP.getY()},
-            {n.getX(), n.getY(), n.getZ(), -VRP.getZ()},
+            {u.getX(), u.getY(), u.getZ(), (float)VMath.produtoEscalar(minusVRP, u)},
+            {v.getX(), v.getY(), v.getZ(), (float)VMath.produtoEscalar(minusVRP, v)},
+            {n.getX(), n.getY(), n.getZ(), (float)VMath.produtoEscalar(minusVRP, n)},
             {       0,        0,        0,           1}
         };
+        
+        /*return new float[][] {
+            {u.getX(), u.getY(), u.getZ(), ((-VRP.getX()*u.getX())+(-VRP.getY()*u.getY())+(-VRP.getZ()*u.getZ()))},
+            {v.getX(), v.getY(), v.getZ(), ((-VRP.getX()*v.getX())+(-VRP.getY()*v.getY())+(-VRP.getZ()*v.getZ()))},
+            {n.getX(), n.getY(), n.getZ(), ((-VRP.getX()*n.getX())+(-VRP.getY()*n.getY())+(-VRP.getZ()*n.getZ()))},
+            {       0,        0,        0,           1}
+        };*/
     }
     
     protected final void updateMatrixJP(){
         float umin   = viewport.getUmin(),
               deltaU = viewport.getDeltaU(),
               vmin   = viewport.getVmin(),
+              vmax   = viewport.getVmax(),
               deltaV = viewport.getDeltaV();
         
         float xmin   = window.getXmin(),
@@ -74,11 +85,11 @@ public abstract class CGPipeline implements Pipeline{
               deltaY = window.getDeltaY();
         
         float del_UX = (deltaU/deltaX),
-              del_VY = (deltaV/deltaY); 
+              del_VY = ((vmin-vmax)/deltaY); 
         
         matrixJP = new float[][] {
            {del_UX,      0, ((-xmin*del_UX)+umin)},
-           {     0, del_VY, ((-ymin*del_VY)+vmin)},
+           {     0, del_VY, (( ymin*del_VY)+vmax)},
            {     0,      0,                     1}
         };
     }

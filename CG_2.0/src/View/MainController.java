@@ -8,6 +8,7 @@ package View;
 import View.Options.CanvasPane;
 import View.Options.PaintController;
 import View.Options.RegularPolygonController;
+import View.Options.RevBuildController;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -31,7 +32,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Text;
 import resource.description.Ferramentas;
-import resource.description.Poligonos;
+import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
 
 /**
@@ -77,7 +78,7 @@ public class MainController implements Initializable {
         TreeItem<String> root = new TreeItem<>("Root");
              
         TreeItem<String> ferramentas    = new TreeItem<>(Ferramentas.C_NAME);
-        TreeItem<String> poligonos      = new TreeItem<>(Poligonos.C_NAME);
+        TreeItem<String> criacao        = new TreeItem<>(CriacaoPrevolucao.C_NAME);
         TreeItem<String> transformacoes = new TreeItem<>(Transformacoes.C_NAME);
 
         ferramentas.getChildren().addAll(
@@ -86,9 +87,9 @@ public class MainController implements Initializable {
             new TreeItem<>(Ferramentas.Paint.NAME,  new ImageView(Ferramentas.Paint.ICON))
         );
         
-        poligonos.getChildren().addAll(
-            new TreeItem<>(Poligonos.Regular.NAME,   new ImageView(Poligonos.Regular.ICON)),
-            new TreeItem<>(Poligonos.Irregular.NAME, new ImageView(Poligonos.Irregular.ICON))
+        criacao.getChildren().addAll(
+            new TreeItem<>(CriacaoPrevolucao.porPontos.NAME,   new ImageView(CriacaoPrevolucao.porPontos.ICON))//,
+            //new TreeItem<>(CriacaoPrevolucao.porLinha.NAME, new ImageView(CriacaoPrevolucao.porLinha.ICON))
         );
         
         transformacoes.getChildren().addAll(
@@ -98,7 +99,7 @@ public class MainController implements Initializable {
             new TreeItem<>(Transformacoes.Cisalhamento.NAME, new ImageView(Transformacoes.Cisalhamento.ICON))
         );
         
-        root.getChildren().addAll(ferramentas, poligonos, transformacoes);
+        root.getChildren().addAll(ferramentas, criacao, transformacoes);
         
         tools.setRoot(root);
         tools.setShowRoot(false);
@@ -118,18 +119,20 @@ public class MainController implements Initializable {
     
     public static final byte NOTHING_SEL       = -1;
     public static final byte FERRAMENTA_SEL    = 0;
-    public static final byte POLIGONO_SEL      = 1;
+    public static final byte REVOLUCAO_SEL     = 1;
     public static final byte TRANSFORMACAO_SEL = 2;
     
     private byte CURRENT_SEL = NOTHING_SEL;
     private Ferramentas current_ferr;
-    private Poligonos current_pol;
+    private CriacaoPrevolucao current_pol;
     private Transformacoes current_tra;
     
     private Parent paintOption;
     private PaintController paintControl;
     private Parent regularOption;
     private RegularPolygonController regularControl;
+    private Parent revBuildOption;
+    private RevBuildController revBuildController;
     
     @FXML //Clicar na árvore de ferramentas
     private void onMouseClickedToolsListener(MouseEvent e){
@@ -137,15 +140,15 @@ public class MainController implements Initializable {
         if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)){
             String name = (String) ((TreeItem)tools.getSelectionModel().getSelectedItem()).getValue();
             
-            Ferramentas ferr = Ferramentas.fromString(name);
-            Poligonos pol = Poligonos.fromString(name);
-            Transformacoes tra = Transformacoes.fromString(name);
+            Ferramentas       ferr = Ferramentas.fromString(name);
+            CriacaoPrevolucao  pol = CriacaoPrevolucao.fromString(name);
+            Transformacoes     tra = Transformacoes.fromString(name);
             
             if (ferr != null){
                 CURRENT_SEL = FERRAMENTA_SEL;
                 current_ferr = ferr;
             } else if (pol != null){
-                CURRENT_SEL = POLIGONO_SEL;
+                CURRENT_SEL = REVOLUCAO_SEL;
                 current_pol = pol;
             } else if (tra != null){
                 CURRENT_SEL = TRANSFORMACAO_SEL;
@@ -168,11 +171,21 @@ public class MainController implements Initializable {
         }
     }
     
-    private void loadRegular(){
+    /*private void loadRegular(){
         try { 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/RegularPolygonOption.fxml"));
             loader.setController(regularControl);
             regularOption = loader.load();
+        } catch (IOException ex) {  
+            LOG.log(Level.SEVERE, null, ex);
+        }
+    }*/
+    
+    private void loadRevPorPontos(){
+        try { 
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/RevBuildOption.fxml"));
+            loader.setController(revBuildController);
+            revBuildOption = loader.load();
         } catch (IOException ex) {  
             LOG.log(Level.SEVERE, null, ex);
         }
@@ -194,10 +207,10 @@ public class MainController implements Initializable {
                         break;
                 }
                 break;
-            case POLIGONO_SEL:
-                if(null != current_pol && current_pol == Poligonos.Regular){
-                    if (regularOption == null) loadRegular();
-                    options.getChildren().add(regularOption);
+            case REVOLUCAO_SEL:
+                if(null != current_pol && current_pol == CriacaoPrevolucao.porPontos){
+                    if (revBuildOption == null) loadRevPorPontos();
+                    options.getChildren().add(revBuildOption);
                 }
                 break;
                 
@@ -223,7 +236,7 @@ public class MainController implements Initializable {
         return current_ferr;
     }
 
-    public Poligonos getCurrentTipoDePoligono() {
+    public CriacaoPrevolucao getCurrentTipoDePoligono() {
         return current_pol;
     }
 

@@ -46,13 +46,7 @@ public class ANDERSON_TEST_SUITE {
         
         for (int j=0; j<res[0].length; j++){
             newRes[0][j] = res[0][j];
-        }
-        
-        for (int j=0; j<res[1].length; j++){
             newRes[1][j] = res[1][j];
-        }
-        
-        for (int j=0; j<res[3].length; j++){
             newRes[2][j] = res[3][j];
         }
         
@@ -65,11 +59,11 @@ public class ANDERSON_TEST_SUITE {
     public static void main(String[] args) {
         
         Vertice ViewUp = new Vertice(0, 1, 0);
-        Vertice VRP    = new Vertice(10, 11, 12);
-        Vertice P      = new Vertice(55, 34, 45);
-        
+        Vertice VRP    = new Vertice(50, 15, 30);
+        Vertice P      = new Vertice(20, 6, 15);
+       
         Camera cam = new Camera(ViewUp, VRP, P);
-        
+       
         Window win = new Window(16, 10);
         Viewport view = new Viewport(new Vertice(0, 0),
                                      new Vertice(320, 240) );
@@ -91,9 +85,9 @@ public class ANDERSON_TEST_SUITE {
         
 
         float[][] pol_mat = {
-            {  10,  11,  12,  13,  14},
-            {  10,  11,  12,  13,  14},
-            {  10,  11,  12,  13,  14},
+            {  30,  35,  25,  20,  30},
+            {   2,   4,   3,   1,  10},
+            {  25,  20,  18,  23,  (float) 22.5},
             {   1,   1,   1,   1,   1}
             //  A    B    C    D    E
         };

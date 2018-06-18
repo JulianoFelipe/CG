@@ -16,7 +16,7 @@ public class Window extends Observable{
     private int altura;
     private int largura;
 
-    public Window(int altura, int largura) {
+    public Window(int largura, int altura) {
         this.altura = altura;
         this.largura = largura;
     }

@@ -15,7 +15,7 @@ import javafx.scene.input.MouseEvent;
 import m.poligonos.Ancora;
 import m.poligonos.OldPoligono;
 import resource.description.Ferramentas;
-import resource.description.Poligonos;
+import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
 
 /**
@@ -48,13 +48,13 @@ public class CanvasPane extends Group{
                         
                         break;
                 }
-            } else if (selection == MainController.POLIGONO_SEL){
-               Poligonos pols = main.getCurrentTipoDePoligono();
+            } else if (selection == MainController.REVOLUCAO_SEL){
+               CriacaoPrevolucao pols = main.getCurrentTipoDePoligono();
                switch(pols){
-                    case Regular:
+                    case porPontos:
                        
                         break;
-                    case Irregular:
+                    case porLinha:
                         
                         break;
                } 

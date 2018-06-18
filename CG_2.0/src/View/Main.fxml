@@ -44,8 +44,8 @@
             <VBox prefHeight="707.0" prefWidth="193.0" BorderPane.alignment="CENTER">
                <children>
                   <Separator prefWidth="200.0" />
-                  <TreeView fx:id="tools" onMouseClicked="#onMouseClickedToolsListener" prefHeight="468.0" prefWidth="171.0" />
-                  <AnchorPane fx:id="options" prefHeight="237.0" prefWidth="193.0" />
+                  <TreeView fx:id="tools" onMouseClicked="#onMouseClickedToolsListener" prefHeight="368.0" prefWidth="193.0" />
+                  <AnchorPane fx:id="options" prefHeight="339.0" prefWidth="193.0" />
                </children>
             </VBox>
          </left>

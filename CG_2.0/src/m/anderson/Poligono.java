@@ -177,6 +177,20 @@ public class Poligono implements CGObject{
         //System.out.println(Arrays.toString(yPts));
         return yPts;
     }
+    
+    public float[][] getMatrixPoints(){
+        float[][] ponits = new float[4][vertices.size()];
+        
+        for (int i=0; i<vertices.size(); i++){
+            ponits[0][i] = vertices.get(i).getX();
+            ponits[1][i] = vertices.get(i).getY();
+            ponits[2][i] = vertices.get(i).getZ();
+            ponits[3][i] = 1;
+        }
+        
+        //System.out.println(Arrays.toString(yPts));
+        return ponits;
+    }
 
     @Override
     public int hashCode() {

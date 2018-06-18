@@ -15,6 +15,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.util.Callback;
+import m.anderson.Vertice;
 import m.poligonos.OldPoligono;
 
 /**
@@ -24,6 +25,7 @@ import m.poligonos.OldPoligono;
 public class World {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
     private final ListProperty<OldPoligono> objetos;
+    private ListProperty<Vertice> verticesTemporarios;
     private List<Vista> planes;
     
     public World() {       
@@ -89,6 +91,10 @@ public class World {
 
     public ListProperty<OldPoligono> objetosProperty() {
         return objetos;
+    }
+    
+    public void addTempPointsListener(ListChangeListener listener){
+        verticesTemporarios.addListener(listener);
     }
     
 }
