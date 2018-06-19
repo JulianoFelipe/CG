@@ -5,6 +5,8 @@
  */
 package m.pipeline;
 
+import View.ANDERSON_TEST_SUITE;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import m.Camera;
@@ -59,17 +61,27 @@ public class PersPipeline extends CGPipeline{
     }
 
     @Override
-    public List<CGObject> convert2D(List<CGObject> lista, VistaNEW vista) {
+    public void convert2D(List<CGObject> lista) {
         lista.forEach((object) -> {
             float[][] retPoints = multiply3D(get3DPipelineMatrix(), object.getPointMatrix());
             retPoints = persMatrixSwitcheroo(retPoints);
             retPoints = multiply2D(get2DPipelineMatrix(), retPoints);
-            
-            //Build Poly
-            
+            object.setPointMatrix(retPoints);
         });
-        
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
+    @Override
+    public void convert2D(CGObject object) {
+        float[][] retPoints = multiply3D(get3DPipelineMatrix(), object.getPointMatrix());
+        System.out.println("\n MATRIZ DEPOIS DE PIPE 3D");
+        ANDERSON_TEST_SUITE.printMatrix(retPoints);
+        retPoints = persMatrixSwitcheroo(retPoints);
+        System.out.println("\n MATRIZ DEPOIS DE DIVISÃO PERSPECTIVA");
+        ANDERSON_TEST_SUITE.printMatrix(retPoints);
+        retPoints = multiply2D(get2DPipelineMatrix(), retPoints);
+        System.out.println("\n MATRIZ DEPOIS DE PIPE 2D (Window e Viewport)");
+        ANDERSON_TEST_SUITE.printMatrix(retPoints);
+        object.setPointMatrix(retPoints);
     }
 
     @Override

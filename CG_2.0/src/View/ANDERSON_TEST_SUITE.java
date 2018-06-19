@@ -8,6 +8,7 @@ package View;
 import m.Camera;
 import m.Viewport;
 import m.Window;
+import m.anderson.Poligono;
 import m.anderson.Vertice;
 import m.pipeline.OrtPipeline;
 import m.pipeline.PersPipeline;
@@ -44,17 +45,20 @@ public class ANDERSON_TEST_SUITE {
     public static void main(String[] args) {
         
         Vertice ViewUp = new Vertice(0, 1, 0);
-        Vertice VRP    = new Vertice(50, 15, 30);
+        Vertice VRP    = new Vertice((float) 50, (float) 15, (float) 30);
         Vertice P      = new Vertice(20, 6, 15);
-       
+        
+        printMatrix(VRP.getPointMatrix());
+        
         Camera cam = new Camera(ViewUp, VRP, P);
        
-        Window win = new Window(16, 10);
+        Window win    = new Window(16, 10);
         Viewport view = new Viewport(new Vertice(0, 0),
                                      new Vertice(320, 240) );
         
-        //OrtPipeline pipe = new OrtPipeline(OrtPipeline.VistaOrtografica.Frontal, cam, win, view);
-        PersPipeline pipe = new PersPipeline(17, cam, win, view);
+        AQUI AQUI AQUI
+        OrtPipeline pipe = new OrtPipeline(OrtPipeline.VistaOrtografica.Frontal, cam, win, view);
+        //PersPipeline pipe = new PersPipeline(17, cam, win, view);
         
         System.out.println("\n\nMATRIZ SRU,SRC");
         printMatrix(pipe.getMatrizSRUsrc());
@@ -78,26 +82,31 @@ public class ANDERSON_TEST_SUITE {
             //  A    B    C    D    E
         };
         
+        Poligono pol = new Poligono(pol_mat);
+        
         System.out.println("\nMATRIZ DE PONTOS");
         printMatrix(pol_mat);
         
-        float[][] res = MMath.multiplicar(pipe.getMatrizSRUsrc(), pol_mat);
+        //float[][] res = MMath.multiplicar(pipe.getMatrizSRUsrc(), pol_mat);
         
-        System.out.println("\nMATRIZ DE PONTOS NO SRC");
-        printMatrix(res);
+        //System.out.println("\nMATRIZ DE PONTOS NO SRC");
+        //printMatrix(res);
         
-        res = MMath.multiplicar(pipe.getMatrixProj(), res);
+        //res = MMath.multiplicar(pipe.getMatrixProj(), res);
         
-        System.out.println("\nMATRIZ DEPOIS DE PROJETADA");
-        printMatrix(res);
+        //System.out.println("\nMATRIZ DEPOIS DE PROJETADA");
+        //printMatrix(res);
         
-        System.out.println("\n MATRIZ DEPOIS DE DIVIDIDA PELOS ESCALARES DOS FATORES HOMOGÊNEOS");
+        //System.out.println("\n MATRIZ DEPOIS DE DIVIDIDA PELOS ESCALARES DOS FATORES HOMOGÊNEOS");
         //res = 
         
-        float [][] newRes = MMath.removeZ(res);
-        newRes = MMath.multiplicar(pipe.getMatrixJP(), newRes);
+        //float [][] newRes = MMath.removeZ(res);
+        //newRes = MMath.multiplicar(pipe.getMatrixJP(), newRes);
         
-        System.out.println("\nMATRIZ DEPOIS DE JP");
+        pipe.convert2D(pol);
+        float[][] newRes = pol.getPointMatrix();
+        
+        System.out.println("\nMATRIZ RESULTANTE");
         printMatrix(newRes);
     }
 }

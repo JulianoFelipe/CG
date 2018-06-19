@@ -32,6 +32,10 @@ public class Poligono extends CGObject{
         super(pointMatrix, ID);        
     }
     
+    public Poligono(float[][] pointMatrix){
+        super(pointMatrix);        
+    }
+    
     protected Poligono(){ super(); }
     
     protected Poligono (long ID) { super(ID); }

@@ -87,12 +87,6 @@ public abstract class CGPipeline implements Pipeline{
         
         float del_UX = (deltaU/deltaX),
               del_VY = ((vmin-vmax)/deltaY); 
-        
-        System.out.println("\n\n\n\n\n\n\nJP NA MÃO");
-        System.out.println("YMin: " + ymin);
-        System.out.println("Delta Y: " + deltaY);
-        System.out.println("Vmin: " + vmin);
-        System.out.println("VMax: " + vmax);
                 
         matrixJP = new float[][] {
            {del_UX,      0, ((-xmin*del_UX)+umin)},

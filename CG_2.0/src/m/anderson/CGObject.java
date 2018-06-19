@@ -7,6 +7,7 @@ package m.anderson;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -26,19 +27,22 @@ public abstract class CGObject implements Serializable{
         this.ID = ID;
         
         pointMatrix = new float[4][pointMatrixCp[0].length]; //Se der erro não é matriz de pontos adequada
-        for(int i = 0; i < pointMatrixCp.length; i++){
-            float[] aMatrix = pointMatrixCp[i];
-            int   aLength = aMatrix.length;
-            this.pointMatrix[i] = new float[aLength];
-            System.arraycopy(aMatrix, 0, pointMatrixCp[i], 0, aLength);
+        for(int i = 0; i < pointMatrixCp[0].length; i++){
+            pointMatrix[0][i] = pointMatrixCp[0][i];
+            pointMatrix[1][i] = pointMatrixCp[1][i];
+            pointMatrix[2][i] = pointMatrixCp[2][i];
+            pointMatrix[3][i] = pointMatrixCp[3][i];
         }
     }
     
     protected CGObject(float[][] pointMatrix) {
         this(pointMatrix, INSTANCES++);
+        //System.out.println("HERE!");
+        //System.out.println(Arrays.deepToString(pointMatrix));
     }
     
-    protected void setPointMatrix(float[][] pointMatrix){
+    //Bad, but... u know...
+    public void setPointMatrix(float[][] pointMatrix){
         this.pointMatrix = pointMatrix;
     }
     
