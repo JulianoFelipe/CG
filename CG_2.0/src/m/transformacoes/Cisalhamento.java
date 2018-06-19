@@ -6,7 +6,7 @@
 package m.transformacoes;
 
 import m.Eixo;
-import m.anderson.Poligono;
+import m.anderson.CGObject;
 import m.anderson.Vertice;
 
 /**
@@ -14,7 +14,7 @@ import m.anderson.Vertice;
  * @author JFPS
  */
 public class Cisalhamento {
-    public Poligono cisalhamento(Eixo axis, double fator, Poligono p){
+    public CGObject cisalhamento(Eixo axis, double fator, CGObject p){
         switch (axis) {
             case Eixo_X:
                 return cisalhamentoX(fator, p);
@@ -27,7 +27,7 @@ public class Cisalhamento {
         }
     }
     
-    public Poligono cisalhamento(Eixo axis, double fator, Poligono p, final Vertice pontoFixo){
+    public CGObject cisalhamento(Eixo axis, double fator, CGObject p, final Vertice pontoFixo){
         switch (axis) {
             case Eixo_X:
                 return cisalhamentoX(fator, p, pontoFixo);
@@ -40,34 +40,49 @@ public class Cisalhamento {
         }
     }
     
-    public Poligono cisalhamentoX(double fator, Poligono p){
-        int vertices = p.getVertices().size();
+    public CGObject cisalhamentoX(double fator, CGObject p){
+        int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getVertices().get(i);
-            p.getVertices().get(i).setX((float) (copy.getX() + (fator*copy.getY())));
+            Vertice copy = p.getPoint(i);
+            
+            p.setPoint(i, 
+                (float) (copy.getX() + (fator*copy.getY())), 
+                (float) (copy.getY()),
+                (float) (copy.getZ())
+            );
         }
         return p;
     }
     
-    public Poligono cisalhamentoY(double fator, Poligono p){
-        int vertices = p.getVertices().size();
+    public CGObject cisalhamentoY(double fator, CGObject p){
+        int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getVertices().get(i);
-            p.getVertices().get(i).setY((float) (copy.getY() + (fator*copy.getX())));
+            Vertice copy = p.getPoint(i);
+            
+            p.setPoint(i, 
+                (float) (copy.getX()), 
+                (float) (copy.getY() + (fator*copy.getX())),
+                (float) (copy.getZ())
+            );
         }
         return p;
     }
     
-    public Poligono cisalhamentoZ(double fator, Poligono p){
-        int vertices = p.getVertices().size();
+    public CGObject cisalhamentoZ(double fator, CGObject p){
+        int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getVertices().get(i);
-            p.getVertices().get(i).setZ((float) (copy.getY() + (fator*copy.getX())));
+            Vertice copy = p.getPoint(i);
+            
+            p.setPoint(i, 
+                (float) (copy.getX()), 
+                (float) (copy.getY()),
+                (float) (copy.getY() + (fator*copy.getX()))
+            );
         }
         return p;
     }
     
-    public Poligono cisalhamentoX(double graus, Poligono p, final Vertice pontoFixo){    
+    public CGObject cisalhamentoX(double graus, CGObject p, final Vertice pontoFixo){    
         if (pontoFixo == null) return cisalhamentoX(graus, p);
         Translacao t = new Translacao();
         p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
@@ -76,7 +91,7 @@ public class Cisalhamento {
         return p;
     }
         
-    public Poligono cisalhamentoY(double graus, Poligono p, final Vertice pontoFixo){
+    public CGObject cisalhamentoY(double graus, CGObject p, final Vertice pontoFixo){
         if (pontoFixo == null) return cisalhamentoY(graus, p);
         Translacao t = new Translacao();
         p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
@@ -85,7 +100,7 @@ public class Cisalhamento {
         return p;
     }
     
-    public Poligono cisalhamentoZ(double graus, Poligono p, final Vertice pontoFixo){
+    public CGObject cisalhamentoZ(double graus, CGObject p, final Vertice pontoFixo){
         if (pontoFixo == null) return cisalhamentoZ(graus, p);
         Translacao t = new Translacao();
         p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);

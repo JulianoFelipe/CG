@@ -9,6 +9,7 @@ import m.Camera;
 import m.Viewport;
 import m.Window;
 import m.anderson.Vertice;
+import utils.math.MMath;
 import utils.math.VMath;
 
 /**
@@ -87,10 +88,32 @@ public abstract class CGPipeline implements Pipeline{
         float del_UX = (deltaU/deltaX),
               del_VY = ((vmin-vmax)/deltaY); 
         
+        System.out.println("\n\n\n\n\n\n\nJP NA MÃO");
+        System.out.println("YMin: " + ymin);
+        System.out.println("Delta Y: " + deltaY);
+        System.out.println("Vmin: " + vmin);
+        System.out.println("VMax: " + vmax);
+                
         matrixJP = new float[][] {
            {del_UX,      0, ((-xmin*del_UX)+umin)},
-           {     0, del_VY, (( ymin*del_VY)+vmax)},
+           {     0, del_VY, ((-ymin*del_VY)+vmax)},
            {     0,      0,                     1}
         };
+    }
+    
+    protected final float[][] passThroughPipeline(float[][] pipeline3D, float[][] pipeline2D, float[][] pointMatrix){
+        pointMatrix = multiply3D(pipeline3D, pointMatrix);
+        return multiply2D(pipeline2D, pointMatrix);
+    }
+    
+    protected final float[][] multiply3D(float[][] pipelineMatrix, float[][] pointMatrix){
+        return MMath.multiplicar(pipelineMatrix, pointMatrix);
+    }
+    
+    //Essa retorna por criar uma nova matriz com uma linha a menos
+    protected final float[][] multiply2D(float[][] pipe2Dmatrix, float[][] pointMatrix){
+        pointMatrix = MMath.removeFactor(pointMatrix);
+        
+        return MMath.multiplicar(matrixJP, pointMatrix);
     }
 }

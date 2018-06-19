@@ -55,8 +55,9 @@ public class MVMath {
         float z = (m[2][0] * v.getX()) + (m[2][1] * v.getY()) + (m[2][2] * v.getW());
         float w = (m[3][0] * v.getX()) + (m[3][1] * v.getY()) + (m[3][2] * v.getW());
         
-        Vertice vertice = new Vertice();
-        vertice.setAll(x, y, z, w);
+        Vertice vertice = new Vertice(x, y, z);
+        if (w != 1)
+            vertice.setW(w);
         return vertice;
     }
 }

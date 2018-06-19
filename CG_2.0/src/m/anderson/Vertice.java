@@ -4,24 +4,9 @@ package m.anderson;
  * Classe da estrutura e manipulacao de vertices
  * @author Anderson
  */
-public class Vertice implements CGObject{
-    private static long INSTANCES;
-    private final long ID;
+public class Vertice extends CGObject{
     
-    /**
-     * Valores x,y,z e w do ponto
-     */
-    public float x;
-    public float y;
-    public float z;
-    public float w;
-    
-    //<editor-fold defaultstate="collapsed" desc="Construtores">
-    /**
-     * Construtor padrao (0,0,0,1)
-     */
-    public Vertice() { this(0,0,0);}
-    
+    //<editor-fold defaultstate="collapsed" desc="Construtores">   
     /**
      * Construtor de vertice
      * @param x valor para x
@@ -29,13 +14,15 @@ public class Vertice implements CGObject{
      * @param z valor para z
      */
     public Vertice(float x, float y, float z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-        this.w = 1;
-        
-        ID = INSTANCES;
-        INSTANCES++;
+        super(new float[][] { {x}, {y}, {z}, {1} } );
+    }
+    
+    /**
+     * Construtor de copia
+     * @param A Vertice a ser copiado
+     */
+    public Vertice(Vertice A){
+        super(new float[][] { {A.getX()}, {A.getY()}, {A.getZ()}, {1} }, A.ID );
     }
     
     public Vertice(int x, int y, int z) { this((float)x, (float)y, (float)z); }
@@ -43,72 +30,61 @@ public class Vertice implements CGObject{
     public Vertice(float x, float y){ this(x,y,0);   }
     
     public Vertice(int x, int y){  this((float) x, (float) y);   }
-    
-    /**
-     * Construtor de copia
-     * @param A Vertice a ser copiado
-     */
-    public Vertice(Vertice A){ this(A.x, A.y, A.z); }
 //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">
     public float getX() {
-        return x;
-    }
-    
-    public void setX(float x) {
-        this.x = x;
+        return pointMatrix[0][0];
     }
     
     public float getY() {
-        return y;
-    }
-    
-    public void setY(float y) {
-        this.y = y;
+        return pointMatrix[1][0];
     }
 
     public float getZ() {
-        return z;
+        return pointMatrix[2][0];
+    }
+
+    public float getW() {
+        return pointMatrix[3][0];
+    }
+    
+    public void setX(float x) {
+        pointMatrix[0][0] = x;
+    }
+    
+    public void setY(float y) {
+        pointMatrix[1][0] = y;
     }
 
     public void setZ(float z) {
-        this.z = z;
+        pointMatrix[2][0] = z;
     }
-    
-    public float getW() {
-        return w;
-    }
-    
+
     public void setW(float w) {
-        this.w = w;
-    }
-
-    public static long getINSTANCES() {
-        return INSTANCES;
-    }
-
-    public long getID() {
-        return ID;
+        pointMatrix[3][0] = w;
     }
     
-    public void setAll(float x, float y, float z, float w ){
-        this.x=x;
-        this.y=y;
-        this.z=z;
-        this.w=w;
+    public void setAll(float x, float y, float z) {
+        setX(x);
+        setY(y);
+        setZ(z);
     }
+    
+    public void setAll(float x, float y, float z, float w) {
+        setX(x);
+        setY(y);
+        setZ(z);
+        setW(w);
+    }
+    
+
 //</editor-fold>
     
     @Override
     public String toString() {
-        return "("+x+";"+y+";" + z + ")";
+        return "("+getX()+";"+getY()+";" + getZ() + ")";
     }
-    
-    public String toString(String nome) {
-        return nome+"=("+x+";"+y+";"+z+")";
-    }
-
     
     /**
      * Método equals para comparação entre vértices. Uso:
@@ -125,8 +101,7 @@ public class Vertice implements CGObject{
      * @param obj para ser comparado com "this".
      * @return True se obj for igual à this, false caso contrário.
      */
-    @Override
-    public boolean equals(Object obj) {
+    public boolean equalsCoords(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -137,24 +112,23 @@ public class Vertice implements CGObject{
             return false;
         }
         final Vertice other = (Vertice) obj;
-        if (Float.floatToIntBits(this.x) != Float.floatToIntBits(other.x)) {
+        if (Float.floatToIntBits(this.getX()) != Float.floatToIntBits(other.getX())) {
             return false;
         }
-        if (Float.floatToIntBits(this.y) != Float.floatToIntBits(other.y)) {
+        if (Float.floatToIntBits(this.getY()) != Float.floatToIntBits(other.getY())) {
             return false;
         }
-        if (Float.floatToIntBits(this.z) != Float.floatToIntBits(other.z)) {
+        if (Float.floatToIntBits(this.getZ()) != Float.floatToIntBits(other.getZ())) {
             return false;
         }
         return true;
     }
 
-    @Override
-    public int hashCode() {
+    public int hashCodeCoords() {
         int hash = 7;
-        hash = 97 * hash + Float.floatToIntBits(this.x);
-        hash = 97 * hash + Float.floatToIntBits(this.y);
-        hash = 97 * hash + Float.floatToIntBits(this.z);
+        hash = 97 * hash + Float.floatToIntBits(this.getX());
+        hash = 97 * hash + Float.floatToIntBits(this.getY());
+        hash = 97 * hash + Float.floatToIntBits(this.getZ());
         return hash;
     }
 }

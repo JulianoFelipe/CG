@@ -20,8 +20,8 @@ import utils.math.MMath;
  */
 public class OrtPipeline extends CGPipeline{
     private final VistaOrtografica vista;
+    
     private float[][] matrizVistaOrt;
-
     private boolean changed = true;
     
     public OrtPipeline(VistaOrtografica vista, Camera cam, Window win, Viewport view) {
@@ -42,7 +42,7 @@ public class OrtPipeline extends CGPipeline{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public float[][] getPipelineMatrix(){
+    public float[][] get3DPipelineMatrix(){
         //Retorna a matriz final do pipeline
         //Se receber update de camera, alterar changed e calc tudo de novo
         //Concatena as budega
@@ -50,17 +50,19 @@ public class OrtPipeline extends CGPipeline{
         if (changed == false){
             return matrizVistaOrt;
         } else {
-            ///Matriz vista = Msru,src * Mvista * Mjp
+            ///Matriz vista = Msru,src * Mvista    --- (Mjp é separada, já que é 2D)
             //Concatena por multiplicar ao contrário
-            
-            float[][] tmp  = MMath.multiplicar(matrixJP, MatrizOrtografica.getMatrizOrt(vista));
-            matrizVistaOrt = MMath.multiplicar(tmp, super.getMatrizSRUsrc());
-            
+            matrizVistaOrt = MMath.multiplicar(MatrizOrtografica.getMatrizOrt(vista), super.getMatrizSRUsrc());
+            changed = false;
             return matrizVistaOrt;
         }
     }
     
-    public float[][] getMatrizProj(){
+    public float[][] get2DPipelineMatrix(){
+        return getMatrixJP();
+    }
+    
+    public float[][] getMatrixProj(){
         return MatrizOrtografica.getMatrizOrt(vista);
     }
     

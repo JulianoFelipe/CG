@@ -5,10 +5,6 @@
  */
 package m.anderson;
 
-import java.awt.Color;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  *
  * @author JFPS
@@ -18,8 +14,9 @@ public class Nregular extends Poligono {
     private int radius;
     private Vertice center;
 
-    private List<Vertice> buildNsided(double pos){
-        List<Vertice> lista = new ArrayList();
+    //<editor-fold defaultstate="collapsed" desc="Constrututores">
+    private float[][] buildNsided(double pos){
+        float[][] lista = new float[4][noLados];
         
         double x,y;
         double angulo = pos;
@@ -28,8 +25,10 @@ public class Nregular extends Poligono {
             x = center.getX() + ( radius * Math.cos(angulo));
             y = center.getY() + ( radius * Math.sin(angulo));
             
-            lista.add(new Vertice((float) x, 
-                                  (float) y, 0));
+            lista[0][i] = (float) x;
+            lista[1][i] = (float) y;
+            lista[2][i] = 0;
+            lista[3][i] = 1;
         }
         
         return lista;
@@ -40,33 +39,17 @@ public class Nregular extends Poligono {
     }
     
     public Nregular(int noLados, int radius, Vertice center, double pos){
-        super(); //Default color and stuff
         this.radius = radius;
         this.noLados = noLados;
         this.center = center;
         
-        super.addAllVertices(buildNsided(pos));
-    }
-
-    public Nregular(int noLados, int radius, Vertice center, Color cor, boolean corBorda){
-        this(noLados, radius, center, 0.);
-        
-        if (corBorda)
-            super.setCorBorda(cor);
-        else
-            super.setCorFundo(cor);
+        super.setPointMatrix(buildNsided(pos));
     }
     
-    public Nregular(int noLados, int radius, Vertice center, Color corBorda, Color corFundo){
-        this(noLados, radius, center, 0.);
-        super.setCorBorda(corBorda);
-        super.setCorFundo(corFundo);
-    }
-
     public Nregular(Nregular nregular){
-        this(nregular.getNoLados(), nregular.getRadius(), nregular.getCenter(), nregular.getCorBorda(), nregular.getCorFundo()); 
-        this.setID(nregular.getID()); //Ugly stuff
+        this(nregular.getNoLados(), nregular.getRadius(), nregular.getCenter());
     }
+//</editor-fold>
     
     public int getNoLados() {
         return noLados;
@@ -79,12 +62,10 @@ public class Nregular extends Poligono {
     public Vertice getCenter() {
         return center;
     }
-       
-    
     
     @Override
     public String toString() {
-        return "Polígono Regular {Lados=" + super.getVertices().size() + ", Centro=" + center + ", Raio=" + radius + '}';
+        return "Polígono Regular: ID=" + ID + "; Lados=" + noLados + "; Centro=" + center + "; Raio=" + radius + '.';
     }
 
     /*@Override

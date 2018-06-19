@@ -79,6 +79,44 @@ public class MMath {
         return result;
     }
     
+    public static float[][] dividir(float[][] A, float B) {
+        int aRows = A.length;
+        
+        float[][] result = new float[aRows][aRows];
+        for (int i = 0; i < aRows; i++) {
+            for (int j = 0; j < aRows; j++) {
+                result[i][j] = A[i][j] / B;
+            }
+        }
+
+        return result;
+    }
+    
+    public static float[][] removeZ(float[][] matrix){
+        float[][] newRes = new float[3][matrix[0].length];
+        
+        for (int j=0; j<matrix[0].length; j++){
+            newRes[0][j] = matrix[0][j];
+            newRes[1][j] = matrix[1][j];
+            newRes[2][j] = matrix[3][j];
+        }
+        
+        return newRes;
+    }
+    
+    public static float[][] removeFactor(float[][] matrix){
+        float[][] newRes = new float[3][matrix[0].length];
+        
+        for (int j=0; j<matrix[0].length; j++){
+            newRes[0][j] = matrix[0][j];
+            newRes[1][j] = matrix[1][j];
+            newRes[2][j] = matrix[2][j];
+        }
+        
+        return newRes;
+    }
+    
+    
     public static String toString(float[][] mat, String nomeMatriz){
         String str = "MATRIZ " + nomeMatriz + "\n";
         for (int i = 0; i < 4; i++) {

@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author JFPS
  */
-public class Face implements CGObject{
+public class Face { //extends CGObject{
     private List<Aresta> listaAresta;
     
     public Face (List<Aresta> lista){

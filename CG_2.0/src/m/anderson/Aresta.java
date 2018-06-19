@@ -9,9 +9,7 @@ import utils.math.VMath;
  *
  * @author Anderson
  */
-public class Aresta implements CGObject{
-    private static long INSTANCES;
-    
+public class Aresta extends CGObject{   
     /**
      * Vertice Inicial (vInicial) e final (vFinal)
      */
@@ -23,24 +21,46 @@ public class Aresta implements CGObject{
     private float maxX;
     private float minX;
     
-    private final long ID;
-    
     private boolean changed;
     private double slope;
     private double b;    //this ->   y= slope*x + b;
     private double interceptX; //"Double" so it can be null
      
-    //<editor-fold defaultstate="collapsed" desc="Construtores">
-    /**
-     * Construtor Default vInicial e vFinal = (0,0,0,1)
-     */
-    public Aresta() { this(new Vertice(), new Vertice()); }
-    
+    //<editor-fold defaultstate="collapsed" desc="Construtores">    
     /**
      * Construtor de copia
      * @param A Aresta a ser copiada
      */
-    public Aresta(Aresta A) { this (A.vInicial, A.vFinal); }
+    public Aresta(Aresta A) {
+        super(new float[][] {
+            {A.vInicial.getX(), A.vFinal.getX()},
+            {A.vInicial.getY(), A.vFinal.getY()},
+            {A.vInicial.getZ(), A.vFinal.getZ()},
+            {                1,               1}},
+            A.ID);
+        
+        this.vInicial = A.vInicial;
+        this.vFinal = A.vFinal;
+        
+        if (this.vInicial.getX() > this.vFinal.getX()){
+            maxX = this.vInicial.getX();
+            minX = this.vFinal.getX();
+        } else {
+            maxX = this.vFinal.getX();
+            minX = this.vInicial.getX();
+        }
+        
+        if (this.vInicial.getY() > this.vFinal.getY()){
+            maxY = this.vInicial.getY();
+            minY = this.vFinal.getY();
+        } else {
+            maxY = this.vFinal.getY();
+            minY = this.vInicial.getY();
+        }
+        
+        interceptX = minX;
+        changed = true;
+    }
     
     /**
      * Construtor padrao
@@ -48,6 +68,13 @@ public class Aresta implements CGObject{
      * @param F Vertice Final
      */
     public Aresta(Vertice I, Vertice F) {
+        super(new float[][] {
+            {I.getX(), F.getX()},
+            {I.getY(), F.getY()},
+            {I.getZ(), F.getZ()},
+            {       1,        1}
+        });
+        
         this.vInicial = I;
         this.vFinal = F;
         
@@ -69,9 +96,6 @@ public class Aresta implements CGObject{
         
         interceptX = minX;
         changed = true;
-        
-        ID = INSTANCES;
-        INSTANCES++;
     }
 //</editor-fold>
 
@@ -80,7 +104,7 @@ public class Aresta implements CGObject{
         return vInicial;
     }
     
-    public void setvInicial(Vertice vInicial) {
+    /*public void setvInicial(Vertice vInicial) {
         this.vInicial = vInicial;
         
         if (vInicial.getX() > maxX)
@@ -94,13 +118,13 @@ public class Aresta implements CGObject{
             minY = vInicial.getY();
         
         changed = true;
-    }
+    }*/
     
     public Vertice getvFinal() {
         return vFinal;
     }
     
-    public void setvFinal(Vertice vFinal) {
+    /*public void setvFinal(Vertice vFinal) {
         this.vFinal = vFinal;
         
         if (vFinal.getX() > maxX)
@@ -114,7 +138,7 @@ public class Aresta implements CGObject{
             minY = vFinal.getY();
         
         changed = true;
-    }
+    }*/
 
     public float getMaxY() {
         return maxY;
@@ -130,14 +154,6 @@ public class Aresta implements CGObject{
 
     public float getMinX() {
         return minX;
-    }
-        
-    public long getID() {
-        return ID;
-    }
-
-    public static long getINSTANCES() {
-        return INSTANCES;
     }
 
     public double getSlope() {
@@ -171,7 +187,7 @@ public class Aresta implements CGObject{
     
     @Override
     public String toString() {
-        return "{" + vInicial.toString() + "," + vFinal.toString() + "}";
+        return "Aresta: ID=" + ID + "; Points={" + vInicial.toString() + "," + vFinal.toString() + "}";
     }
     
     @Override

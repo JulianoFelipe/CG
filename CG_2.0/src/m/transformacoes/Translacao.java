@@ -6,7 +6,7 @@
 package m.transformacoes;
 
 import m.Eixo;
-import m.anderson.Poligono;
+import m.anderson.CGObject;
 import m.anderson.Vertice;
 
 /**
@@ -15,19 +15,21 @@ import m.anderson.Vertice;
  */
 public class Translacao{
     
-    public Poligono transladar(int unidadesX, int unidadesY, int unidadesZ, Poligono p){
-        int vertices = p.getVertices().size();
+    public CGObject transladar(int unidadesX, int unidadesY, int unidadesZ, CGObject p){
+        int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getVertices().get(i);
-            p.getVertices().get(i).setX((float) (copy.getX() + unidadesX));
-            p.getVertices().get(i).setY((float) (copy.getY() + unidadesY));
-            p.getVertices().get(i).setZ((float) (copy.getZ() + unidadesZ));
+            Vertice copy = p.getPoint(i);
+            p.setPoint(i, 
+                (copy.getX() + unidadesX), 
+                (copy.getY() + unidadesY),
+                (copy.getZ() + unidadesZ)
+            );
         }
         
         return p;
     }
     
-    public Poligono transladar(Eixo axis, int unidades, Poligono p){
+    public CGObject transladar(Eixo axis, int unidades, CGObject p){
         int unidadesX=0, unidadesY=0, unidadesZ=0;
         switch(axis){
             case Eixo_X:   unidadesX = unidades; break;
