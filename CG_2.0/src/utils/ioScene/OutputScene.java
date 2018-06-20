@@ -16,17 +16,17 @@ import java.util.List;
 import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import m.poligonos.Poligono;
+import m.poligonos.CGObject;
 
 /**
  *
  * @author JFPS
  */
 public class OutputScene {
-    public static final String FILE_EXTENSION = ".cgjpab";
+    public static final String FILE_EXTENSION = ""; //".jas";
     private static final SimpleDateFormat DATE_F = new SimpleDateFormat("HH.mm.ss-dd.MM.yyyy", new Locale("pt", "BR"));
             
-    public static void outputToFile(List<Poligono> lista) throws IOException{
+    public static void outputToFile(List<CGObject> lista) throws IOException{
         File out = new File("CG-" + DATE_F.format(new Date()) + FILE_EXTENSION);
         
         FileOutputStream fos = null;
@@ -40,7 +40,7 @@ public class OutputScene {
         oos.close();
     }
     
-    public static void outputToFile(List<Poligono> lista, File file) throws IOException{
+    public static void outputToFile(List<CGObject> lista, File file) throws IOException{
         File out = null;
         if (file.isDirectory())
             out = new File(file.getCanonicalPath() + "\\CG-" + DATE_F.format(new Date()) + FILE_EXTENSION);

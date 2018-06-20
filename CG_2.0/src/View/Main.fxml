@@ -18,8 +18,9 @@
               <menus>
                 <Menu mnemonicParsing="false" text="Arquivo">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Salvar" />
-                        <MenuItem mnemonicParsing="false" text="Carregar" />
+                    <MenuItem fx:id="salvar" mnemonicParsing="false" text="Salvar" />
+                        <MenuItem fx:id="carregar" mnemonicParsing="false" text="Carregar" />
+                        <MenuItem fx:id="limparCena" mnemonicParsing="false" text="Limpar Cena" />
                   </items>
                 </Menu>
               </menus>

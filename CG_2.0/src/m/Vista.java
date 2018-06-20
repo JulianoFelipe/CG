@@ -54,11 +54,6 @@ public class Vista {
         }
     }
     
-    public void clearTemp(){
-        System.out.println("CLEAR CALL");
-        tempPoints.clear();
-    }
-    
     public List<CGObject> get2Dobjects(){
         return objetos;
     }
@@ -67,8 +62,13 @@ public class Vista {
         return tempPoints;
     }
     
-    public void clearTemPoints(){
+    public void clearTempPoints(){
         tempPoints.clear();
+    }
+    
+    public void clearAll(){
+        clearTempPoints();
+        objetos.clear();
     }
     
     public Visao getVisao(){

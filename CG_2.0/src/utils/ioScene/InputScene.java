@@ -10,7 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.List;
-import m.poligonos.Poligono;
+import m.poligonos.CGObject;
 
 /**
  *
@@ -18,13 +18,13 @@ import m.poligonos.Poligono;
  */
 public class InputScene {
 
-    public static List<Poligono> getListFromFile(File arquivo) throws IOException, ClassNotFoundException{
+    public static List<CGObject> getListFromFile(File arquivo) throws IOException, ClassNotFoundException{
         if (!arquivo.getName().endsWith(OutputScene.FILE_EXTENSION))
             throw new IllegalArgumentException("Arquivo sem a extensão gerada pelo programa: " + arquivo.getName());
         
         FileInputStream fis = new FileInputStream(arquivo);
         ObjectInputStream ois = new ObjectInputStream(fis);
-        List<Poligono> result = (List<Poligono>) ois.readObject();
+        List<CGObject> result = (List<CGObject>) ois.readObject();
         ois.close();
         
         return result;

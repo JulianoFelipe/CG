@@ -7,6 +7,7 @@ package m;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
 import m.poligonos.CGObject;
@@ -52,6 +53,10 @@ public class World {
         }
     }
     
+    public void addObject(Collection<? extends CGObject> colecao){
+        objetos.addAll(colecao);
+    }
+    
     public void addTempPoint(Vertice p){
         tempPoints.add(p);
         vistas.forEach((vista) -> {
@@ -69,7 +74,7 @@ public class World {
     public void clearTemp(){
         tempPoints.clear();
         vistas.forEach((vista) -> {
-            vista.clearTemp();
+            vista.clearTempPoints();
         });
     }
 
@@ -84,6 +89,18 @@ public class World {
             INSTANCE = new World();
         }
         return INSTANCE;
+    }
+    
+    public List<CGObject> getObjects(){
+        return objetos;
+    }
+    
+    public void clearAll(){
+        tempPoints.clear();
+        objetos.clear();
+        vistas.forEach((vista) -> {
+            vista.clearAll();
+        });
     }
     
 }

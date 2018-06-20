@@ -6,7 +6,6 @@
 package m;
 
 import java.util.Observable;
-import m.poligonos.Vertice;
 
 /**
  *

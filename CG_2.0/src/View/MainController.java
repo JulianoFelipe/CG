@@ -8,12 +8,14 @@ package View;
 import View.Options.PaintController;
 import View.Options.RegularPolygonController;
 import View.Options.RevBuildController;
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -22,16 +24,16 @@ import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.MenuBar;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
@@ -39,6 +41,8 @@ import m.poligonos.Vertice;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
+import utils.ioScene.InputScene;
+import utils.ioScene.OutputScene;
 
 /**
  *
@@ -48,25 +52,17 @@ public class MainController implements Initializable {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
     //https://www.youtube.com/watch?v=RY_Rb2UVQKQ
     
-    @FXML
-    private TreeView<String> tools;
-    @FXML
-    private MenuBar menu;
-    @FXML
-    private TextArea console;
-    @FXML
-    private AnchorPane options;
-    @FXML
-    private GridPane grid;
+    @FXML private TreeView<String> tools;
+    @FXML private MenuBar menu;
+    @FXML private MenuItem salvar;
+    @FXML private MenuItem carregar;
+    @FXML private MenuItem limparCena;
+    @FXML private AnchorPane options;
     
-    @FXML
-    private Canvas frente;
-    @FXML
-    private Canvas topo;
-    @FXML
-    private Canvas lateral;
-    @FXML
-    private Canvas perspectiva;
+    @FXML private Canvas frente;
+    @FXML private Canvas topo;
+    @FXML private Canvas lateral;
+    @FXML private Canvas perspectiva;
     
     private World mundo;
     
@@ -76,7 +72,6 @@ public class MainController implements Initializable {
         
         initializeTools();
         initializeMenuBar();
-        initializeConsole();
         paintStuff();
         //borderPane.setCenter( new CanvasPane(this) );
         
@@ -115,15 +110,48 @@ public class MainController implements Initializable {
     }
     
     private void initializeMenuBar(){
-        
-    }
-    
-    private void initializeConsole(){
-        
-    }
+        salvar.setOnAction((ActionEvent event) -> {
+            FileChooser fileChooser = new FileChooser(); 
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Arquivos de CG (*.jas)", "*.jas");
+            fileChooser.getExtensionFilters().add(extFilter);
+            File file = fileChooser.showSaveDialog(menu.getScene().getWindow());
 
-    private void initViews(){
+            if(file != null){
+                try {
+                    OutputScene.outputToFile(mundo.getObjects(), file);
+                } catch (IOException ex) {
+                    Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
         
+        carregar.setOnAction((ActionEvent event) -> {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
+            FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Arquivos de CG (*.jas)", "*.jas");
+            fileChooser.getExtensionFilters().add(extFilter);
+            File file = fileChooser.showOpenDialog(menu.getScene().getWindow());
+
+            if(file != null){
+                try {
+                    List<CGObject> objectsList = InputScene.getListFromFile(file);
+                    mundo.clearAll();
+                    mundo.addObject(objectsList);
+                    paintStuff();
+                } catch (IOException ex) {
+                    Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
+        
+        limparCena.setOnAction((ActionEvent event) -> { 
+            mundo.clearAll();
+            paintStuff();
+            
+        });
     }
     
     public static final byte NOTHING_SEL       = -1;
@@ -183,6 +211,8 @@ public class MainController implements Initializable {
     }
     
     private void paintStuff(){
+        clearCanvases();
+        
         for (Vista vista : mundo.getVistas()){
             GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
             graphs.setFill(Color.BLACK);
@@ -215,7 +245,7 @@ public class MainController implements Initializable {
             
             List<Vertice> vertices = vista.getTempPoints();
             graphs.beginPath();
-            System.out.println("BEGIN: " + vertices.size());
+
             for (Vertice vert : vertices){
                 Vertice point = vert.getPoint(0);
                 graphs.moveTo(point.getX(), point.getY());
@@ -224,6 +254,20 @@ public class MainController implements Initializable {
             graphs.fill();
             graphs.closePath();
         }
+    }
+    
+    private void clearCanvases(){
+        GraphicsContext cl = frente.getGraphicsContext2D();
+        cl.clearRect(0, 0, frente.getWidth(), frente.getHeight());
+        
+        cl = topo.getGraphicsContext2D();
+        cl.clearRect(0, 0, topo.getWidth(), topo.getHeight());
+        
+        cl = lateral.getGraphicsContext2D();
+        cl.clearRect(0, 0, lateral.getWidth(), lateral.getHeight());
+        
+        cl = perspectiva.getGraphicsContext2D();
+        cl.clearRect(0, 0, perspectiva.getWidth(), perspectiva.getHeight());
     }
     
     private void loadPaint(){
