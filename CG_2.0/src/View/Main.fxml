@@ -10,9 +10,9 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="854.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane fx:id="borderPane" layoutX="-1.0" layoutY="-1.0" prefHeight="800.0" prefWidth="1280.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane fx:id="borderPane" layoutX="-1.0" layoutY="-1.0" prefHeight="852.0" prefWidth="1280.0" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <MenuBar fx:id="menu" BorderPane.alignment="TOP_CENTER">
               <menus>
@@ -32,43 +32,53 @@
          <left>
             <VBox prefHeight="707.0" prefWidth="193.0" BorderPane.alignment="CENTER">
                <children>
-                  <Separator prefWidth="200.0" />
-                  <TreeView fx:id="tools" onMouseClicked="#onMouseClickedToolsListener" prefHeight="402.0" prefWidth="193.0" />
-                  <AnchorPane fx:id="options" prefHeight="339.0" prefWidth="193.0" />
+                  <TreeView fx:id="tools" onMouseClicked="#onMouseClickedToolsListener" prefHeight="430.0" prefWidth="193.0" />
+                  <AnchorPane fx:id="options" prefHeight="390.0" prefWidth="193.0" />
                </children>
             </VBox>
          </left>
          <center>
-            <GridPane fx:id="grid" BorderPane.alignment="CENTER">
+            <GridPane fx:id="grid" gridLinesVisible="true" BorderPane.alignment="CENTER">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="35.0" minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="374.0" minHeight="10.0" prefHeight="345.0" vgrow="SOMETIMES" />
+                  <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="374.0" minHeight="10.0" prefHeight="374.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <TitledPane animated="false" collapsible="false" prefHeight="460.0" prefWidth="544.0" text="Frente (X, Y)">
-                     <content>
-                        <Canvas fx:id="frente" height="362.0" onMouseClicked="#onMouseClickedFrenteListener" width="542.0" />
-                     </content>
-                  </TitledPane>
-                  <TitledPane animated="false" collapsible="false" prefHeight="461.0" prefWidth="543.0" text="Lateral (Z, Y)" GridPane.columnIndex="1">
-                     <content>
-                        <Canvas fx:id="lateral" height="362.0" onMouseClicked="#onMouseClickedLateralListener" width="542.0" />
-                     </content>
-                  </TitledPane>
-                  <TitledPane animated="false" collapsible="false" prefHeight="387.0" prefWidth="538.0" text="Topo (X, Z)" GridPane.rowIndex="1">
-                     <content>
-                        <Canvas fx:id="topo" height="362.0" onMouseClicked="#onMouseClickedTopoListener" width="542.0" />
-                     </content>
-                  </TitledPane>
-                  <TitledPane animated="false" collapsible="false" prefHeight="581.0" prefWidth="543.0" text="Perspectiva" GridPane.columnIndex="1" GridPane.rowIndex="1">
-                     <content>
-                        <Canvas fx:id="perspectiva" height="362.0" width="542.0" />
-                     </content>
-                  </TitledPane>
+                  <ToolBar prefHeight="35.0" prefWidth="544.0">
+                    <items>
+                        <Label text="Frente (X, Y)" />
+                        <Pane prefHeight="25.0" prefWidth="397.0" />
+                      <Button alignment="TOP_RIGHT" mnemonicParsing="false" text="Button" />
+                    </items>
+                  </ToolBar>
+                  <ToolBar maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="200.0" GridPane.columnIndex="1">
+                    <items>
+                        <Label text="Lateral (Z, Y)" />
+                      <Button mnemonicParsing="false" text="Button" />
+                    </items>
+                  </ToolBar>
+                  <ToolBar maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="544.0" GridPane.rowIndex="2">
+                    <items>
+                        <Label text="Topo (X, Z)" />
+                      <Button mnemonicParsing="false" text="Button" />
+                    </items>
+                  </ToolBar>
+                  <ToolBar maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+                    <items>
+                        <Label text="Perspectiva" />
+                      <Button mnemonicParsing="false" text="Button" />
+                    </items>
+                  </ToolBar>
+                  <Canvas fx:id="frente" height="374.0" onMousePressed="#onMouseClickedFrenteListener" width="544.0" GridPane.rowIndex="1" />
+                  <Canvas fx:id="lateral" height="374.0" onMousePressed="#onMouseClickedLateralListener" width="544.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                  <Canvas fx:id="topo" height="374.0" onMousePressed="#onMouseClickedTopoListener" width="544.0" GridPane.rowIndex="3" />
+                  <Canvas fx:id="perspectiva" height="374.0" width="544.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
                </children>
             </GridPane>
          </center>
