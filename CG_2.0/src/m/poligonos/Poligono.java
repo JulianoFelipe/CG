@@ -1,4 +1,4 @@
-package m.anderson;
+package m.poligonos;
 
 import java.awt.Color;
 import java.util.logging.Logger;

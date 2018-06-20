@@ -1,4 +1,4 @@
-package m.anderson;
+package m.poligonos;
 
 /**
  * Classe da estrutura e manipulacao de vertices

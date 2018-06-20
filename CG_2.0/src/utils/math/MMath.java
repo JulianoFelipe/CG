@@ -115,36 +115,21 @@ public class MMath {
         
         return newRes;
     }
-    
-    
-    public static String toString(float[][] mat, String nomeMatriz){
-        String str = "MATRIZ " + nomeMatriz + "\n";
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                if (j != 0) {
-                    str += (" ; " + mat[i][j]);
-                } else {
-                    str += (" " + mat[i][j]);
+    //https://stackoverflow.com/questions/5061912/printing-out-a-2-d-array-in-matrix-format
+    public static void printMatrix(float[][] m) {
+        try {
+            int rows = m.length;
+            int columns = m[0].length;
+            String str = "|\t";
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < columns; j++) {
+                    str += m[i][j] + "\t";
                 }
+                System.out.println(str + "|");
+                str = "|\t";
             }
-            str += "\n";
+        } catch (Exception e) {
+            System.out.println("Matrix is empty!!");
         }
-        return str;
-    }
-    
-    public static String toString(float[][] mat){
-        String str="";
-        for (int i = 0; i < 4; i++) {
-            for (int j = 0; j < 4; j++) {
-                if (j != 0) {
-                    str += (" ; " + mat[i][j]);
-                } else {
-                    str += (" " + mat[i][j]);
-                }
-            }
-            str += "\n";
-        }
-        return str;
-    }
-    
+    } 
 }

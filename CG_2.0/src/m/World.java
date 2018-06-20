@@ -6,95 +6,82 @@
 package m;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
-import javafx.beans.Observable;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import javafx.util.Callback;
-import m.anderson.Vertice;
-import m.poligonos.OldPoligono;
+import m.poligonos.CGObject;
+import m.poligonos.Vertice;
 
 /**
  *
  * @author JFPS
  */
 public class World {
-    private static final Logger LOG = Logger.getLogger("CG_2.0");
-    private final ListProperty<OldPoligono> objetos;
-    private ListProperty<Vertice> verticesTemporarios;
-    private List<Vista> planes;
+    private static final Logger LOG = Logger.getLogger("CG_2.0");    
+    private final List<CGObject> objetos;
+    private final List<Vertice> tempPoints;
+    private List<Vista> vistas;
     
-    public World() {       
-        ObservableList<OldPoligono> oobjetos = FXCollections.observableArrayList(new Callback<OldPoligono, Observable[]>() {
-                @Override
-                public Observable[] call(final OldPoligono param) {
-                    return new Observable[]{
-                        param.pontosProperty()
-                    };
-                }
-        });
-        
-        objetos = new SimpleListProperty(oobjetos);
+    private World() {       
+        objetos    = new ArrayList();
+        tempPoints = new ArrayList();
     }
     
-    public World(List<OldPoligono> lista){
-        ObservableList<OldPoligono> oobjetos = 
-                FXCollections.observableArrayList((final OldPoligono param) 
-                        -> new Observable[]{
-            param.pontosProperty()
-        });
-        
-        objetos = new SimpleListProperty(oobjetos);
-        objetos.addAll(lista);
+    private World(List<CGObject> lista){
+        objetos    = new ArrayList(lista);
+        tempPoints = new ArrayList();
     }
     
     public void setPlanes(Vista...planes){
-        this.planes = new ArrayList<>();
-        for (Vista p : planes){
-            this.planes.add(p);
-            //<editor-fold defaultstate="collapsed" desc="Not to be added">
-            p.addPoligonoListener((ListChangeListener) new ListChangeListener<OldPoligono>() {
-                @Override
-                public void onChanged(ListChangeListener.Change<? extends OldPoligono> c) {
-                    while (c.next()) {
-                        if (c.wasPermutated()) {
-                            for (int i = c.getFrom(); i < c.getTo(); ++i) {
-                                LOG.severe("Permutation not implemented");
-                            }
-                        } else if (c.wasUpdated()) {
-                            for (int i = c.getFrom(); i < c.getTo(); ++i) {
-                                p.objetosProperty().get(i);
-                            }
-                        } else {
-                            c.getRemoved().forEach((removedItem) -> {
-                                objetos.remove(removedItem);
-                            });
-                            c.getAddedSubList().forEach((addedItem) -> {
-                                //p.getConverter().convertFromRaster(addedItem);
-                                objetos.add(addedItem);
-                            });
-                        }
-                    }
-                }
-            });
-//</editor-fold>
+        this.vistas = new ArrayList<>();
+        this.vistas.addAll(Arrays.asList(planes));
+    }
+    
+    public void addObject(CGObject p){
+        objetos.add(p);
+        vistas.forEach((vista) -> {
+            vista.addObject(p);
+        });
+    }
+    
+    public void addObject(CGObject...p){
+        for (CGObject obj : p){
+            addObject(obj);
         }
     }
     
-    public void addPoligonoListener(ListChangeListener listener){
-        objetos.addListener(listener);
-    }
-
-    public ListProperty<OldPoligono> objetosProperty() {
-        return objetos;
+    public void addTempPoint(Vertice p){
+        tempPoints.add(p);
+        vistas.forEach((vista) -> {
+            vista.addTempPoint(new Vertice(p));
+        });
+        //System.out.println("TEMPO POINT: " + tempPoints);
     }
     
-    public void addTempPointsListener(ListChangeListener listener){
-        verticesTemporarios.addListener(listener);
+    public void addTempPoint(Vertice...p){
+        for (Vertice obj : p){
+            addTempPoint(obj);
+        }
+    }
+    
+    public void clearTemp(){
+        tempPoints.clear();
+        vistas.forEach((vista) -> {
+            vista.clearTemp();
+        });
+    }
+
+    public List<Vista> getVistas() {
+        return vistas;
+    }
+    
+    private static World INSTANCE;
+    
+    public static World getInstance(){
+        if (INSTANCE == null){
+            INSTANCE = new World();
+        }
+        return INSTANCE;
     }
     
 }

@@ -7,7 +7,7 @@ package m;
 
 
 import java.util.Observable;
-import m.anderson.Vertice;
+import m.poligonos.Vertice;
 import utils.math.VMath;
 
 /**

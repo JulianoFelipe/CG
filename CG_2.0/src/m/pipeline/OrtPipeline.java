@@ -5,14 +5,14 @@
  */
 package m.pipeline;
 
-import View.ANDERSON_TEST_SUITE;
+import View.Teste_Pipeline;
 import java.util.List;
 import java.util.Observable;
 import m.Camera;
 import m.Viewport;
-import m.VistaNEW;
+import m.Visao;
 import m.Window;
-import m.anderson.CGObject;
+import m.poligonos.CGObject;
 import utils.math.MMath;
 
 /**
@@ -20,15 +20,15 @@ import utils.math.MMath;
  * @author JFPS
  */
 public class OrtPipeline extends CGPipeline{
-    private final VistaOrtografica vista;
+    private final Visao vista;
     
     private float[][] matrizVistaOrt;
     private boolean changed = true;
     
-    public OrtPipeline(VistaOrtografica vista, Camera cam, Window win, Viewport view) {
+    public OrtPipeline(Visao visao, Camera cam, Window win, Viewport view) {
         super(cam, win, view);
-        this.vista = vista;
-        matrizVistaOrt = MatrizOrtografica.getMatrizOrt(vista);
+        this.vista = visao;
+        matrizVistaOrt = MatrizOrtografica.getMatrizOrt(visao);
     }
 
     @Override
@@ -42,12 +42,18 @@ public class OrtPipeline extends CGPipeline{
     
     @Override
     public void convert2D(CGObject object) {
+        System.out.println("VISTA: " + vista);
+        MMath.printMatrix(object.getPointMatrix());
         float[][] retPoints = multiply3D(get3DPipelineMatrix(), object.getPointMatrix());
+        /*System.out.println("\n Matriz PIPELINE 3D");
+        MMath.printMatrix(get3DPipelineMatrix());
         System.out.println("\n MATRIZ DEPOIS DE PIPE 3D");
-        ANDERSON_TEST_SUITE.printMatrix(retPoints);
+        MMath.printMatrix(retPoints);*/
         retPoints = multiply2D(get2DPipelineMatrix(), retPoints);
+        /*System.out.println("\n Matriz PIPELINE 2D");
+        MMath.printMatrix(get2DPipelineMatrix());
         System.out.println("\n MATRIZ DEPOIS DE PIPE 2D (Window e Viewport)");
-        ANDERSON_TEST_SUITE.printMatrix(retPoints);
+        MMath.printMatrix(retPoints);*/
         object.setPointMatrix(retPoints);
     }
 
@@ -81,23 +87,24 @@ public class OrtPipeline extends CGPipeline{
     public float[][] getMatrixProj(){
         return MatrizOrtografica.getMatrizOrt(vista);
     }
-    
-    public static enum VistaOrtografica{
-        Frontal, Topo, Lateral;
-    };
-    
+
+    @Override
+    public Visao getVisao() {
+        return vista;
+    }
+        
     protected static final class MatrizOrtografica{
         protected static final float[][] MAT_TOPO = {
             { 1, 0, 0, 0},
-            { 0, 0, 0, 0},
             { 0, 0, 1, 0},
+            { 0, 0, 0, 0},
             { 0, 0, 0, 1}
         };
         
         protected static final float[][] MAT_LATERAL = {
-            { 0, 0, 0, 0},
-            { 0, 1, 0, 0},
             { 0, 0, 1, 0},
+            { 0, 1, 0, 0},
+            { 0, 0, 0, 0},
             { 0, 0, 0, 1}
         };
         
@@ -108,7 +115,7 @@ public class OrtPipeline extends CGPipeline{
             { 0, 0, 0, 1}
         };
         
-        protected static float[][] getMatrizOrt(VistaOrtografica vista){            
+        protected static float[][] getMatrizOrt(Visao vista){            
             switch(vista){
                 case Frontal:
                     return MAT_FRENTE;

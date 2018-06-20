@@ -5,11 +5,12 @@
  */
 package View.Options;
 
+import View.CG_20;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -23,7 +24,9 @@ public class RevBuildController implements Initializable {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
     
     @FXML
-    private TextField pointsField;
+    private TextField sectionsField;
+    @FXML
+    private TextField angleField;
     @FXML
     private Button okButton;
     @FXML
@@ -43,5 +46,13 @@ public class RevBuildController implements Initializable {
         /*sidesField.textProperty().addListener((observable, oldValue, newValue) -> {
             numberOfSides = Integer.parseInt(sidesField.getText());
         });*/
+        
+        okButton.setOnAction((ActionEvent event) -> {
+            CG_20.main.finalizeTempPoints();
+        });
+        
+        cancelButton.setOnAction((ActionEvent event) -> {
+            CG_20.main.cancelTempPoints();
+        });
     }
 }

@@ -16,19 +16,10 @@
          <top>
             <MenuBar fx:id="menu" BorderPane.alignment="TOP_CENTER">
               <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu mnemonicParsing="false" text="Arquivo">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Close" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
+                    <MenuItem mnemonicParsing="false" text="Salvar" />
+                        <MenuItem mnemonicParsing="false" text="Carregar" />
                   </items>
                 </Menu>
               </menus>
@@ -37,14 +28,11 @@
                </BorderPane.margin>
             </MenuBar>
          </top>
-         <bottom>
-            <TextArea fx:id="console" editable="false" prefHeight="68.0" prefWidth="1280.0" BorderPane.alignment="BOTTOM_CENTER" />
-         </bottom>
          <left>
             <VBox prefHeight="707.0" prefWidth="193.0" BorderPane.alignment="CENTER">
                <children>
                   <Separator prefWidth="200.0" />
-                  <TreeView fx:id="tools" onMouseClicked="#onMouseClickedToolsListener" prefHeight="368.0" prefWidth="193.0" />
+                  <TreeView fx:id="tools" onMouseClicked="#onMouseClickedToolsListener" prefHeight="402.0" prefWidth="193.0" />
                   <AnchorPane fx:id="options" prefHeight="339.0" prefWidth="193.0" />
                </children>
             </VBox>
@@ -60,24 +48,24 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <TitledPane animated="false" collapsible="false" prefHeight="460.0" prefWidth="544.0" text="Frente">
+                  <TitledPane animated="false" collapsible="false" prefHeight="460.0" prefWidth="544.0" text="Frente (X, Y)">
                      <content>
-                        <ImageView fx:id="frente" fitHeight="329.0" fitWidth="541.0" pickOnBounds="true" preserveRatio="true" />
+                        <Canvas fx:id="frente" height="362.0" onMouseClicked="#onMouseClickedFrenteListener" width="542.0" />
                      </content>
                   </TitledPane>
-                  <TitledPane animated="false" collapsible="false" prefHeight="461.0" prefWidth="543.0" text="Lateral" GridPane.columnIndex="1">
+                  <TitledPane animated="false" collapsible="false" prefHeight="461.0" prefWidth="543.0" text="Lateral (Z, Y)" GridPane.columnIndex="1">
                      <content>
-                        <ImageView fx:id="lateral" fitHeight="326.0" fitWidth="540.0" pickOnBounds="true" preserveRatio="true" />
+                        <Canvas fx:id="lateral" height="362.0" width="542.0" />
                      </content>
                   </TitledPane>
-                  <TitledPane animated="false" collapsible="false" prefHeight="612.0" prefWidth="544.0" text="Topo" GridPane.rowIndex="1">
+                  <TitledPane animated="false" collapsible="false" prefHeight="387.0" prefWidth="538.0" text="Topo (X, Z)" GridPane.rowIndex="1">
                      <content>
-                        <ImageView fx:id="topo" fitHeight="327.0" fitWidth="542.0" pickOnBounds="true" preserveRatio="true" />
+                        <Canvas fx:id="topo" height="362.0" width="542.0" />
                      </content>
                   </TitledPane>
                   <TitledPane animated="false" collapsible="false" prefHeight="581.0" prefWidth="543.0" text="Perspectiva" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <content>
-                        <ImageView fx:id="perspectiva" fitHeight="326.0" fitWidth="541.0" pickOnBounds="true" preserveRatio="true" />
+                        <Canvas fx:id="perspectiva" height="362.0" width="542.0" />
                      </content>
                   </TitledPane>
                </children>

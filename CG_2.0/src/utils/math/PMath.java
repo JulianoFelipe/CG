@@ -7,8 +7,8 @@ package utils.math;
 
 //import Model.Poligono;
 
-import m.anderson.Poligono;
-import m.anderson.Vertice;
+import m.poligonos.Poligono;
+import m.poligonos.Vertice;
 
 //import Model.Vertice;
 

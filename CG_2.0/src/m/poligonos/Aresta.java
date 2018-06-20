@@ -1,4 +1,4 @@
-package m.anderson;
+package m.poligonos;
 
 import java.util.Objects;
 import utils.math.VMath;

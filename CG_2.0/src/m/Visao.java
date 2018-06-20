@@ -5,15 +5,10 @@
  */
 package m;
 
-import m.pipeline.Pipeline;
-
 /**
  *
  * @author JFPS
  */
-public class VistaNEW {
-    //private final Camera cam;
-    //private final Pipeline pipe;
-    
-    
+public enum Visao {
+    Frontal, Lateral, Topo, Perspectiva;
 }

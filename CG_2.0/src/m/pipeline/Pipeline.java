@@ -7,7 +7,7 @@ package m.pipeline;
 
 import java.util.List;
 import java.util.Observer;
-import m.anderson.CGObject;
+import m.poligonos.CGObject;
 
 /**
  *

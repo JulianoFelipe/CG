@@ -5,21 +5,22 @@
  */
 package View;
 
-import View.Options.CanvasPane;
 import View.Options.PaintController;
 import View.Options.RegularPolygonController;
 import View.Options.RevBuildController;
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TreeCell;
@@ -28,9 +29,13 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
+import m.Vista;
+import m.World;
+import m.poligonos.CGObject;
+import m.poligonos.Vertice;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
@@ -55,16 +60,20 @@ public class MainController implements Initializable {
     private GridPane grid;
     
     @FXML
-    private ImageView frente;
+    private Canvas frente;
     @FXML
-    private ImageView topo;
+    private Canvas topo;
     @FXML
-    private ImageView lateral;
+    private Canvas lateral;
     @FXML
-    private ImageView perspectiva;
+    private Canvas perspectiva;
+    
+    private World mundo;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        mundo = World.getInstance();
+        
         initializeTools();
         initializeMenuBar();
         initializeConsole();
@@ -77,15 +86,15 @@ public class MainController implements Initializable {
     private void initializeTools(){
         TreeItem<String> root = new TreeItem<>("Root");
              
-        TreeItem<String> ferramentas    = new TreeItem<>(Ferramentas.C_NAME);
+        //TreeItem<String> ferramentas    = new TreeItem<>(Ferramentas.C_NAME);
         TreeItem<String> criacao        = new TreeItem<>(CriacaoPrevolucao.C_NAME);
         TreeItem<String> transformacoes = new TreeItem<>(Transformacoes.C_NAME);
 
-        ferramentas.getChildren().addAll(
+        /*ferramentas.getChildren().addAll(
             new TreeItem<>(Ferramentas.Select.NAME, new ImageView(Ferramentas.Select.ICON)),
             new TreeItem<>(Ferramentas.Delete.NAME, new ImageView(Ferramentas.Delete.ICON)),
             new TreeItem<>(Ferramentas.Paint.NAME,  new ImageView(Ferramentas.Paint.ICON))
-        );
+        );*/
         
         criacao.getChildren().addAll(
             new TreeItem<>(CriacaoPrevolucao.porPontos.NAME,   new ImageView(CriacaoPrevolucao.porPontos.ICON))//,
@@ -99,7 +108,7 @@ public class MainController implements Initializable {
             new TreeItem<>(Transformacoes.Cisalhamento.NAME, new ImageView(Transformacoes.Cisalhamento.ICON))
         );
         
-        root.getChildren().addAll(ferramentas, criacao, transformacoes);
+        root.getChildren().addAll(/*ferramentas, */criacao, transformacoes);
         
         tools.setRoot(root);
         tools.setShowRoot(false);
@@ -158,6 +167,57 @@ public class MainController implements Initializable {
             }
             
             handleSelectedTool();
+        }
+    }
+    
+    @FXML //Clicar na árvore de ferramentas
+    private void onMouseClickedFrenteListener(MouseEvent e){
+        System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
+        if (CURRENT_SEL == REVOLUCAO_SEL){
+            if (current_pol == CriacaoPrevolucao.porPontos){
+                mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
+                //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+            }
+        }
+        paintStuff();
+    }
+    
+    private void paintStuff(){
+        for (Vista vista : mundo.getVistas()){
+            GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
+            graphs.setFill(Color.BLACK);
+            graphs.setStroke(Color.BLACK);
+            graphs.setLineWidth(5);
+            
+            List<CGObject> objs = vista.get2Dobjects();
+            for (CGObject obj : objs){
+                graphs.beginPath();
+                for (int i=0; i<obj.getNumberOfPoints(); i++){
+                    Vertice point = obj.getPoint(i);
+                    graphs.moveTo(point.getX(), point.getY());
+                }
+                
+                graphs.fill();
+                graphs.closePath();
+            }
+        }
+        
+        for (Vista vista : mundo.getVistas()){
+            GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
+            graphs.setFill(Color.BLACK);
+            graphs.setStroke(Color.BLACK);
+            graphs.setLineWidth(5);
+            
+            List<Vertice> vertices = vista.getTempPoints();
+            graphs.beginPath();
+            System.out.println("BEGIN: " + vertices.size());
+            for (Vertice vert : vertices){
+                Vertice point = vert.getPoint(0);
+                graphs.moveTo(point.getX(), point.getY());
+                graphs.fillOval(vert.getX(), vert.getY(), 5, 5);
+            }
+            graphs.fill();
+            graphs.closePath();
         }
     }
     
@@ -244,5 +304,27 @@ public class MainController implements Initializable {
         return current_tra;
     }
     
+    public void cancelTempPoints(){
+        
+    }
     
+    public void finalizeTempPoints(){
+        
+    }
+    
+    private Canvas getCanvasFromView(Vista vista){
+        switch (vista.getVisao()){
+            case Frontal:
+                return frente;
+            case Lateral:
+                return lateral;
+            case Topo:
+                return topo;
+            case Perspectiva:
+                return perspectiva;
+            default:
+                throw new IllegalArgumentException("Visão não prevista.");
+                    
+        }
+    }
 }

@@ -10,11 +10,14 @@
    <children>
       <VBox prefHeight="237.0" prefWidth="193.0">
          <children>
-            <Label prefHeight="17.0" prefWidth="196.0" text="Quantia de pontos no perfil:" />
-            <TextField fx:id="pointsField" editable="false" />
-            <Separator prefHeight="50.0" prefWidth="193.0" />
+            <Label prefHeight="17.0" prefWidth="196.0" text="Quantia de seções:" />
+            <TextField fx:id="sectionsField" editable="false" />
+            <Separator prefHeight="20.0" prefWidth="193.0" visible="false" />
+            <Label text="Ângulo:" />
+            <TextField fx:id="angleField" />
+            <Separator prefHeight="20.0" prefWidth="193.0" visible="false" />
             <Button fx:id="okButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="201.0" text="Finalizar" />
-            <Separator prefHeight="50.0" prefWidth="193.0" />
+            <Separator prefHeight="20.0" prefWidth="193.0" visible="false" />
             <Button fx:id="cancelButton" mnemonicParsing="false" prefHeight="25.0" prefWidth="195.0" text="Cancelar" />
          </children>
       </VBox>

@@ -6,9 +6,9 @@
 package utils.math;
 
 import java.util.Arrays;
-import m.anderson.Aresta;
-import m.anderson.Movimento;
-import m.anderson.Vertice;
+import m.poligonos.Aresta;
+import m.poligonos.Movimento;
+import m.poligonos.Vertice;
 
 /**
  * Vector/Vertice math

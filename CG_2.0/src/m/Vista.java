@@ -5,15 +5,12 @@
  */
 package m;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
-import javafx.beans.Observable;
-import javafx.beans.property.ListProperty;
-import javafx.beans.property.SimpleListProperty;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener;
-import javafx.collections.ObservableList;
-import m.pipeline.Pipeline;
-import m.poligonos.OldPoligono;
+import m.pipeline.CGPipeline;
+import m.poligonos.CGObject;
+import m.poligonos.Vertice;
 
 /**
  *
@@ -21,81 +18,60 @@ import m.poligonos.OldPoligono;
  */
 public class Vista {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
-    //https://coderanch.com/t/666722/java/Notify-ObservableList-Listeners-Change-Elements
-    private final Pipeline pipe;
-    private final ListProperty<OldPoligono> objetos;
-    private final World world;
 
-    private boolean changeLock = false;
+    private final CGPipeline pipe;
+    private List<CGObject> objetos;
+    private List<Vertice> tempPoints;
+    //private final World world;
+
     
-    public Vista(Pipeline pipeline, World world) {
+    public Vista(CGPipeline pipeline) {
         this.pipe = pipeline;
-        
-        ObservableList<OldPoligono> oobjetos = 
-                FXCollections.observableArrayList((final OldPoligono param) 
-                        -> new Observable[]{
-            param.pontosProperty()
-        });
-        
-        objetos = new SimpleListProperty(oobjetos);
-        
-        world.addPoligonoListener((ListChangeListener) new ListChangeListener<OldPoligono>() {
-            @Override
-            public void onChanged(ListChangeListener.Change<? extends OldPoligono> c) {
-                if(changeLock){
-                    System.out.println("LOCK");
-                    changeLock=false;
-                    return;
-                }
-                
-                while (c.next()) {                   
-                    if (c.wasPermutated()) {
-                        for (int i = c.getFrom(); i < c.getTo(); ++i) {
-                            LOG.severe("Permutation not implemented");
-                        }
-                    } else if (c.wasUpdated()) {
-                        for (int i = c.getFrom(); i < c.getTo(); ++i) {
-                            OldPoligono p = world.objetosProperty().get(i);
-                            //converter.convertToRaster(p);
-                            FORLOOP: for(int t=0; t<objetos.getSize(); t++){
-                                if (objetosProperty().get(t).getID() == p.getID()){
-                                    objetosProperty().set(t, p);
-                                    break FORLOOP;
-                                }
-                            }
-                        }
-                    } else {
-                        c.getRemoved().forEach((removedItem) -> {
-                            objetos.remove(removedItem);
-                        });
-                        c.getAddedSubList().forEach((addedItem) -> {
-                            //converter.convertToRaster(addedItem);
-                            objetos.add(addedItem);
-                        });
-                    }
-                }
-            }
-        });
-        
-        this.world = world;
+        objetos = new ArrayList();
+        tempPoints = new ArrayList<>();
     }
     
-    public void addPoligonoListener(ListChangeListener listener){
-        objetos.addListener(listener);
+    public void addObject(CGObject p){
+        pipe.convert2D(p);
+        objetos.add(p);
     }
-
-    /*public WorldToRasterConverter getConverter() {
-        return pipe;
-    }*/
-
-    public ListProperty<OldPoligono> objetosProperty() {
+    
+    public void addObject(CGObject...p){
+        for (CGObject obj : p){
+            addObject(obj);
+        }
+    }
+    
+    public void addTempPoint(Vertice p){
+        pipe.convert2D(p);
+        tempPoints.add(p);
+        //System.out.println("TEMP POINT: " + tempPoints);
+    }
+    
+    public void addTempPoint(Vertice...p){
+        for (Vertice obj : p){
+            addTempPoint(obj);
+        }
+    }
+    
+    public void clearTemp(){
+        System.out.println("CLEAR CALL");
+        tempPoints.clear();
+    }
+    
+    public List<CGObject> get2Dobjects(){
         return objetos;
     }
     
-    public void addPoligono(OldPoligono p){
-        changeLock = true; //Bloqueia atualização do plano atual
-        //pipe.convertFromRaster(p); //Converte para coordenadas do mundo
-        world.objetosProperty().add(p); //Adiciona ao mundo
+    public List<Vertice> getTempPoints(){
+        return tempPoints;
     }
     
+    public void clearTemPoints(){
+        tempPoints.clear();
+    }
+    
+    public Visao getVisao(){
+        return pipe.getVisao();
+    }
 }

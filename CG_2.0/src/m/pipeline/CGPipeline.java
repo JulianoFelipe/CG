@@ -7,8 +7,9 @@ package m.pipeline;
 
 import m.Camera;
 import m.Viewport;
+import m.Visao;
 import m.Window;
-import m.anderson.Vertice;
+import m.poligonos.Vertice;
 import utils.math.MMath;
 import utils.math.VMath;
 
@@ -110,4 +111,6 @@ public abstract class CGPipeline implements Pipeline{
         
         return MMath.multiplicar(matrixJP, pointMatrix);
     }
+    
+    public abstract Visao getVisao();
 }

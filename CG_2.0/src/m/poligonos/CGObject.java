@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package m.anderson;
+package m.poligonos;
 
 import java.io.Serializable;
 import java.util.ArrayList;

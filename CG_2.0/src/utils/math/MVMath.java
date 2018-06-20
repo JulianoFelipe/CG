@@ -5,7 +5,7 @@
  */
 package utils.math;
 
-import m.anderson.Vertice;
+import m.poligonos.Vertice;
 
 /**
  * Mix de MMath e VMath

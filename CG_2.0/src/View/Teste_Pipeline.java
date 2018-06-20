@@ -7,38 +7,19 @@ package View;
 
 import m.Camera;
 import m.Viewport;
+import m.Visao;
 import m.Window;
-import m.anderson.Poligono;
-import m.anderson.Vertice;
 import m.pipeline.OrtPipeline;
-import m.pipeline.PersPipeline;
+import m.poligonos.Poligono;
+import m.poligonos.Vertice;
 import utils.math.MMath;
 
 /**
  *
  * @author JFPS
  */
-public class ANDERSON_TEST_SUITE {
-    
-    //https://stackoverflow.com/questions/5061912/printing-out-a-2-d-array-in-matrix-format
-    public static void printMatrix(float[][] m){
-        try{
-            int rows = m.length;
-            int columns = m[0].length;
-            String str = "|\t";
-
-            for(int i=0;i<rows;i++){
-                for(int j=0;j<columns;j++){
-                    str += m[i][j] + "\t";
-                }
-
-                System.out.println(str + "|");
-                str = "|\t";
-            }
-
-        }catch(Exception e){System.out.println("Matrix is empty!!");}
-    }
-    
+public class Teste_Pipeline {
+        
     /**
      * @param args the command line arguments
      */
@@ -48,7 +29,7 @@ public class ANDERSON_TEST_SUITE {
         Vertice VRP    = new Vertice((float) 50, (float) 15, (float) 30);
         Vertice P      = new Vertice(20, 6, 15);
         
-        printMatrix(VRP.getPointMatrix());
+        MMath.printMatrix(VRP.getPointMatrix());
         
         Camera cam = new Camera(ViewUp, VRP, P);
        
@@ -56,18 +37,17 @@ public class ANDERSON_TEST_SUITE {
         Viewport view = new Viewport(new Vertice(0, 0),
                                      new Vertice(320, 240) );
         
-        AQUI AQUI AQUI
-        OrtPipeline pipe = new OrtPipeline(OrtPipeline.VistaOrtografica.Frontal, cam, win, view);
+        OrtPipeline pipe = new OrtPipeline(Visao.Frontal, cam, win, view);
         //PersPipeline pipe = new PersPipeline(17, cam, win, view);
         
         System.out.println("\n\nMATRIZ SRU,SRC");
-        printMatrix(pipe.getMatrizSRUsrc());
+        MMath.printMatrix(pipe.getMatrizSRUsrc());
         
         System.out.println("\nMATRIZ PROJEÇÃO");
-        printMatrix(pipe.getMatrixProj());
+        MMath.printMatrix(pipe.getMatrixProj());
         
         System.out.println("\nMATRIZ JP");
-        printMatrix(pipe.getMatrixJP());
+        MMath.printMatrix(pipe.getMatrixJP());
         
         /*System.out.println("\nMATRIZ CONCATENADA FINAL");
         float [][] fin = pipe.getPipelineMatrix();
@@ -85,7 +65,7 @@ public class ANDERSON_TEST_SUITE {
         Poligono pol = new Poligono(pol_mat);
         
         System.out.println("\nMATRIZ DE PONTOS");
-        printMatrix(pol_mat);
+        MMath.printMatrix(pol_mat);
         
         //float[][] res = MMath.multiplicar(pipe.getMatrizSRUsrc(), pol_mat);
         
@@ -107,6 +87,6 @@ public class ANDERSON_TEST_SUITE {
         float[][] newRes = pol.getPointMatrix();
         
         System.out.println("\nMATRIZ RESULTANTE");
-        printMatrix(newRes);
+        MMath.printMatrix(newRes);
     }
 }

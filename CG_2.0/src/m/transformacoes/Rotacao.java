@@ -5,8 +5,8 @@
  */
 package m.transformacoes;
 
-import m.anderson.CGObject;
-import m.anderson.Vertice;
+import m.poligonos.CGObject;
+import m.poligonos.Vertice;
 
 /**
  *

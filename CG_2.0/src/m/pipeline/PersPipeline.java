@@ -5,15 +5,13 @@
  */
 package m.pipeline;
 
-import View.ANDERSON_TEST_SUITE;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 import m.Camera;
 import m.Viewport;
-import m.VistaNEW;
+import m.Visao;
 import m.Window;
-import m.anderson.CGObject;
+import m.poligonos.CGObject;
 import utils.math.MMath;
 
 /**
@@ -73,14 +71,14 @@ public class PersPipeline extends CGPipeline{
     @Override
     public void convert2D(CGObject object) {
         float[][] retPoints = multiply3D(get3DPipelineMatrix(), object.getPointMatrix());
-        System.out.println("\n MATRIZ DEPOIS DE PIPE 3D");
-        ANDERSON_TEST_SUITE.printMatrix(retPoints);
+        //System.out.println("\n MATRIZ DEPOIS DE PIPE 3D");
+        //MMath.printMatrix(retPoints);
         retPoints = persMatrixSwitcheroo(retPoints);
-        System.out.println("\n MATRIZ DEPOIS DE DIVISÃO PERSPECTIVA");
-        ANDERSON_TEST_SUITE.printMatrix(retPoints);
+        //System.out.println("\n MATRIZ DEPOIS DE DIVISÃO PERSPECTIVA");
+        //MMath.printMatrix(retPoints);
         retPoints = multiply2D(get2DPipelineMatrix(), retPoints);
-        System.out.println("\n MATRIZ DEPOIS DE PIPE 2D (Window e Viewport)");
-        ANDERSON_TEST_SUITE.printMatrix(retPoints);
+        //System.out.println("\n MATRIZ DEPOIS DE PIPE 2D (Window e Viewport)");
+        //MMath.printMatrix(retPoints);
         object.setPointMatrix(retPoints);
     }
 
@@ -97,9 +95,17 @@ public class PersPipeline extends CGPipeline{
             float fator = pointMatrix[3][i];
             result[0][i]   = pointMatrix[0][i] / fator;
             result[1][i]   = pointMatrix[1][i] / fator;
-            result[2][i]   = pointMatrix[2][i] / fator;
+            //result[2][i]   = pointMatrix[2][i] / fator;
+            //result[3][i]   = pointMatrix[3][i] / fator;
+            result[2][i]   = 1;
+            //result[3][i]   = 1;
         }
 
         return result;
+    }
+
+    @Override
+    public Visao getVisao() {
+        return Visao.Perspectiva;
     }
 }
