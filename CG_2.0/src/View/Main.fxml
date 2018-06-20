@@ -56,12 +56,12 @@
                   </TitledPane>
                   <TitledPane animated="false" collapsible="false" prefHeight="461.0" prefWidth="543.0" text="Lateral (Z, Y)" GridPane.columnIndex="1">
                      <content>
-                        <Canvas fx:id="lateral" height="362.0" width="542.0" />
+                        <Canvas fx:id="lateral" height="362.0" onMouseClicked="#onMouseClickedLateralListener" width="542.0" />
                      </content>
                   </TitledPane>
                   <TitledPane animated="false" collapsible="false" prefHeight="387.0" prefWidth="538.0" text="Topo (X, Z)" GridPane.rowIndex="1">
                      <content>
-                        <Canvas fx:id="topo" height="362.0" width="542.0" />
+                        <Canvas fx:id="topo" height="362.0" onMouseClicked="#onMouseClickedTopoListener" width="542.0" />
                      </content>
                   </TitledPane>
                   <TitledPane animated="false" collapsible="false" prefHeight="581.0" prefWidth="543.0" text="Perspectiva" GridPane.columnIndex="1" GridPane.rowIndex="1">

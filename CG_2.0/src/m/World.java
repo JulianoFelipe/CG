@@ -101,6 +101,5 @@ public class World {
         vistas.forEach((vista) -> {
             vista.clearAll();
         });
-    }
-    
+    }    
 }

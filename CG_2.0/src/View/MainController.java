@@ -137,7 +137,10 @@ public class MainController implements Initializable {
                 try {
                     List<CGObject> objectsList = InputScene.getListFromFile(file);
                     mundo.clearAll();
-                    mundo.addObject(objectsList);
+                    //mundo.addObject(objectsList);
+                    for (CGObject obj : objectsList){
+                        mundo.addObject(obj);
+                    }
                     paintStuff();
                 } catch (IOException ex) {
                     Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
@@ -198,9 +201,33 @@ public class MainController implements Initializable {
         }
     }
     
-    @FXML //Clicar na árvore de ferramentas
+    @FXML
     private void onMouseClickedFrenteListener(MouseEvent e){
         System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
+        if (CURRENT_SEL == REVOLUCAO_SEL){
+            if (current_pol == CriacaoPrevolucao.porPontos){
+                mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
+                //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+            }
+        }
+        paintStuff();
+    }
+    
+    @FXML
+    private void onMouseClickedLateralListener(MouseEvent e){
+        System.out.println("Lateral Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
+        if (CURRENT_SEL == REVOLUCAO_SEL){
+            if (current_pol == CriacaoPrevolucao.porPontos){
+                mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
+                //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+            }
+        }
+        paintStuff();
+    }
+    
+    @FXML
+    private void onMouseClickedTopoListener(MouseEvent e){
+        System.out.println("Topo Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
         if (CURRENT_SEL == REVOLUCAO_SEL){
             if (current_pol == CriacaoPrevolucao.porPontos){
                 mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
@@ -244,14 +271,20 @@ public class MainController implements Initializable {
             graphs.setLineWidth(1);
             
             List<Vertice> vertices = vista.getTempPoints();
-            graphs.beginPath();
-
-            for (Vertice vert : vertices){
-                Vertice point = vert.getPoint(0);
-                graphs.moveTo(point.getX(), point.getY());
-                graphs.fillOval(vert.getX(), vert.getY(), 5, 5);
+            if (vertices.isEmpty())
+                continue;
+                
+            graphs.beginPath();           
+            Vertice point1 = vertices.get(0);
+            graphs.fillOval(point1.getX(), point1.getY(), 5, 5);
+            Vertice point2 = null;
+            for (int i=1; i<vertices.size(); i++){
+                point2 = vertices.get(i);
+                graphs.fillOval(point2.getX(), point2.getY(), 5, 5);
+                graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+                point1 = point2;
             }
-            graphs.fill();
+            //graphs.strokeLine(point1.getX(), point1.getY(), vertices.get(0).getX(), vertices.get(0).getY());
             graphs.closePath();
         }
     }
@@ -354,7 +387,8 @@ public class MainController implements Initializable {
     }
     
     public void cancelTempPoints(){
-        
+        mundo.clearTemp();
+        paintStuff();
     }
     
     public void finalizeTempPoints(){
