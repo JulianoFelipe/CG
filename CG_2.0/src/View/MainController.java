@@ -218,7 +218,7 @@ public class MainController implements Initializable {
         System.out.println("Lateral Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
         if (CURRENT_SEL == REVOLUCAO_SEL){
             if (current_pol == CriacaoPrevolucao.porPontos){
-                mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
+                mundo.addTempPoint(new Vertice(0, (float) e.getX(), (float) e.getY()));
                 //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
             }
         }
@@ -230,7 +230,7 @@ public class MainController implements Initializable {
         System.out.println("Topo Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
         if (CURRENT_SEL == REVOLUCAO_SEL){
             if (current_pol == CriacaoPrevolucao.porPontos){
-                mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
+                mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
                 //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
             }
         }

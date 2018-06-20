@@ -95,17 +95,17 @@ public class OrtPipeline extends CGPipeline{
         
     protected static final class MatrizOrtografica{
         protected static final float[][] MAT_TOPO = {
-            { 1, 0, 0, 0},
-            { 0, 0, 1, 0},
-            { 0, 0, 0, 0},
-            { 0, 0, 0, 1}
+            { 1, 0,  0, 0},
+            { 0, 0,  0, 0},
+            { 0, 0, -1, 0},
+            { 0, 0,  0, 1}
         };
         
         protected static final float[][] MAT_LATERAL = {
-            { 0, 0, 1, 0},
-            { 0, 1, 0, 0},
-            { 0, 0, 0, 0},
-            { 0, 0, 0, 1}
+            { 0, 0,  0, 0},
+            { 0, 1,  0, 0},
+            { 0, 0, -1, 0},
+            { 0, 0,  0, 1}
         };
         
         protected static final float[][] MAT_FRENTE = {

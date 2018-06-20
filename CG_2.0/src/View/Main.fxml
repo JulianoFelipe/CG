@@ -12,7 +12,7 @@
 
 <AnchorPane id="AnchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="854.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <BorderPane fx:id="borderPane" layoutX="-1.0" layoutY="-1.0" prefHeight="852.0" prefWidth="1280.0" AnchorPane.bottomAnchor="9.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+      <BorderPane fx:id="borderPane" layoutX="-1.0" layoutY="-1.0" prefHeight="852.0" prefWidth="1280.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <top>
             <MenuBar fx:id="menu" BorderPane.alignment="TOP_CENTER">
               <menus>
@@ -38,47 +38,80 @@
             </VBox>
          </left>
          <center>
-            <GridPane fx:id="grid" gridLinesVisible="true" BorderPane.alignment="CENTER">
+            <GridPane fx:id="grid" BorderPane.alignment="CENTER">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
               </columnConstraints>
               <rowConstraints>
-                  <RowConstraints maxHeight="35.0" minHeight="35.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="374.0" minHeight="10.0" prefHeight="345.0" vgrow="SOMETIMES" />
-                  <RowConstraints maxHeight="35.0" minHeight="10.0" prefHeight="35.0" vgrow="SOMETIMES" />
-                <RowConstraints maxHeight="374.0" minHeight="10.0" prefHeight="374.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="409.0" vgrow="SOMETIMES" />
+                <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="409.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <ToolBar prefHeight="35.0" prefWidth="544.0">
-                    <items>
-                        <Label text="Frente (X, Y)" />
-                        <Pane prefHeight="25.0" prefWidth="397.0" />
-                      <Button alignment="TOP_RIGHT" mnemonicParsing="false" text="Button" />
-                    </items>
-                  </ToolBar>
-                  <ToolBar maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="200.0" GridPane.columnIndex="1">
-                    <items>
-                        <Label text="Lateral (Z, Y)" />
-                      <Button mnemonicParsing="false" text="Button" />
-                    </items>
-                  </ToolBar>
-                  <ToolBar maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="544.0" GridPane.rowIndex="2">
-                    <items>
-                        <Label text="Topo (X, Z)" />
-                      <Button mnemonicParsing="false" text="Button" />
-                    </items>
-                  </ToolBar>
-                  <ToolBar maxHeight="35.0" minHeight="35.0" prefHeight="35.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
-                    <items>
-                        <Label text="Perspectiva" />
-                      <Button mnemonicParsing="false" text="Button" />
-                    </items>
-                  </ToolBar>
-                  <Canvas fx:id="frente" height="374.0" onMousePressed="#onMouseClickedFrenteListener" width="544.0" GridPane.rowIndex="1" />
-                  <Canvas fx:id="lateral" height="374.0" onMousePressed="#onMouseClickedLateralListener" width="544.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                  <Canvas fx:id="topo" height="374.0" onMousePressed="#onMouseClickedTopoListener" width="544.0" GridPane.rowIndex="3" />
-                  <Canvas fx:id="perspectiva" height="374.0" width="544.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                  <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;">
+                     <children>
+                        <ToolBar maxHeight="35.0" prefHeight="35.0" prefWidth="200.0" VBox.vgrow="SOMETIMES">
+                          <items>
+                              <HBox maxHeight="35.0" prefHeight="25.0" prefWidth="526.0">
+                                 <children>
+                                    <Label alignment="CENTER" prefHeight="27.0" prefWidth="64.0" text="Frente (X, Y)" />
+                                    <Pane prefHeight="35.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                  <Button mnemonicParsing="false" text="Button" />
+                                 </children>
+                              </HBox>
+                          </items>
+                        </ToolBar>
+                        <Canvas fx:id="frente" height="374.0" onMouseClicked="#onMouseClickedFrenteListener" width="544.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1">
+                     <children>
+                        <ToolBar maxHeight="35.0" prefHeight="35.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                           <items>
+                              <HBox maxHeight="35.0" prefHeight="25.0" prefWidth="526.0">
+                                 <children>
+                                    <Label alignment="CENTER" prefHeight="25.0" prefWidth="69.0" text="Lateral (Y, Z)" />
+                                    <Pane prefHeight="35.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <Button mnemonicParsing="false" text="Button" />
+                                 </children>
+                              </HBox>
+                           </items>
+                        </ToolBar>
+                        <Canvas fx:id="lateral" height="374.0" onMouseClicked="#onMouseClickedLateralListener" width="544.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.rowIndex="1">
+                     <children>
+                        <ToolBar maxHeight="35.0" prefHeight="35.0" prefWidth="200.0" VBox.vgrow="NEVER">
+                           <items>
+                              <HBox maxHeight="35.0" prefHeight="25.0" prefWidth="526.0">
+                                 <children>
+                                    <Label alignment="CENTER" prefHeight="27.0" prefWidth="64.0" text="Topo (X, Z)" />
+                                    <Pane prefHeight="35.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <Button mnemonicParsing="false" text="Button" />
+                                 </children>
+                              </HBox>
+                           </items>
+                        </ToolBar>
+                        <Canvas fx:id="topo" height="374.0" onMouseClicked="#onMouseClickedTopoListener" width="544.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                     <children>
+                        <ToolBar maxHeight="35.0" prefHeight="35.0" prefWidth="456.0" VBox.vgrow="NEVER">
+                           <items>
+                              <HBox maxHeight="35.0" prefHeight="25.0" prefWidth="524.0">
+                                 <children>
+                                    <Label alignment="CENTER" prefHeight="27.0" prefWidth="64.0" text="Perspectiva" />
+                                    <Pane prefHeight="35.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <Button mnemonicParsing="false" text="Button" />
+                                 </children>
+                              </HBox>
+                           </items>
+                        </ToolBar>
+                        <Canvas fx:id="perspectiva" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
                </children>
             </GridPane>
          </center>

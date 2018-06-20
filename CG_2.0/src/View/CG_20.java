@@ -30,12 +30,12 @@ public class CG_20 extends Application {
     public static final MainController main = new MainController();
     
     ///                                          ViewUp              VRP                                                 p
-    private static Camera cam1 = new Camera( new Vertice(0,1,0), new Vertice((float) 15, (float) 15, (float) 10), new Vertice(20, 6, 15) );
+    private static Camera cam1 = new Camera( new Vertice(0,1,0), new Vertice((float) 0, (float) 0, (float) 0), new Vertice(0, 0, 0) );
     private static Window   win1  = new Window(544, -374); //?????
     private static Viewport view1 = new Viewport( new Vertice(0, 0), new Vertice(544, 374) );
-    private static Camera cam2 = new Camera( new Vertice(0,1,0), new Vertice((float) 20, (float) 33, (float) 12), new Vertice(20, 6, 15) );
-    private static Camera cam3 = new Camera( new Vertice(0,1,0), new Vertice((float) 50, (float) 15, (float) 30), new Vertice(20, 6, 15) );
-    private static Camera cam4 = new Camera( new Vertice(0,1,0), new Vertice((float) 50, (float) 15, (float) 30), new Vertice(20, 6, 15) );
+    private static Camera cam2 = new Camera( new Vertice(0,1,0), new Vertice((float) 10, (float) 0, (float) 0), new Vertice(0, 0, 0) );
+    private static Camera cam3 = new Camera( new Vertice(0,0,1), new Vertice((float) 0, (float) 10, (float) 0), new Vertice(0, 0, 0) );
+    private static Camera cam4 = new Camera( new Vertice(0,1,0), new Vertice((float) 50, (float) 15, (float) 30), new Vertice(0, 0, 0) );
     private static float DP = 500;
     
     @Override
