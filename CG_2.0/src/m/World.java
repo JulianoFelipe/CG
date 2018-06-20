@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 import m.poligonos.CGObject;
+import m.poligonos.Poligono;
 import m.poligonos.Vertice;
 
 /**
@@ -40,7 +41,8 @@ public class World {
     public void addObject(CGObject p){
         objetos.add(p);
         vistas.forEach((vista) -> {
-            vista.addObject(p);
+            if (p instanceof Poligono)
+                vista.addObject(new Poligono ( (Poligono) p) ); //Very ugly, but..
         });
     }
     

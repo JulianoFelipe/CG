@@ -77,7 +77,7 @@ public class MainController implements Initializable {
         initializeTools();
         initializeMenuBar();
         initializeConsole();
-        
+        paintStuff();
         //borderPane.setCenter( new CanvasPane(this) );
         
         //grid.add(new , NOTHING_SEL, NOTHING_SEL);
@@ -187,17 +187,22 @@ public class MainController implements Initializable {
             GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
             graphs.setFill(Color.BLACK);
             graphs.setStroke(Color.BLACK);
-            graphs.setLineWidth(5);
+            graphs.setLineWidth(1);
             
             List<CGObject> objs = vista.get2Dobjects();
             for (CGObject obj : objs){
                 graphs.beginPath();
-                for (int i=0; i<obj.getNumberOfPoints(); i++){
-                    Vertice point = obj.getPoint(i);
-                    graphs.moveTo(point.getX(), point.getY());
-                }
                 
-                graphs.fill();
+                Vertice point1 = obj.getPoint(0);
+                Vertice point2 = null;
+                for (int i=1; i<obj.getNumberOfPoints(); i++){
+                    point2 = obj.getPoint(i);
+                    graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+                    //graphs.moveTo(point1.getX(), point.getY());
+                    point1 = point2;
+                }
+                graphs.strokeLine(point1.getX(), point1.getY(), obj.getPoint(0).getX(),obj.getPoint(0).getY());
+                //graphs.fill();
                 graphs.closePath();
             }
         }
@@ -206,7 +211,7 @@ public class MainController implements Initializable {
             GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
             graphs.setFill(Color.BLACK);
             graphs.setStroke(Color.BLACK);
-            graphs.setLineWidth(5);
+            graphs.setLineWidth(1);
             
             List<Vertice> vertices = vista.getTempPoints();
             graphs.beginPath();

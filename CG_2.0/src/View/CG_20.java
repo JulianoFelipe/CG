@@ -19,6 +19,7 @@ import m.World;
 import m.poligonos.Vertice;
 import m.pipeline.OrtPipeline;
 import m.pipeline.PersPipeline;
+import m.poligonos.Poligono;
 
 /**
  *
@@ -46,7 +47,17 @@ public class CG_20 extends Application {
             new Vista(new OrtPipeline(Visao.Topo,    cam3, win1, view1)),
             new Vista(new PersPipeline(DP,           cam4, win1, view1))
         );
-        System.out.println(mundo.getVistas());
+
+        float[][] pol_mat = {
+            {  30,  35,  25,  20,  30},
+            {   2,   4,   3,   1,  10},
+            {  25,  20,  18,  23,  (float) 22.5},
+            {   1,   1,   1,   1,   1}
+            //  A    B    C    D    E
+        };
+        
+        Poligono pol = new Poligono(pol_mat);
+        mundo.addObject(pol);
         
         //PaintController paint = new PaintController();
         //RegularPolygonController regular = new RegularPolygonController();
