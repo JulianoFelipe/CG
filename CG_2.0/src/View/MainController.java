@@ -23,6 +23,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
@@ -78,7 +79,7 @@ public class MainController implements Initializable {
         //grid.add(new , NOTHING_SEL, NOTHING_SEL);
     }
     
-    private void initializeTools(){
+    private void initializeTools(){       
         TreeItem<String> root = new TreeItem<>("Root");
              
         //TreeItem<String> ferramentas    = new TreeItem<>(Ferramentas.C_NAME);

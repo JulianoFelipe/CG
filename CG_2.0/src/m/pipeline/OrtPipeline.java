@@ -97,7 +97,7 @@ public class OrtPipeline extends CGPipeline{
         protected static final float[][] MAT_TOPO = {
             { 1, 0,  0, 0},
             { 0, 0,  0, 0},
-            { 0, 0, -1, 0},
+            { 0, 0,  1, 0},
             { 0, 0,  0, 1}
         };
         
