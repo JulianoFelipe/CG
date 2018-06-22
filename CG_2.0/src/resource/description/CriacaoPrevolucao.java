@@ -12,8 +12,8 @@ import javafx.scene.image.Image;
  * @author JFPS
  */
 public enum CriacaoPrevolucao {
-    porPontos  ("Pontos",   new Image(Ferramentas.class.getResourceAsStream("/resource/images/porPontos.png"))),
-    porLinha   ("Linha",    new Image(Ferramentas.class.getResourceAsStream("/resource/images/Irregular.jpg")));
+    free     ("Livre",        new Image(Ferramentas.class.getResourceAsStream("/resource/images/GridFree.png"))),
+    gridSnap ("Snap To Grid", new Image(Ferramentas.class.getResourceAsStream("/resource/images/GridSnap.png")));
     
     public final String NAME;
     public final Image ICON;

@@ -109,8 +109,8 @@ public class MainController implements Initializable {
         );
         
         criacao.getChildren().addAll(
-                new TreeItem<>(CriacaoPrevolucao.porPontos.NAME,   new ImageView(CriacaoPrevolucao.porPontos.ICON))//,
-                //new TreeItem<>(CriacaoPrevolucao.porLinha.NAME, new ImageView(CriacaoPrevolucao.porLinha.ICON))
+                new TreeItem<>(CriacaoPrevolucao.free.NAME,   new ImageView(CriacaoPrevolucao.free.ICON))//,
+                //new TreeItem<>(CriacaoPrevolucao.gridSnap.NAME, new ImageView(CriacaoPrevolucao.gridSnap.ICON))
         );
         
         transformacoes.getChildren().addAll(
@@ -227,7 +227,7 @@ public class MainController implements Initializable {
         frente.setOnMouseClicked((MouseEvent e) -> {
             System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.porPontos){
+                if (current_pol == CriacaoPrevolucao.free){
                     mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
                 }
@@ -238,7 +238,7 @@ public class MainController implements Initializable {
         lateral.setOnMouseClicked((MouseEvent e) -> {
             System.out.println("Lateral Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.porPontos){
+                if (current_pol == CriacaoPrevolucao.free){
                     mundo.addTempPoint(new Vertice(0, (float) e.getX(), (float) e.getY()));
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
                 }
@@ -249,7 +249,7 @@ public class MainController implements Initializable {
         topo.setOnMouseClicked((MouseEvent e) -> {
             System.out.println("Topo Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.porPontos){
+                if (current_pol == CriacaoPrevolucao.free){
                     mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
                 }
@@ -442,7 +442,7 @@ public class MainController implements Initializable {
                 }
                 break;
             case REVOLUCAO_SEL:
-                if(null != current_pol && current_pol == CriacaoPrevolucao.porPontos){
+                if(null != current_pol && current_pol == CriacaoPrevolucao.free){
                     if (revBuildOption == null) loadRevPorPontos();
                     options.getChildren().add(revBuildOption);
                 }
