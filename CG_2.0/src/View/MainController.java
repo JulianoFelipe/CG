@@ -82,15 +82,15 @@ public class MainController implements Initializable {
     private void initializeTools(){       
         TreeItem<String> root = new TreeItem<>("Root");
              
-        //TreeItem<String> ferramentas    = new TreeItem<>(Ferramentas.C_NAME);
+        TreeItem<String> ferramentas    = new TreeItem<>(Ferramentas.C_NAME);
         TreeItem<String> criacao        = new TreeItem<>(CriacaoPrevolucao.C_NAME);
         TreeItem<String> transformacoes = new TreeItem<>(Transformacoes.C_NAME);
 
-        /*ferramentas.getChildren().addAll(
+        ferramentas.getChildren().addAll(
             new TreeItem<>(Ferramentas.Select.NAME, new ImageView(Ferramentas.Select.ICON)),
             new TreeItem<>(Ferramentas.Delete.NAME, new ImageView(Ferramentas.Delete.ICON)),
             new TreeItem<>(Ferramentas.Paint.NAME,  new ImageView(Ferramentas.Paint.ICON))
-        );*/
+        );
         
         criacao.getChildren().addAll(
             new TreeItem<>(CriacaoPrevolucao.porPontos.NAME,   new ImageView(CriacaoPrevolucao.porPontos.ICON))//,
@@ -104,7 +104,7 @@ public class MainController implements Initializable {
             new TreeItem<>(Transformacoes.Cisalhamento.NAME, new ImageView(Transformacoes.Cisalhamento.ICON))
         );
         
-        root.getChildren().addAll(/*ferramentas, */criacao, transformacoes);
+        root.getChildren().addAll(ferramentas, criacao, transformacoes);
         
         tools.setRoot(root);
         tools.setShowRoot(false);

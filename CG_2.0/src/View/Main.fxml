@@ -76,7 +76,19 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <Canvas fx:id="frente" height="374.0" onMouseClicked="#onMouseClickedFrenteListener" width="544.0" VBox.vgrow="ALWAYS" />
+                        <StackPane>
+                           <children>
+                              <Canvas fx:id="frente" height="374.0" onMouseClicked="#onMouseClickedFrenteListener" width="544.0" VBox.vgrow="ALWAYS" />
+                              <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
+                                 <image>
+                                    <Image url="@../resource/images/Frontal.png" />
+                                 </image>
+                                 <StackPane.margin>
+                                    <Insets bottom="5.0" left="5.0" />
+                                 </StackPane.margin>
+                              </ImageView>
+                           </children>
+                        </StackPane>
                      </children>
                   </VBox>
                   <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1">
@@ -107,7 +119,19 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <Canvas fx:id="lateral" height="374.0" onMouseClicked="#onMouseClickedLateralListener" width="544.0" VBox.vgrow="ALWAYS" />
+                        <StackPane>
+                           <children>
+                              <Canvas fx:id="lateral" height="374.0" onMouseClicked="#onMouseClickedLateralListener" width="544.0" VBox.vgrow="ALWAYS" />
+                              <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
+                                 <image>
+                                    <Image url="@../resource/images/Lateral.png" />
+                                 </image>
+                                 <StackPane.margin>
+                                    <Insets bottom="5.0" left="5.0" />
+                                 </StackPane.margin>
+                              </ImageView>
+                           </children>
+                        </StackPane>
                      </children>
                   </VBox>
                   <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.rowIndex="1">
@@ -138,7 +162,19 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <Canvas fx:id="topo" height="374.0" onMouseClicked="#onMouseClickedTopoListener" width="544.0" VBox.vgrow="ALWAYS" />
+                        <StackPane>
+                           <children>
+                              <Canvas fx:id="topo" height="374.0" onMouseClicked="#onMouseClickedTopoListener" width="544.0" VBox.vgrow="ALWAYS" />
+                              <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
+                                 <image>
+                                    <Image url="@../resource/images/Topo.png" />
+                                 </image>
+                                 <StackPane.margin>
+                                    <Insets bottom="5.0" left="5.0" />
+                                 </StackPane.margin>
+                              </ImageView>
+                           </children>
+                        </StackPane>
                      </children>
                   </VBox>
                   <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="1">
@@ -169,7 +205,19 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <Canvas fx:id="perspectiva" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
+                        <StackPane>
+                           <children>
+                              <Canvas fx:id="perspectiva" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
+                              <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
+                                 <image>
+                                    <Image url="@../resource/images/Perspectiva.png" />
+                                 </image>
+                                 <StackPane.margin>
+                                    <Insets bottom="5.0" left="5.0" />
+                                 </StackPane.margin>
+                              </ImageView>
+                           </children>
+                        </StackPane>
                      </children>
                   </VBox>
                </children>
