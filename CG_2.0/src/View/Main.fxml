@@ -38,7 +38,7 @@
             </VBox>
          </left>
          <center>
-            <GridPane fx:id="grid" BorderPane.alignment="CENTER">
+            <GridPane fx:id="grid" minHeight="200.0" minWidth="200.0" BorderPane.alignment="CENTER">
               <columnConstraints>
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                 <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -48,7 +48,7 @@
                 <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="409.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;">
+                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;">
                      <children>
                         <HBox maxHeight="35.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
                            <children>
@@ -60,8 +60,8 @@
                               <Pane prefHeight="35.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
                               <MenuButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="48.0">
                                 <items>
-                                  <MenuItem mnemonicParsing="false" text="Action 1" />
-                                  <MenuItem mnemonicParsing="false" text="Action 2" />
+                                  <MenuItem fx:id="frenteCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
+                                  <MenuItem fx:id="frenteCamAuto" mnemonicParsing="false" text="Câmera (Auto)" />
                                 </items>
                                  <HBox.margin>
                                     <Insets bottom="5.0" right="5.0" top="5.0" />
@@ -76,9 +76,9 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane>
+                        <StackPane minHeight="0.0" minWidth="0.0">
                            <children>
-                              <Canvas fx:id="frente" height="374.0" onMouseClicked="#onMouseClickedFrenteListener" width="544.0" VBox.vgrow="ALWAYS" />
+                              <Canvas fx:id="frente" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
                               <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
                                  <image>
                                     <Image url="@../resource/images/Frontal.png" />
@@ -91,7 +91,7 @@
                         </StackPane>
                      </children>
                   </VBox>
-                  <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1">
+                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1">
                      <children>
                         <HBox maxHeight="35.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
                            <children>
@@ -110,8 +110,8 @@
                                     </ImageView>
                                  </graphic>
                                  <items>
-                                    <MenuItem mnemonicParsing="false" text="Action 1" />
-                                    <MenuItem mnemonicParsing="false" text="Action 2" />
+                                    <MenuItem fx:id="lateralCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
+                                    <MenuItem fx:id="lateralCamAuto" mnemonicParsing="false" text="Câmera (Auto)" />
                                  </items>
                                  <HBox.margin>
                                     <Insets bottom="5.0" right="5.0" top="5.0" />
@@ -121,7 +121,7 @@
                         </HBox>
                         <StackPane>
                            <children>
-                              <Canvas fx:id="lateral" height="374.0" onMouseClicked="#onMouseClickedLateralListener" width="544.0" VBox.vgrow="ALWAYS" />
+                              <Canvas fx:id="lateral" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
                               <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
                                  <image>
                                     <Image url="@../resource/images/Lateral.png" />
@@ -134,7 +134,7 @@
                         </StackPane>
                      </children>
                   </VBox>
-                  <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.rowIndex="1">
+                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.rowIndex="1">
                      <children>
                         <HBox maxHeight="35.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
                            <children>
@@ -153,8 +153,8 @@
                                     </ImageView>
                                  </graphic>
                                  <items>
-                                    <MenuItem mnemonicParsing="false" text="Action 1" />
-                                    <MenuItem mnemonicParsing="false" text="Action 2" />
+                                    <MenuItem fx:id="topoCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
+                                    <MenuItem fx:id="topoCamAuto" mnemonicParsing="false" text="Câmera (Auto)" />
                                  </items>
                                  <HBox.margin>
                                     <Insets bottom="5.0" right="5.0" top="5.0" />
@@ -164,7 +164,7 @@
                         </HBox>
                         <StackPane>
                            <children>
-                              <Canvas fx:id="topo" height="374.0" onMouseClicked="#onMouseClickedTopoListener" width="544.0" VBox.vgrow="ALWAYS" />
+                              <Canvas fx:id="topo" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
                               <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
                                  <image>
                                     <Image url="@../resource/images/Topo.png" />
@@ -177,7 +177,7 @@
                         </StackPane>
                      </children>
                   </VBox>
-                  <VBox prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="1">
                      <children>
                         <HBox maxHeight="35.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
                            <children>
@@ -196,8 +196,8 @@
                                     </ImageView>
                                  </graphic>
                                  <items>
-                                    <MenuItem mnemonicParsing="false" text="Action 1" />
-                                    <MenuItem mnemonicParsing="false" text="Action 2" />
+                                    <MenuItem fx:id="persCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
+                                    <MenuItem fx:id="persCamAuto" mnemonicParsing="false" text="Câmera (Auto)" />
                                  </items>
                                  <HBox.margin>
                                     <Insets bottom="5.0" right="5.0" top="5.0" />

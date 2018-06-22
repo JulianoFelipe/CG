@@ -12,16 +12,16 @@ import m.poligonos.Vertice;
  *
  * @author JFPS
  */
-public class Viewport extends Observable {
+public class CGViewport extends Observable {
     private Vertice min; //Window é a dos X;
     private Vertice max;
 
-    public Viewport(Vertice min, Vertice max) {
+    public CGViewport(Vertice min, Vertice max) {
         this.min = min;
         this.max = max;
     }
     
-    public Viewport (Vertice max){
+    public CGViewport (Vertice max){
         this.max = max;
         this.min = new Vertice(0, 0);
     }
@@ -32,6 +32,12 @@ public class Viewport extends Observable {
     }
 
     public void setMax(Vertice max) {
+        this.max = max;
+        notifyObservers();
+    }
+    
+    public void setDimensions(Vertice min, Vertice max){
+        this.min = min;
         this.max = max;
         notifyObservers();
     }

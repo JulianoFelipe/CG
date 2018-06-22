@@ -5,6 +5,7 @@
  */
 package View;
 
+import View.Config.ManualCamController;
 import View.Options.PaintController;
 import View.Options.RegularPolygonController;
 import View.Options.RevBuildController;
@@ -21,9 +22,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.control.Button;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TreeCell;
@@ -32,9 +33,14 @@ import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.Window;
+import static jdk.nashorn.internal.objects.NativeArray.pop;
 import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
@@ -51,13 +57,13 @@ import utils.ioScene.OutputScene;
  */
 public class MainController implements Initializable {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
-    //https://www.youtube.com/watch?v=RY_Rb2UVQKQ
     
-    @FXML private TreeView<String> tools;
     @FXML private MenuBar menu;
     @FXML private MenuItem salvar;
     @FXML private MenuItem carregar;
     @FXML private MenuItem limparCena;
+    
+    @FXML private TreeView<String> tools;
     @FXML private AnchorPane options;
     
     @FXML private Canvas frente;
@@ -65,43 +71,53 @@ public class MainController implements Initializable {
     @FXML private Canvas lateral;
     @FXML private Canvas perspectiva;
     
+    @FXML private MenuItem frenteCamParams;
+    @FXML private MenuItem frenteCamAuto;
+    @FXML private MenuItem lateralCamParams;
+    @FXML private MenuItem lateralCamAuto;
+    @FXML private MenuItem topoCamParams;
+    @FXML private MenuItem topoCamAuto;
+    @FXML private MenuItem persCamParams;
+    @FXML private MenuItem persCamAuto;
+    
     private World mundo;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mundo = World.getInstance();
         
-        initializeTools();
-        initializeMenuBar();
-        paintStuff();
-        //borderPane.setCenter( new CanvasPane(this) );
+        initializeTools(); //Listeners para a barra esquerda de ferramentas
+        initializeMenuBar(); //Listeners para a barra de menu superior
+        initializeViewToolbars(); //Listeners para as 4 barras de ferramentas das views
+        initializeCanvases(); //Listeners para clicks nos canvas (Exceto perspectiva)
         
-        //grid.add(new , NOTHING_SEL, NOTHING_SEL);
+        paintStuff();
     }
     
-    private void initializeTools(){       
+    //<editor-fold defaultstate="collapsed" desc="Listeners gerais para barra de menu e barras de ferramentas">
+    private void initializeTools(){
         TreeItem<String> root = new TreeItem<>("Root");
-             
+        
         TreeItem<String> ferramentas    = new TreeItem<>(Ferramentas.C_NAME);
         TreeItem<String> criacao        = new TreeItem<>(CriacaoPrevolucao.C_NAME);
         TreeItem<String> transformacoes = new TreeItem<>(Transformacoes.C_NAME);
-
+        
         ferramentas.getChildren().addAll(
-            new TreeItem<>(Ferramentas.Select.NAME, new ImageView(Ferramentas.Select.ICON)),
-            new TreeItem<>(Ferramentas.Delete.NAME, new ImageView(Ferramentas.Delete.ICON)),
-            new TreeItem<>(Ferramentas.Paint.NAME,  new ImageView(Ferramentas.Paint.ICON))
+                new TreeItem<>(Ferramentas.Select.NAME, new ImageView(Ferramentas.Select.ICON)),
+                new TreeItem<>(Ferramentas.Delete.NAME, new ImageView(Ferramentas.Delete.ICON)),
+                new TreeItem<>(Ferramentas.Paint.NAME,  new ImageView(Ferramentas.Paint.ICON))
         );
         
         criacao.getChildren().addAll(
-            new TreeItem<>(CriacaoPrevolucao.porPontos.NAME,   new ImageView(CriacaoPrevolucao.porPontos.ICON))//,
-            //new TreeItem<>(CriacaoPrevolucao.porLinha.NAME, new ImageView(CriacaoPrevolucao.porLinha.ICON))
+                new TreeItem<>(CriacaoPrevolucao.porPontos.NAME,   new ImageView(CriacaoPrevolucao.porPontos.ICON))//,
+                //new TreeItem<>(CriacaoPrevolucao.porLinha.NAME, new ImageView(CriacaoPrevolucao.porLinha.ICON))
         );
         
         transformacoes.getChildren().addAll(
-            new TreeItem<>(Transformacoes.Rotacao.NAME,      new ImageView(Transformacoes.Rotacao.ICON)),
-            new TreeItem<>(Transformacoes.Escala.NAME,       new ImageView(Transformacoes.Escala.ICON)),
-            new TreeItem<>(Transformacoes.Translacao.NAME,   new ImageView(Transformacoes.Translacao.ICON)),
-            new TreeItem<>(Transformacoes.Cisalhamento.NAME, new ImageView(Transformacoes.Cisalhamento.ICON))
+                new TreeItem<>(Transformacoes.Rotacao.NAME,      new ImageView(Transformacoes.Rotacao.ICON)),
+                new TreeItem<>(Transformacoes.Escala.NAME,       new ImageView(Transformacoes.Escala.ICON)),
+                new TreeItem<>(Transformacoes.Translacao.NAME,   new ImageView(Transformacoes.Translacao.ICON)),
+                new TreeItem<>(Transformacoes.Cisalhamento.NAME, new ImageView(Transformacoes.Cisalhamento.ICON))
         );
         
         root.getChildren().addAll(ferramentas, criacao, transformacoes);
@@ -112,12 +128,12 @@ public class MainController implements Initializable {
     
     private void initializeMenuBar(){
         salvar.setOnAction((ActionEvent event) -> {
-            FileChooser fileChooser = new FileChooser(); 
+            FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Arquivos de CG (*.jas)", "*.jas");
             fileChooser.getExtensionFilters().add(extFilter);
             File file = fileChooser.showSaveDialog(menu.getScene().getWindow());
-
+            
             if(file != null){
                 try {
                     OutputScene.outputToFile(mundo.getObjects(), file);
@@ -133,7 +149,7 @@ public class MainController implements Initializable {
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Arquivos de CG (*.jas)", "*.jas");
             fileChooser.getExtensionFilters().add(extFilter);
             File file = fileChooser.showOpenDialog(menu.getScene().getWindow());
-
+            
             if(file != null){
                 try {
                     List<CGObject> objectsList = InputScene.getListFromFile(file);
@@ -151,91 +167,95 @@ public class MainController implements Initializable {
             }
         });
         
-        limparCena.setOnAction((ActionEvent event) -> { 
+        limparCena.setOnAction((ActionEvent event) -> {
             mundo.clearAll();
             paintStuff();
             
         });
     }
     
-    public static final byte NOTHING_SEL       = -1;
-    public static final byte FERRAMENTA_SEL    = 0;
-    public static final byte REVOLUCAO_SEL     = 1;
-    public static final byte TRANSFORMACAO_SEL = 2;
-    
-    private byte CURRENT_SEL = NOTHING_SEL;
-    private Ferramentas current_ferr;
-    private CriacaoPrevolucao current_pol;
-    private Transformacoes current_tra;
-    
-    private Parent paintOption;
-    private PaintController paintControl;
-    private Parent regularOption;
-    private RegularPolygonController regularControl;
-    private Parent revBuildOption;
-    private RevBuildController revBuildController;
-    
-    @FXML //Clicar na árvore de ferramentas
-    private void onMouseClickedToolsListener(MouseEvent e){
-        Node node = e.getPickResult().getIntersectedNode();
-        if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)){
-            String name = (String) ((TreeItem)tools.getSelectionModel().getSelectedItem()).getValue();
+    private void initializeViewToolbars(){
+        frenteCamParams.setOnAction((ActionEvent event) -> {
+            Pane pane = null;
             
-            Ferramentas       ferr = Ferramentas.fromString(name);
-            CriacaoPrevolucao  pol = CriacaoPrevolucao.fromString(name);
-            Transformacoes     tra = Transformacoes.fromString(name);
-            
-            if (ferr != null){
-                CURRENT_SEL = FERRAMENTA_SEL;
-                current_ferr = ferr;
-            } else if (pol != null){
-                CURRENT_SEL = REVOLUCAO_SEL;
-                current_pol = pol;
-            } else if (tra != null){
-                CURRENT_SEL = TRANSFORMACAO_SEL;
-                current_tra = tra;
-            } else {
-                CURRENT_SEL = NOTHING_SEL;
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Config/ManualCam.fxml"));
+            loader.setController(new ManualCamController());
+            try {
+                pane = loader.load();
+            } catch (IOException ex) {
+                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
             }
-            
-            handleSelectedTool();
-        }
+
+            final Stage dialog = new Stage();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initOwner(menu.getScene().getWindow());
+            Scene dialogScene = new Scene(pane);
+            dialog.setResizable(false);
+            dialog.setTitle("Câmera Frontal");
+            dialog.setScene(dialogScene);
+            dialog.show();
+        });
+        frenteCamAuto.setOnAction((ActionEvent event) -> {
+            throw new UnsupportedOperationException("Not supported yet.");
+        });
+        
+        lateralCamParams.setOnAction((ActionEvent event) -> {
+            throw new UnsupportedOperationException("Not supported yet.");
+        });
+        lateralCamAuto.setOnAction((ActionEvent event) -> {
+            throw new UnsupportedOperationException("Not supported yet.");
+        });
+        
+        topoCamParams.setOnAction((ActionEvent event) -> {
+            throw new UnsupportedOperationException("Not supported yet.");
+        });
+        topoCamAuto.setOnAction((ActionEvent event) -> {
+            throw new UnsupportedOperationException("Not supported yet.");
+        });
+        
+        persCamParams.setOnAction((ActionEvent event) -> {
+            throw new UnsupportedOperationException("Not supported yet.");
+        });
+        persCamAuto.setOnAction((ActionEvent event) -> {
+            throw new UnsupportedOperationException("Not supported yet.");
+        });
     }
+//</editor-fold>
     
-    @FXML
-    private void onMouseClickedFrenteListener(MouseEvent e){
-        System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
-        if (CURRENT_SEL == REVOLUCAO_SEL){
-            if (current_pol == CriacaoPrevolucao.porPontos){
-                mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
-                //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+    //<editor-fold defaultstate="collapsed" desc="Operações em cima dos Canvas">
+    private void initializeCanvases(){
+        frente.setOnMouseClicked((MouseEvent e) -> {
+            System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
+            if (CURRENT_SEL == REVOLUCAO_SEL){
+                if (current_pol == CriacaoPrevolucao.porPontos){
+                    mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
+                    //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+                }
             }
-        }
-        paintStuff();
-    }
-    
-    @FXML
-    private void onMouseClickedLateralListener(MouseEvent e){
-        System.out.println("Lateral Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
-        if (CURRENT_SEL == REVOLUCAO_SEL){
-            if (current_pol == CriacaoPrevolucao.porPontos){
-                mundo.addTempPoint(new Vertice(0, (float) e.getX(), (float) e.getY()));
-                //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+            paintStuff();
+        });
+        
+        lateral.setOnMouseClicked((MouseEvent e) -> {
+            System.out.println("Lateral Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
+            if (CURRENT_SEL == REVOLUCAO_SEL){
+                if (current_pol == CriacaoPrevolucao.porPontos){
+                    mundo.addTempPoint(new Vertice(0, (float) e.getX(), (float) e.getY()));
+                    //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+                }
             }
-        }
-        paintStuff();
-    }
-    
-    @FXML
-    private void onMouseClickedTopoListener(MouseEvent e){
-        System.out.println("Topo Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
-        if (CURRENT_SEL == REVOLUCAO_SEL){
-            if (current_pol == CriacaoPrevolucao.porPontos){
-                mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
-                //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+            paintStuff();
+        });
+        
+        topo.setOnMouseClicked((MouseEvent e) -> {
+            System.out.println("Topo Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
+            if (CURRENT_SEL == REVOLUCAO_SEL){
+                if (current_pol == CriacaoPrevolucao.porPontos){
+                    mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
+                    //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+                }
             }
-        }
-        paintStuff();
+            paintStuff();
+        });
     }
     
     private void paintStuff(){
@@ -304,32 +324,103 @@ public class MainController implements Initializable {
         cl.clearRect(0, 0, perspectiva.getWidth(), perspectiva.getHeight());
     }
     
+    private Canvas getCanvasFromView(Vista vista){
+        switch (vista.getVisao()){
+            case Frontal:
+                return frente;
+            case Lateral:
+                return lateral;
+            case Topo:
+                return topo;
+            case Perspectiva:
+                return perspectiva;
+            default:
+                throw new IllegalArgumentException("Visão não prevista.");
+                    
+        }
+    }
+//</editor-fold>
+    
+    public void cancelTempPoints(){
+        mundo.clearTemp();
+        paintStuff();
+    }
+    
+    public void finalizeTempPoints(){
+        
+    }
+    
+    //<editor-fold defaultstate="collapsed" desc="Seleção e carregamento da barra de ferramentas lateral esquerda">
+    public static final byte NOTHING_SEL       = -1;
+    public static final byte FERRAMENTA_SEL    = 0;
+    public static final byte REVOLUCAO_SEL     = 1;
+    public static final byte TRANSFORMACAO_SEL = 2;
+    
+    private byte CURRENT_SEL = NOTHING_SEL;
+    private Ferramentas current_ferr;
+    private CriacaoPrevolucao current_pol;
+    private Transformacoes current_tra;
+    
+    private Parent paintOption;
+    private PaintController paintControl;
+    private Parent regularOption;
+    private RegularPolygonController regularControl;
+    private Parent revBuildOption;
+    private RevBuildController revBuildController;
+    
+    @FXML //Clicar na árvore de ferramentas
+    private void onMouseClickedToolsListener(MouseEvent e){
+        Node node = e.getPickResult().getIntersectedNode();
+        if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)){
+            String name = (String) ((TreeItem)tools.getSelectionModel().getSelectedItem()).getValue();
+            
+            Ferramentas       ferr = Ferramentas.fromString(name);
+            CriacaoPrevolucao  pol = CriacaoPrevolucao.fromString(name);
+            Transformacoes     tra = Transformacoes.fromString(name);
+            
+            if (ferr != null){
+                CURRENT_SEL = FERRAMENTA_SEL;
+                current_ferr = ferr;
+            } else if (pol != null){
+                CURRENT_SEL = REVOLUCAO_SEL;
+                current_pol = pol;
+            } else if (tra != null){
+                CURRENT_SEL = TRANSFORMACAO_SEL;
+                current_tra = tra;
+            } else {
+                CURRENT_SEL = NOTHING_SEL;
+            }
+            
+            handleSelectedTool();
+        }
+    }
+    
     private void loadPaint(){
-        try { 
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/PaintOption.fxml"));
             loader.setController(paintControl);
             paintOption = loader.load();
-        } catch (IOException ex) {  
+        } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
     }
     
-    /*private void loadRegular(){
-        try { 
+    private void loadRegular(){
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/RegularPolygonOption.fxml"));
             loader.setController(regularControl);
             regularOption = loader.load();
-        } catch (IOException ex) {  
+        } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
-    }*/
+    }
     
     private void loadRevPorPontos(){
-        try { 
+        try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/RevBuildOption.fxml"));
             loader.setController(revBuildController);
             revBuildOption = loader.load();
-        } catch (IOException ex) {  
+        } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
     }
@@ -362,53 +453,29 @@ public class MainController implements Initializable {
                 break;
         }
     }
-
+    
     public PaintController getPaintControl() {
         return paintControl;
     }
-
+    
     public RegularPolygonController getRegularControl() {
         return regularControl;
     }
-
+    
     public byte getCurrentSelection() {
         return CURRENT_SEL;
     }
-
+    
     public Ferramentas getCurrentFerramenta() {
         return current_ferr;
     }
-
+    
     public CriacaoPrevolucao getCurrentTipoDePoligono() {
         return current_pol;
     }
-
+    
     public Transformacoes getCurrentTrasformacao() {
         return current_tra;
     }
-    
-    public void cancelTempPoints(){
-        mundo.clearTemp();
-        paintStuff();
-    }
-    
-    public void finalizeTempPoints(){
-        
-    }
-    
-    private Canvas getCanvasFromView(Vista vista){
-        switch (vista.getVisao()){
-            case Frontal:
-                return frente;
-            case Lateral:
-                return lateral;
-            case Topo:
-                return topo;
-            case Perspectiva:
-                return perspectiva;
-            default:
-                throw new IllegalArgumentException("Visão não prevista.");
-                    
-        }
-    }
+//</editor-fold>
 }

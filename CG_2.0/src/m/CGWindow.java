@@ -11,11 +11,11 @@ import java.util.Observable;
  *
  * @author JFPS
  */
-public class Window extends Observable{
+public class CGWindow extends Observable{
     private int altura;
     private int largura;
 
-    public Window(int largura, int altura) {
+    public CGWindow(int largura, int altura) {
         this.altura = altura;
         this.largura = largura;
     }
@@ -26,6 +26,12 @@ public class Window extends Observable{
     }
 
     public void setAltura(int altura) {
+        this.altura = altura;
+        notifyObservers();
+    }
+    
+    public void setDimensions(int largura, int altura){
+        this.largura = largura;
         this.altura = altura;
         notifyObservers();
     }

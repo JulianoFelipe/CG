@@ -6,9 +6,9 @@
 package View;
 
 import m.Camera;
-import m.Viewport;
+import m.CGViewport;
 import m.Visao;
-import m.Window;
+import m.CGWindow;
 import m.pipeline.OrtPipeline;
 import m.poligonos.Poligono;
 import m.poligonos.Vertice;
@@ -33,8 +33,8 @@ public class Teste_Pipeline {
         
         Camera cam = new Camera(ViewUp, VRP, P);
        
-        Window win    = new Window(16, 10);
-        Viewport view = new Viewport(new Vertice(0, 0),
+        CGWindow win    = new CGWindow(16, 10);
+        CGViewport view = new CGViewport(new Vertice(0, 0),
                                      new Vertice(320, 240) );
         
         OrtPipeline pipe = new OrtPipeline(Visao.Frontal, cam, win, view);

@@ -95,6 +95,10 @@ public class World {
         return objetos;
     }
     
+    public List<Vertice> getTempPoints(){
+        return tempPoints;
+    }
+    
     public void clearAll(){
         tempPoints.clear();
         objetos.clear();

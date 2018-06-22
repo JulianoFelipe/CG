@@ -8,9 +8,9 @@ package m.pipeline;
 import java.util.List;
 import java.util.Observable;
 import m.Camera;
-import m.Viewport;
+import m.CGViewport;
 import m.Visao;
-import m.Window;
+import m.CGWindow;
 import m.poligonos.CGObject;
 import utils.math.MMath;
 
@@ -24,7 +24,7 @@ public class PersPipeline extends CGPipeline{
     private float[][] matrizVistaPers;
     private boolean changed = true;
 
-    public PersPipeline(float DP, Camera cam, Window win, Viewport view) {
+    public PersPipeline(float DP, Camera cam, CGWindow win, CGViewport view) {
         super(cam, win, view);
         this.DP = DP;
     }
@@ -77,7 +77,7 @@ public class PersPipeline extends CGPipeline{
         //System.out.println("\n MATRIZ DEPOIS DE DIVISÃO PERSPECTIVA");
         //MMath.printMatrix(retPoints);
         retPoints = multiply2D(get2DPipelineMatrix(), retPoints);
-        //System.out.println("\n MATRIZ DEPOIS DE PIPE 2D (Window e Viewport)");
+        //System.out.println("\n MATRIZ DEPOIS DE PIPE 2D (CGWindow e CGViewport)");
         //MMath.printMatrix(retPoints);
         object.setPointMatrix(retPoints);
     }
@@ -107,5 +107,15 @@ public class PersPipeline extends CGPipeline{
     @Override
     public Visao getVisao() {
         return Visao.Perspectiva;
+    }
+
+    @Override
+    public void reverseConversion(List<CGObject> lista) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void reverseConversion(CGObject object) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

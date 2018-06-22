@@ -57,7 +57,7 @@ public class Teste_Grid extends Application {
             graph.setStroke(Color.RED); //Cor da linha
             graph.setLineWidth(5); //Espessura da linha
             
-            Desenha aqui
+            ///Desenha aqui
             graph.strokeLine(0, 0, canvas.getWidth(), canvas.getHeight());
             
             

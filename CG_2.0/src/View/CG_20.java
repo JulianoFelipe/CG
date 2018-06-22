@@ -11,10 +11,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import m.Camera;
-import m.Viewport;
+import m.CGViewport;
 import m.Visao;
 import m.Vista;
-import m.Window;
+import m.CGWindow;
 import m.World;
 import m.poligonos.Vertice;
 import m.pipeline.OrtPipeline;
@@ -26,13 +26,12 @@ import m.poligonos.Poligono;
  * @author JFPS
  */
 public class CG_20 extends Application {
-    
     public static final MainController main = new MainController();
     
     ///                                          ViewUp              VRP                                                 p
     private static Camera cam1 = new Camera( new Vertice(0,1,0), new Vertice((float) 0, (float) 0, (float) 0), new Vertice(0, 0, 0) );
-    private static Window   win1  = new Window(544, -374); //?????
-    private static Viewport view1 = new Viewport( new Vertice(0, 0), new Vertice(544, 374) );
+    private static CGWindow   win1  = new CGWindow(544, 374); //?????
+    private static CGViewport view1 = new CGViewport( new Vertice(0, 0), new Vertice(544, 374) );
     private static Camera cam2 = new Camera( new Vertice(0,1,0), new Vertice((float) 10, (float) 0, (float) 0), new Vertice(0, 0, 0) );
     private static Camera cam3 = new Camera( new Vertice(0,0,-1), new Vertice((float) 0, (float) 10, (float) 0), new Vertice(0, 0, 0) );
     private static Camera cam4 = new Camera( new Vertice(0,1,0), new Vertice((float) 50, (float) 15, (float) 30), new Vertice(0, 0, 0) );

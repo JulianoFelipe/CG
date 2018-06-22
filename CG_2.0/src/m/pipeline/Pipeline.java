@@ -18,4 +18,8 @@ public interface Pipeline extends Observer{
     public void convert2D(List<CGObject> lista);
     
     public void convert2D(CGObject object);
+    
+    public void reverseConversion(List<CGObject> lista);
+    
+    public void reverseConversion(CGObject object);
 }
