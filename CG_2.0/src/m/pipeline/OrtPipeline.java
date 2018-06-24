@@ -5,8 +5,6 @@
  */
 package m.pipeline;
 
-import java.util.Arrays;
-import java.util.List;
 import m.Camera;
 import m.CGViewport;
 import m.Visao;
@@ -58,19 +56,47 @@ public class OrtPipeline extends CGPipeline{
     @Override
     public void reverseConversion(CGObject object) {       
         float[][] retPoints = MMath.removeFactor(object.getPointMatrix());
+        
+        System.out.println("OBJ POINTS: ");
+        MMath.printMatrix(retPoints);
+        System.out.println("JP POINTS: ");
+        MMath.printMatrix(getMatrixJP());
+        
         float[][] invJP = MMath.invert3x3Matrix(getMatrixJP());
 
+        System.out.println("INV JP: ");
+        MMath.printMatrix(invJP);
+        
         if (invJP != null)
             retPoints = MMath.multiplicar(invJP, retPoints);
+        
+        System.out.println("POINTS AFTER INV JP: ");
+        MMath.printMatrix(retPoints);
+        System.out.println("MATRIX PROJ: ");
+        MMath.printMatrix(getMatrixProj());
         
         retPoints = MMath.addFactor(retPoints);
         invJP = MMath.invert4x4Matrix(getMatrixProj());
+        
+        /*System.out.println("INV MATRIX PROJ: ");
+        MMath.printMatrix(invJP);
+        if (invJP != null)
+            retPoints = MMath.multiplicar(invJP, retPoints);*/
+        
+        System.out.println("POINTS AFTER INV JP: ");
+        MMath.printMatrix(retPoints);
+        System.out.println("MATRIX SRU SRC: ");
+        MMath.printMatrix(getMatrizSRUsrc());
+        
+        invJP = MMath.invert4x4Matrix(getMatrizSRUsrc());
+        System.out.println("INV MATRIX SRU SRC: ");
+        MMath.printMatrix(invJP);
+        
         if (invJP != null)
             retPoints = MMath.multiplicar(invJP, retPoints);
         
-        invJP = MMath.invert4x4Matrix(getMatrizSRUsrc());
-        if (invJP != null)
-            retPoints = MMath.multiplicar(invJP, retPoints);
+        System.out.println("POINTS AFTER INV SRUSRC: ");
+        MMath.printMatrix(retPoints);
         
         object.setAll(retPoints);
     }
@@ -103,13 +129,13 @@ public class OrtPipeline extends CGPipeline{
     protected static final class MatrizOrtografica{
         protected static final float[][] MAT_TOPO = {
             { 1, 0,  0, 0},
-            { 0, 0,  0, 0},
+            { 0, 1,  0, 0},
             { 0, 0,  1, 0},
             { 0, 0,  0, 1}
         };
         
         protected static final float[][] MAT_LATERAL = {
-            { 0, 0,  0, 0},
+            { 1, 0,  0, 0},
             { 0, 1,  0, 0},
             { 0, 0, -1, 0},
             { 0, 0,  0, 1}

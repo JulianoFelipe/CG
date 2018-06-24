@@ -128,7 +128,7 @@ public class MMath {
             newRes[0][j] = matrix[0][j];
             newRes[1][j] = matrix[1][j];
             newRes[2][j] = matrix[2][j];
-            newRes[2][j] = 1;
+            newRes[3][j] = 1;
         }
 
         return newRes;

@@ -47,6 +47,7 @@ import m.Visao;
 import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
+import m.poligonos.Nregular;
 import m.poligonos.Vertice;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
@@ -185,7 +186,7 @@ public class MainController implements Initializable {
             );
             
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
-                System.out.println("CAM MUDOU. PROPAGANDO.");
+                //System.out.println("CAM MUDOU. PROPAGANDO.");
                 getVistaFromVisao(Visao.Frontal).getPipelineCamera().set(newValue);
                 paintStuff();
             });
@@ -199,14 +200,36 @@ public class MainController implements Initializable {
         });
         
         lateralCamParams.setOnAction((ActionEvent event) -> {
-            throw new UnsupportedOperationException("Not supported yet.");
+            ManualCamController controller = new ManualCamController(
+                getVistaFromVisao(Visao.Lateral).getPipelineCamera(), Visao.Lateral
+            );
+            
+            controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
+                getVistaFromVisao(Visao.Lateral).getPipelineCamera().set(newValue);
+                paintStuff();
+            });
+            
+            final Stage dialog = getManualCamWindow(controller);
+            dialog.setTitle("Câmera Lateral");
+            dialog.show();
         });
         lateralCamAuto.setOnAction((ActionEvent event) -> {
             throw new UnsupportedOperationException("Not supported yet.");
         });
         
         topoCamParams.setOnAction((ActionEvent event) -> {
-            throw new UnsupportedOperationException("Not supported yet.");
+            ManualCamController controller = new ManualCamController(
+                getVistaFromVisao(Visao.Topo).getPipelineCamera(), Visao.Topo
+            );
+            
+            controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
+                getVistaFromVisao(Visao.Topo).getPipelineCamera().set(newValue);
+                paintStuff();
+            });
+            
+            final Stage dialog = getManualCamWindow(controller);
+            dialog.setTitle("Câmera Topo");
+            dialog.show();
         });
         topoCamAuto.setOnAction((ActionEvent event) -> {
             throw new UnsupportedOperationException("Not supported yet.");
@@ -264,8 +287,12 @@ public class MainController implements Initializable {
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
                     
                     Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
-                    getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newPoint);
-                    mundo.addTempPoint(newPoint);
+                    //getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newPoint);
+                    //mundo.addTempPoint(newPoint);
+                    
+                    Nregular newreg = new Nregular(6, 66, newPoint);
+                    getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newreg);
+                    mundo.addObject(newreg);
                 }
             }
             paintStuff();
@@ -278,9 +305,15 @@ public class MainController implements Initializable {
                     //mundo.addTempPoint(new Vertice(0, (float) e.getX(), (float) e.getY()));
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
                     
-                    Vertice newPoint = new Vertice(0, (float) e.getX(), (float) e.getY());
-                    getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newPoint);
-                    mundo.addTempPoint(newPoint);
+                    Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
+                    System.out.println("VERT LATERAL: " + newPoint);
+                    //getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newPoint);
+                    //System.out.println("VERT MUNDO: " + newPoint);
+                    //mundo.addTempPoint(newPoint);
+                    
+                    Nregular newreg = new Nregular(6, 66, newPoint);
+                    getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newreg);
+                    mundo.addObject(newreg);
                 }
             }
             paintStuff();
@@ -293,9 +326,14 @@ public class MainController implements Initializable {
                     //mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
                     
-                    Vertice newPoint = new Vertice((float) e.getX(), 0, (float) e.getY());
-                    getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newPoint);
-                    mundo.addTempPoint(newPoint);
+                    Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
+                    Vertice newPointCP = new Vertice(newPoint);
+                    //getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newPoint);
+                    //mundo.addTempPoint(newPoint);
+                    
+                    Nregular newreg = new Nregular(6, 66, newPointCP);
+                    getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newreg);
+                    mundo.addObject(newreg);
                 }
             }
             paintStuff();
@@ -343,7 +381,8 @@ public class MainController implements Initializable {
             graphs.beginPath();           
             Vertice point1 = vertices.get(0);
             graphs.fillOval(point1.getX(), point1.getY(), 5, 5);
-            
+            if (vista.getVisao().equals(Visao.Lateral))
+                System.out.println("Point: " + point1);
             Vertice point2 = null;
             for (int i=1; i<vertices.size(); i++){
                 point2 = vertices.get(i);
