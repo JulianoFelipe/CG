@@ -98,26 +98,7 @@ public abstract class CGPipeline extends Observable implements Pipeline{
     }
     
     protected float[][] getMatrizSRCsru(){
-        Vertice u   = cam.getVetorU();
-        Vertice v   = cam.getVetorV();
-        Vertice n   = cam.getVetorN();
-        Vertice VRP = cam.getVRP();
-           
-        Vertice minusVRP = new Vertice(-VRP.getX(), -VRP.getY(), -VRP.getZ());
-        
-        return new float[][] {
-            {u.getX(), u.getY(), u.getZ(), (float)VMath.produtoEscalar(minusVRP, u)},
-            {v.getX(), v.getY(), v.getZ(), (float)VMath.produtoEscalar(minusVRP, v)},
-            {n.getX(), n.getY(), n.getZ(), (float)VMath.produtoEscalar(minusVRP, n)},
-            {       0,        0,        0,           1}
-        };
-        
-        /*return new float[][] {
-            {u.getX(), u.getY(), u.getZ(), ((-VRP.getX()*u.getX())+(-VRP.getY()*u.getY())+(-VRP.getZ()*u.getZ()))},
-            {v.getX(), v.getY(), v.getZ(), ((-VRP.getX()*v.getX())+(-VRP.getY()*v.getY())+(-VRP.getZ()*v.getZ()))},
-            {n.getX(), n.getY(), n.getZ(), ((-VRP.getX()*n.getX())+(-VRP.getY()*n.getY())+(-VRP.getZ()*n.getZ()))},
-            {       0,        0,        0,           1}
-        };*/
+        return MMath.invert4x4Matrix(getMatrizSRUsrc());
     }
     
     protected final void updateMatrixJP(){

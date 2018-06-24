@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import m.pipeline.CGPipeline;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
+import utils.math.MMath;
 
 /**
  *
@@ -103,5 +104,9 @@ public class Vista implements Observer{
     
     public Camera getPipelineCamera(){
         return pipe.getCamera();
+    }
+    
+    public CGPipeline getPipe(){
+        return pipe;
     }
 }

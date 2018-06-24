@@ -5,6 +5,7 @@
  */
 package m.pipeline;
 
+import java.util.Arrays;
 import java.util.List;
 import m.Camera;
 import m.CGViewport;
@@ -47,16 +48,31 @@ public class OrtPipeline extends CGPipeline{
     public void convert2D(CGObject object) {
         //MMath.printMatrix(object.getPointMatrix());
         
-        float[][] retPoints = MMath.multiplicar(get3DPipelineMatrix(), object.getPointMatrix());
+        float[][] retPoints = MMath.multiplicar(get3DPipelineMatrix(), object.getPointMatrix());        
         retPoints = MMath.removeFactor(retPoints);
         retPoints = MMath.multiplicar(getMatrixJP(), retPoints);
-
+        
         object.setAll(retPoints);
     }
     
     @Override
-    public void reverseConversion(CGObject object) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public void reverseConversion(CGObject object) {       
+        float[][] retPoints = MMath.removeFactor(object.getPointMatrix());
+        float[][] invJP = MMath.invert3x3Matrix(getMatrixJP());
+
+        if (invJP != null)
+            retPoints = MMath.multiplicar(invJP, retPoints);
+        
+        retPoints = MMath.addFactor(retPoints);
+        invJP = MMath.invert4x4Matrix(getMatrixProj());
+        if (invJP != null)
+            retPoints = MMath.multiplicar(invJP, retPoints);
+        
+        invJP = MMath.invert4x4Matrix(getMatrizSRUsrc());
+        if (invJP != null)
+            retPoints = MMath.multiplicar(invJP, retPoints);
+        
+        object.setAll(retPoints);
     }
     
     public float[][] get3DPipelineMatrix(){

@@ -27,7 +27,7 @@ public class Teste_Pipeline {
         
         Vertice ViewUp = new Vertice(0, 1, 0);
         Vertice VRP    = new Vertice((float) 50, (float) 15, (float) 30);
-        Vertice P      = new Vertice(20, 6, 15);
+        Vertice P      = new Vertice(0, 0, 0);
         
         MMath.printMatrix(VRP.getPointMatrix());
         

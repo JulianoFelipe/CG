@@ -259,8 +259,13 @@ public class MainController implements Initializable {
             System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
                 if (current_pol == CriacaoPrevolucao.free){
-                    mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
+                    //mundo.addTempPoint(new Vertice((float) -34, (float) 9));
+                    //mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+                    
+                    Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
+                    getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newPoint);
+                    mundo.addTempPoint(newPoint);
                 }
             }
             paintStuff();
@@ -270,8 +275,12 @@ public class MainController implements Initializable {
             System.out.println("Lateral Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
                 if (current_pol == CriacaoPrevolucao.free){
-                    mundo.addTempPoint(new Vertice(0, (float) e.getX(), (float) e.getY()));
+                    //mundo.addTempPoint(new Vertice(0, (float) e.getX(), (float) e.getY()));
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+                    
+                    Vertice newPoint = new Vertice(0, (float) e.getX(), (float) e.getY());
+                    getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newPoint);
+                    mundo.addTempPoint(newPoint);
                 }
             }
             paintStuff();
@@ -281,8 +290,12 @@ public class MainController implements Initializable {
             System.out.println("Topo Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
                 if (current_pol == CriacaoPrevolucao.free){
-                    mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
+                    //mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+                    
+                    Vertice newPoint = new Vertice((float) e.getX(), 0, (float) e.getY());
+                    getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newPoint);
+                    mundo.addTempPoint(newPoint);
                 }
             }
             paintStuff();
@@ -330,6 +343,7 @@ public class MainController implements Initializable {
             graphs.beginPath();           
             Vertice point1 = vertices.get(0);
             graphs.fillOval(point1.getX(), point1.getY(), 5, 5);
+            
             Vertice point2 = null;
             for (int i=1; i<vertices.size(); i++){
                 point2 = vertices.get(i);

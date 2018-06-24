@@ -38,7 +38,7 @@ public class PersPipeline extends CGPipeline{
        
     @Override
     public void convert2D(CGObject object) {
-        MMath.printMatrix(object.getPointMatrix());
+        //MMath.printMatrix(object.getPointMatrix());
         
         float[][] retPoints = MMath.multiplicar(get3DPipelineMatrix(), object.getPointMatrix());
         retPoints = persMatrixSwitcheroo(retPoints); 
@@ -47,13 +47,14 @@ public class PersPipeline extends CGPipeline{
 
         object.setAll(retPoints);
         
-        System.out.println("AFTER CHANGE");
-        MMath.printMatrix(object.getPointMatrix());
+        //System.out.println("AFTER CHANGE");
+        //MMath.printMatrix(object.getPointMatrix());
     }
 
     @Override
     public void reverseConversion(CGObject object) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        float[][] retPoints = MMath.multiplicar(getMatrizSRCsru(), object.getPointMatrix());
+        object.setAll(retPoints);
     }
         
     public float[][] get3DPipelineMatrix(){
