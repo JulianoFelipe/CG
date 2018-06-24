@@ -29,19 +29,33 @@ public class Camera extends Observable{
         this.ViewUp = ViewUp;
         this.VRP = VRP;
         this.P = P;
+        /*this.ViewUp = new Vertice(ViewUp);
+        this.VRP    = new Vertice(VRP);
+        this.P      = new Vertice(P);*/
+        calculateNVU();
+    }
+
+    public Camera(Camera toCopy) {
+        this.ViewUp = new Vertice(toCopy.ViewUp);
+        this.VRP    = new Vertice(toCopy.VRP);
+        this.P      = new Vertice(toCopy.P);
         calculateNVU();
     }
 
     public void setViewUp(Vertice ViewUp) {
         this.ViewUp = ViewUp;
         changed = true;
+        setChanged(); //??????
         notifyObservers();
+        clearChanged(); //?????
     }
 
     public void setVRP(Vertice VRP) {
         this.VRP = VRP;
         changed = true;
+        setChanged(); //??????
         notifyObservers();
+        clearChanged(); //?????
     }
     
     public Vertice getVRP(){
@@ -51,7 +65,9 @@ public class Camera extends Observable{
     public void setP(Vertice P) {
         this.P = P;
         changed = true;
+        setChanged(); //??????
         notifyObservers();
+        clearChanged(); //?????
     }
 
     public Vertice getVetorN() {
@@ -95,4 +111,30 @@ public class Camera extends Observable{
         
         uNormalizado = VMath.produtoVetorial(vNormalizado, nNormalizado);
     }
+
+    public Vertice getViewUp() {
+        return ViewUp;
+    }
+
+    public Vertice getP() {
+        return P;
+    }
+    
+    public void set(Camera cam){
+        this.VRP = cam.VRP;
+        this.ViewUp = cam.ViewUp;
+        this.P = cam.P;
+        changed = true;
+
+        setChanged(); //??????
+        notifyObservers();
+        clearChanged(); //?????
+    }
+
+    @Override
+    public String toString() {
+        return "Camera{" + "ViewUp=" + ViewUp + ", VRP=" + VRP + ", P=" + P + '}';
+    }
+    
+    
 }

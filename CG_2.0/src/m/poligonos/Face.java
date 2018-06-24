@@ -12,11 +12,17 @@ import java.util.List;
  *
  * @author JFPS
  */
-public class Face { //extends CGObject{
+public class Face extends CGObject{ //extends CGObject{
     private List<Aresta> listaAresta;
     
     public Face (List<Aresta> lista){
-        this.listaAresta = new ArrayList<>(lista);
+        super(lista.size()*2);
+        throw new IllegalArgumentException("Arrumar implementação");
+    }
+    
+    public Face (Face f){
+        super(f.getNumberOfArestas()*2);
+        throw new IllegalArgumentException("Arrumar implementação");
     }
 
     @Override
@@ -25,5 +31,7 @@ public class Face { //extends CGObject{
         return "Face{" + listaAresta.size() + " arestas." + '}';
     }
     
-    
+    public int getNumberOfArestas(){
+        return listaAresta.size();
+    }
 }

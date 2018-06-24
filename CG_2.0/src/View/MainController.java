@@ -9,6 +9,7 @@ import View.Config.ManualCamController;
 import View.Options.PaintController;
 import View.Options.RegularPolygonController;
 import View.Options.RevBuildController;
+import com.sun.javafx.property.adapter.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -16,6 +17,8 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -39,8 +42,8 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.Window;
-import static jdk.nashorn.internal.objects.NativeArray.pop;
+import m.Camera;
+import m.Visao;
 import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
@@ -136,7 +139,7 @@ public class MainController implements Initializable {
             
             if(file != null){
                 try {
-                    OutputScene.outputToFile(mundo.getObjects(), file);
+                    OutputScene.outputToFile(mundo.getObjectsCopy(), file);
                 } catch (IOException ex) {
                     Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -176,23 +179,19 @@ public class MainController implements Initializable {
     
     private void initializeViewToolbars(){
         frenteCamParams.setOnAction((ActionEvent event) -> {
-            Pane pane = null;
+            System.out.println(getVistaFromVisao(Visao.Frontal).getPipelineCamera());
+            ManualCamController controller = new ManualCamController(
+                getVistaFromVisao(Visao.Frontal).getPipelineCamera(), Visao.Frontal
+            );
             
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Config/ManualCam.fxml"));
-            loader.setController(new ManualCamController());
-            try {
-                pane = loader.load();
-            } catch (IOException ex) {
-                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            final Stage dialog = new Stage();
-            dialog.initModality(Modality.APPLICATION_MODAL);
-            dialog.initOwner(menu.getScene().getWindow());
-            Scene dialogScene = new Scene(pane);
-            dialog.setResizable(false);
+            controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
+                System.out.println("CAM MUDOU. PROPAGANDO.");
+                getVistaFromVisao(Visao.Frontal).getPipelineCamera().set(newValue);
+                paintStuff();
+            });
+            
+            final Stage dialog = getManualCamWindow(controller);
             dialog.setTitle("Câmera Frontal");
-            dialog.setScene(dialogScene);
             dialog.show();
         });
         frenteCamAuto.setOnAction((ActionEvent event) -> {
@@ -214,11 +213,43 @@ public class MainController implements Initializable {
         });
         
         persCamParams.setOnAction((ActionEvent event) -> {
-            throw new UnsupportedOperationException("Not supported yet.");
+            ManualCamController controller = new ManualCamController(
+                getVistaFromVisao(Visao.Perspectiva).getPipelineCamera(), Visao.Perspectiva
+            );
+            
+            controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
+                getVistaFromVisao(Visao.Perspectiva).getPipelineCamera().set(newValue);
+                paintStuff();
+            });
+            
+            final Stage dialog = getManualCamWindow(controller);
+            dialog.setTitle("Câmera Perspectiva");
+            dialog.show();
         });
         persCamAuto.setOnAction((ActionEvent event) -> {
             throw new UnsupportedOperationException("Not supported yet.");
         });
+    }
+    
+    private Stage getManualCamWindow(ManualCamController controller){
+        Pane pane = null;
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Config/ManualCam.fxml"));
+        loader.setController(controller);
+        try {
+            pane = loader.load();
+        } catch (IOException ex) {
+            Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        final Stage dialog = new Stage();
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.initOwner(menu.getScene().getWindow());
+        Scene dialogScene = new Scene(pane);
+        dialog.setResizable(false);
+        dialog.setScene(dialogScene);
+
+        return dialog;
     }
 //</editor-fold>
     
@@ -259,6 +290,7 @@ public class MainController implements Initializable {
     }
     
     private void paintStuff(){
+        System.out.println("PAINT");
         clearCanvases();
         
         for (Vista vista : mundo.getVistas()){
@@ -348,6 +380,15 @@ public class MainController implements Initializable {
     
     public void finalizeTempPoints(){
         
+    }
+    
+    private Vista getVistaFromVisao(Visao vis){
+        for (Vista vista : mundo.getVistas()){
+            if (vista.getVisao().equals(vis)){
+                return vista;
+            }
+        }
+        return null;
     }
     
     //<editor-fold defaultstate="collapsed" desc="Seleção e carregamento da barra de ferramentas lateral esquerda">

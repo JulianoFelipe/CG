@@ -1,6 +1,7 @@
 package m.poligonos;
 
 import java.awt.Color;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 
@@ -25,20 +26,20 @@ public class Poligono extends CGObject{
  
     //<editor-fold defaultstate="collapsed" desc="Construtores">       
     public Poligono(Poligono p){
-        super(p.getPointMatrix(), p.getID());  
+        super(p.getPointMatrix(), p.getID());
     }
     
     public Poligono(float[][] pointMatrix, long ID){
-        super(pointMatrix, ID);        
+        super(pointMatrix, ID);    
     }
     
     public Poligono(float[][] pointMatrix){
-        super(pointMatrix);        
+        super(pointMatrix);     
     }
     
-    protected Poligono(){ super(); }
+    protected Poligono(int numberOfPoints){ super(numberOfPoints); }
     
-    protected Poligono (long ID) { super(ID); }
+    protected Poligono (long ID, int numberOfPoints) { super(ID, numberOfPoints); }
 //</editor-fold>
     
     @Override

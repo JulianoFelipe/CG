@@ -6,15 +6,16 @@
 <?import java.lang.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="137.0" prefWidth="250.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="137.0" prefWidth="297.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <GridPane prefHeight="127.0" prefWidth="250.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
+      <GridPane prefHeight="127.0" prefWidth="297.0" AnchorPane.bottomAnchor="5.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="5.0">
         <columnConstraints>
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="95.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
             <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="95.0" />
+            <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="95.0" />
         </columnConstraints>
         <rowConstraints>
           <RowConstraints maxHeight="18.0" minHeight="10.0" prefHeight="16.0" vgrow="SOMETIMES" />
@@ -106,6 +107,21 @@
                      </image>
                   </ImageView>
                </graphic>
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </Button>
+            <Button fx:id="okVRP" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="1.0" maxWidth="40.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="37.0" text="Ok" GridPane.columnIndex="5" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </Button>
+            <Button fx:id="okP" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="1.0" maxWidth="40.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="37.0" text="Ok" GridPane.columnIndex="5" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </Button>
+            <Button fx:id="okViewUp" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="1.0" maxWidth="40.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="37.0" text="Ok" GridPane.columnIndex="5" GridPane.rowIndex="3">
                <GridPane.margin>
                   <Insets left="5.0" right="5.0" />
                </GridPane.margin>

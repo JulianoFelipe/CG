@@ -16,12 +16,18 @@ import java.util.List;
  */
 public abstract class CGObject implements Serializable{
     protected static long INSTANCES;
-    protected float[][] pointMatrix;
+    protected final float[][] pointMatrix;
     protected long ID;
     
-    protected CGObject(){ this.ID = INSTANCES++; }
+    protected CGObject(int numberOfPoints){ 
+        this.ID = INSTANCES++;
+        pointMatrix = new float [4][numberOfPoints];
+    }
     
-    protected CGObject(long ID){ this.ID = ID; }
+    protected CGObject(long ID, int numberOfPoints){ 
+        this.ID = ID;
+        pointMatrix = new float [4][numberOfPoints];
+    }
     
     protected CGObject(float[][] pointMatrixCp, long ID) {
         this.ID = ID;
@@ -39,11 +45,6 @@ public abstract class CGObject implements Serializable{
         this(pointMatrix, INSTANCES++);
         //System.out.println("HERE!");
         //System.out.println(Arrays.deepToString(pointMatrix));
-    }
-    
-    //Bad, but... u know...
-    public void setPointMatrix(float[][] pointMatrix){
-        this.pointMatrix = pointMatrix;
     }
     
     public float[][] getPointMatrix(){
@@ -114,5 +115,26 @@ public abstract class CGObject implements Serializable{
         pointMatrix[0][i] = x;
         pointMatrix[1][i] = y;
         pointMatrix[2][i] = z;
+        pointMatrix[3][i] = 1;
+    }
+    
+    public void setAll(float[][] pointMatrix){
+        int newMatPoints = pointMatrix.length;
+        
+        if (newMatPoints == 2){
+            for (int i=0; i<getNumberOfPoints(); i++){
+                setPoint(i, pointMatrix[0][i], pointMatrix[1][i], 0);
+            }
+        } else if (newMatPoints == 3){
+            for (int i=0; i<getNumberOfPoints(); i++){
+                setPoint(i, pointMatrix[0][i], pointMatrix[1][i], pointMatrix[2][i]);
+            }
+        } else if (newMatPoints == 4) {
+            for (int i=0; i<getNumberOfPoints(); i++){
+                setPoint(i, pointMatrix[0][i], pointMatrix[1][i], pointMatrix[2][i]);
+            }
+        } else {
+            throw new IllegalArgumentException("Matriz de pontos não possui número de coordenadas válido: " + newMatPoints);
+        }
     }
 }

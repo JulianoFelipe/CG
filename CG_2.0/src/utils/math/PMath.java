@@ -7,6 +7,9 @@ package utils.math;
 
 //import Model.Poligono;
 
+import java.util.List;
+import m.poligonos.Aresta;
+import m.poligonos.CGObject;
 import m.poligonos.Poligono;
 import m.poligonos.Vertice;
 
@@ -53,6 +56,17 @@ public class PMath {
                 return ver;
             }
         }
+        return null;
+    }
+    
+    public static Poligono attemptBuildingFromPlanes(CGObject object){
+        if (object.getNumberOfPoints() < 4) return null;
+        
+        return null;
+        
+    }
+    
+    public static Poligono attempBuildingFromLines(List<Aresta> lista){
         return null;
     }
 }

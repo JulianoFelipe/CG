@@ -222,7 +222,7 @@
                   </VBox>
                </children>
                <BorderPane.margin>
-                  <Insets right="3.0" />
+                  <Insets />
                </BorderPane.margin>
             </GridPane>
          </center>

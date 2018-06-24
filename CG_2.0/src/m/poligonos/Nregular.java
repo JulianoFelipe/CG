@@ -25,10 +25,7 @@ public class Nregular extends Poligono {
             x = center.getX() + ( radius * Math.cos(angulo));
             y = center.getY() + ( radius * Math.sin(angulo));
             
-            lista[0][i] = (float) x;
-            lista[1][i] = (float) y;
-            lista[2][i] = 0;
-            lista[3][i] = 1;
+            setPoint(i, (float) x, (float) y, 0);
         }
         
         return lista;
@@ -39,15 +36,21 @@ public class Nregular extends Poligono {
     }
     
     public Nregular(int noLados, int radius, Vertice center, double pos){
+        super(noLados); //Valido sempre?
         this.radius = radius;
         this.noLados = noLados;
         this.center = center;
         
-        super.setPointMatrix(buildNsided(pos));
+        buildNsided(pos);
     }
     
     public Nregular(Nregular nregular){
-        this(nregular.getNoLados(), nregular.getRadius(), nregular.getCenter());
+        super(nregular.ID, nregular.noLados); //Valido sempre?
+        this.radius  = nregular.radius;
+        this.noLados = nregular.noLados;
+        this.center  = nregular.center;
+        
+        buildNsided(0.);
     }
 //</editor-fold>
     

@@ -9,6 +9,6 @@ package utils.config;
  *
  * @author JFPS
  */
-public class StandardConfigGen {
+public class Config {
     
 }

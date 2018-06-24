@@ -26,7 +26,6 @@ public class Vista implements Observer{
     private List<CGObject> objetos;
     private List<Vertice> tempPoints;
     private final World mundo;
-
     
     public Vista(CGPipeline pipeline) {
         this.pipe = pipeline;
@@ -96,9 +95,13 @@ public class Vista implements Observer{
     public void update(Observable o, Object arg) {
         if (o instanceof CGPipeline){
             clearAll();
-            addObject(mundo.getObjects());
-            addTempPoint(mundo.getTempPoints());
+            addObject(mundo.getObjectsCopy());
+            addTempPoint(mundo.getTempPointsCopy());
             System.out.println("Updated at Vista");
         }
+    }
+    
+    public Camera getPipelineCamera(){
+        return pipe.getCamera();
     }
 }

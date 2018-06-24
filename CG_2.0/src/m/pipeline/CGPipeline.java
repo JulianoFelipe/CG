@@ -24,6 +24,7 @@ public abstract class CGPipeline extends Observable implements Pipeline{
     protected final CGViewport viewport;
     
     protected float[][] matrixJP;
+    protected boolean sruSRCchanged=true;
     
     protected CGPipeline(Camera cam, CGWindow window, CGViewport viewport) {
         this.cam = cam;
@@ -38,24 +39,32 @@ public abstract class CGPipeline extends Observable implements Pipeline{
         updateMatrixJP();
     }
     
-    /*@Override
-    public List<CGObject> convert2D(List<CGObject> lista, Vista vista) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }*/
+    public Camera getCamera() {
+        return cam;
+    }
     
     @Override
     public void update(Observable o, Object arg) {
         //Por enquanto, qualquer update é tratado igual, passando pelo pipeline inteiro novamente
-        System.out.println("Updated at CGPipeline. Notifying Vistas");
+        
         if (o instanceof Camera){
-            //forceUpdate();
+            sruSRCchanged = true;
+            
+            setChanged();
             notifyObservers();
+            clearChanged();
         } else if (o instanceof CGWindow){
-            //forceUpdate();
+            updateMatrixJP();
+            
+            setChanged();
             notifyObservers();
+            clearChanged();
         } else if (o instanceof CGViewport){
-            //forceUpdate();
+            updateMatrixJP();
+            
+            setChanged();
             notifyObservers();
+            clearChanged();
         } else {
             throw new IllegalArgumentException("Update não previsto no pipeline.");
         }
@@ -133,23 +142,5 @@ public abstract class CGPipeline extends Observable implements Pipeline{
         };
     }
     
-    protected final float[][] passThroughPipeline(float[][] pipeline3D, float[][] pipeline2D, float[][] pointMatrix){
-        pointMatrix = multiply3D(pipeline3D, pointMatrix);
-        return multiply2D(pipeline2D, pointMatrix);
-    }
-    
-    protected final float[][] multiply3D(float[][] pipelineMatrix, float[][] pointMatrix){
-        return MMath.multiplicar(pipelineMatrix, pointMatrix);
-    }
-    
-    //Essa retorna por criar uma nova matriz com uma linha a menos
-    protected final float[][] multiply2D(float[][] pipe2Dmatrix, float[][] pointMatrix){
-        pointMatrix = MMath.removeFactor(pointMatrix);
-        
-        return MMath.multiplicar(matrixJP, pointMatrix);
-    }
-    
     public abstract Visao getVisao();
-    
-    //protected abstract void forceUpdate();
 }

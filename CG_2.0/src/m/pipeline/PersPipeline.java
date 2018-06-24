@@ -6,12 +6,13 @@
 package m.pipeline;
 
 import java.util.List;
-import java.util.Observable;
 import m.Camera;
 import m.CGViewport;
 import m.Visao;
 import m.CGWindow;
 import m.poligonos.CGObject;
+import utils.config.StandardConfigCam;
+import utils.config.StandardConfigWinView;
 import utils.math.MMath;
 
 /**
@@ -20,13 +21,54 @@ import utils.math.MMath;
  */
 public class PersPipeline extends CGPipeline{
     protected float DP;
-    
     private float[][] matrizVistaPers;
-    private boolean changed = true;
 
+    //<editor-fold defaultstate="collapsed" desc="Construtores">
     public PersPipeline(float DP, Camera cam, CGWindow win, CGViewport view) {
         super(cam, win, view);
         this.DP = DP;
+    }
+    
+    public PersPipeline(){
+        super(StandardConfigCam.getStandardCamera(Visao.Perspectiva),
+                StandardConfigWinView.STD_WINDOW, StandardConfigWinView.STD_VIEWPORT);
+        this.DP = StandardConfigCam.PERS_DP;
+    }
+//</editor-fold>
+       
+    @Override
+    public void convert2D(CGObject object) {
+        MMath.printMatrix(object.getPointMatrix());
+        
+        float[][] retPoints = MMath.multiplicar(get3DPipelineMatrix(), object.getPointMatrix());
+        retPoints = persMatrixSwitcheroo(retPoints); 
+        retPoints = MMath.removeFactor(retPoints);
+        retPoints = MMath.multiplicar(getMatrixJP(), retPoints);
+
+        object.setAll(retPoints);
+        
+        System.out.println("AFTER CHANGE");
+        MMath.printMatrix(object.getPointMatrix());
+    }
+
+    @Override
+    public void reverseConversion(CGObject object) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+        
+    public float[][] get3DPipelineMatrix(){
+        //Retorna a matriz final do pipeline
+        //Se receber update de camera, alterar changed e calc tudo de novo
+        
+        if (sruSRCchanged == false){
+            return matrizVistaPers;
+        } else {
+            ///Matriz vista = Msru,src * Mvista    --- (Mjp é separada, já que é 2D)
+            //Concatena por multiplicar ao contrário
+            matrizVistaPers = MMath.multiplicar(getMatrixProj(), super.getMatrizSRUsrc());
+            sruSRCchanged = false;
+            return matrizVistaPers;
+        }
     }
     
     public float[][] getMatrixProj(){
@@ -36,55 +78,6 @@ public class PersPipeline extends CGPipeline{
             { 0, 0,     1, 0},
             { 0, 0, -1/DP, 0}
         };
-    }
-    
-    public float[][] get3DPipelineMatrix(){
-        //Retorna a matriz final do pipeline
-        //Se receber update de camera, alterar changed e calc tudo de novo
-        //Concatena as budega
-        
-        if (changed == false){
-            return matrizVistaPers;
-        } else {
-            ///Matriz vista = Msru,src * Mvista    --- (Mjp é separada, já que é 2D)
-            //Concatena por multiplicar ao contrário
-            matrizVistaPers = MMath.multiplicar(getMatrixProj(), super.getMatrizSRUsrc());
-            changed = false;
-            return matrizVistaPers;
-        }
-    }
-    
-    public float[][] get2DPipelineMatrix(){
-        return getMatrixJP();
-    }
-
-    @Override
-    public void convert2D(List<CGObject> lista) {
-        lista.forEach((object) -> {
-            float[][] retPoints = multiply3D(get3DPipelineMatrix(), object.getPointMatrix());
-            retPoints = persMatrixSwitcheroo(retPoints);
-            retPoints = multiply2D(get2DPipelineMatrix(), retPoints);
-            object.setPointMatrix(retPoints);
-        });
-    }
-    
-    @Override
-    public void convert2D(CGObject object) {
-        float[][] retPoints = multiply3D(get3DPipelineMatrix(), object.getPointMatrix());
-        //System.out.println("\n MATRIZ DEPOIS DE PIPE 3D");
-        //MMath.printMatrix(retPoints);
-        retPoints = persMatrixSwitcheroo(retPoints);
-        //System.out.println("\n MATRIZ DEPOIS DE DIVISÃO PERSPECTIVA");
-        //MMath.printMatrix(retPoints);
-        retPoints = multiply2D(get2DPipelineMatrix(), retPoints);
-        //System.out.println("\n MATRIZ DEPOIS DE PIPE 2D (CGWindow e CGViewport)");
-        //MMath.printMatrix(retPoints);
-        object.setPointMatrix(retPoints);
-    }
-
-    @Override
-    public void update(Observable o, Object arg) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     protected float[][] persMatrixSwitcheroo(float[][] pointMatrix){
@@ -107,15 +100,5 @@ public class PersPipeline extends CGPipeline{
     @Override
     public Visao getVisao() {
         return Visao.Perspectiva;
-    }
-
-    @Override
-    public void reverseConversion(List<CGObject> lista) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void reverseConversion(CGObject object) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
