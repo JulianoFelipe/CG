@@ -355,6 +355,7 @@ public class MainController implements Initializable {
                 graphs.beginPath();
                 
                 Vertice point1 = obj.getPoint(0);
+                System.out.println("Vista: " + vista.getVisao() + ". Point: " + point1);
                 Vertice point2 = null;
                 for (int i=1; i<obj.getNumberOfPoints(); i++){
                     point2 = obj.getPoint(i);

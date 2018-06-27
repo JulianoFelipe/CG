@@ -136,5 +136,11 @@ public class Camera extends Observable{
         return "Camera{" + "ViewUp=" + ViewUp + ", VRP=" + VRP + ", P=" + P + '}';
     }
     
-    
+    public static void main(String...args){
+        Camera cam = new Camera( new Vertice( 0, 1, 0), new Vertice( 10, 0, 0), new Vertice(0, 0, 0) );
+        
+        System.out.println(cam.getVetorN());
+        System.out.println(cam.getVetorU());
+        System.out.println(cam.getVetorV());
+    }
 }
