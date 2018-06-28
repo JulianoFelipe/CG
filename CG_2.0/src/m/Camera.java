@@ -45,17 +45,17 @@ public class Camera extends Observable{
     public void setViewUp(Vertice ViewUp) {
         this.ViewUp = ViewUp;
         changed = true;
-        setChanged(); //??????
+        setChanged();
         notifyObservers();
-        clearChanged(); //?????
+        clearChanged();
     }
 
     public void setVRP(Vertice VRP) {
         this.VRP = VRP;
         changed = true;
-        setChanged(); //??????
+        setChanged();
         notifyObservers();
-        clearChanged(); //?????
+        clearChanged();
     }
     
     public Vertice getVRP(){
@@ -65,9 +65,9 @@ public class Camera extends Observable{
     public void setP(Vertice P) {
         this.P = P;
         changed = true;
-        setChanged(); //??????
+        setChanged();
         notifyObservers();
-        clearChanged(); //?????
+        clearChanged();
     }
 
     public Vertice getVetorN() {
@@ -126,9 +126,9 @@ public class Camera extends Observable{
         this.P = cam.P;
         changed = true;
 
-        setChanged(); //??????
+        setChanged();
         notifyObservers();
-        clearChanged(); //?????
+        clearChanged();
     }
 
     @Override
@@ -136,11 +136,11 @@ public class Camera extends Observable{
         return "Camera{" + "ViewUp=" + ViewUp + ", VRP=" + VRP + ", P=" + P + '}';
     }
     
-    public static void main(String...args){
+    /*public static void main(String...args){
         Camera cam = new Camera( new Vertice( 0, 1, 0), new Vertice( 10, 0, 0), new Vertice(0, 0, 0) );
         
         System.out.println(cam.getVetorN());
         System.out.println(cam.getVetorU());
         System.out.println(cam.getVetorV());
-    }
+    }*/
 }

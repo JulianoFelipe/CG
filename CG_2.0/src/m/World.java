@@ -56,7 +56,9 @@ public class World {
     }
     
     public void addObject(Collection<? extends CGObject> colecao){
-        objetos.addAll(colecao);
+        colecao.forEach((obj) -> {
+            addObject(obj);
+        });
     }
     
     public void addTempPoint(Vertice p){

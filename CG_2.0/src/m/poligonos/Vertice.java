@@ -5,7 +5,6 @@ package m.poligonos;
  * @author Anderson
  */
 public class Vertice extends CGObject{
-    
     //<editor-fold defaultstate="collapsed" desc="Construtores">   
     /**
      * Construtor de vertice
@@ -15,6 +14,10 @@ public class Vertice extends CGObject{
      */
     public Vertice(float x, float y, float z) {
         super(new float[][] { {x}, {y}, {z}, {1} } );
+    }
+    
+    public Vertice(float x, float y, float z, float w) {
+        super(new float[][] { {x}, {y}, {z}, {w} } );
     }
     
     /**
@@ -86,22 +89,18 @@ public class Vertice extends CGObject{
         return "("+getX()+";"+getY()+";" + getZ() + ")";
     }
     
-    /**
-     * Método equals para comparação entre vértices. Uso:
-     * umVertice.equals(outroVertice);
-     * <p>
-     * Se o parâmetro for nulo ou não for uma instância da
-     * classe Vértice, não pode ser igual, então nem compara.
-     * Caso contrário, compara as coordenadas (floats) usando
-     * o método "Float.floatToIntBits(other.x)" que retorna a
-     * representação de float da I3E 754 de floats para comparação,
-     * evitando inconsistências do próprio float, e levando em
-     * consideração valores especiais como:
-     * Float.NAN; Float.NEGATIVE_INFINITY; etc.
-     * @param obj para ser comparado com "this".
-     * @return True se obj for igual à this, false caso contrário.
-     */
-    public boolean equalsCoords(Object obj) {
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 97 * hash + Float.floatToIntBits(getX());
+        hash = 97 * hash + Float.floatToIntBits(getY());
+        hash = 97 * hash + Float.floatToIntBits(getZ());
+        hash = 97 * hash + Float.floatToIntBits(getW());
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
         if (this == obj) {
             return true;
         }
@@ -112,23 +111,17 @@ public class Vertice extends CGObject{
             return false;
         }
         final Vertice other = (Vertice) obj;
-        if (Float.floatToIntBits(this.getX()) != Float.floatToIntBits(other.getX())) {
+        if (Float.floatToIntBits(getX()) != Float.floatToIntBits(other.getX())) {
             return false;
         }
-        if (Float.floatToIntBits(this.getY()) != Float.floatToIntBits(other.getY())) {
+        if (Float.floatToIntBits(getY()) != Float.floatToIntBits(other.getY())) {
             return false;
         }
-        if (Float.floatToIntBits(this.getZ()) != Float.floatToIntBits(other.getZ())) {
+        if (Float.floatToIntBits(getZ()) != Float.floatToIntBits(other.getZ())) {
             return false;
         }
-        return true;
+        return Float.floatToIntBits(getW()) == Float.floatToIntBits(other.getW());
     }
-
-    public int hashCodeCoords() {
-        int hash = 7;
-        hash = 97 * hash + Float.floatToIntBits(this.getX());
-        hash = 97 * hash + Float.floatToIntBits(this.getY());
-        hash = 97 * hash + Float.floatToIntBits(this.getZ());
-        return hash;
-    }
+    
+    
 }

@@ -9,7 +9,6 @@ import View.Config.ManualCamController;
 import View.Options.PaintController;
 import View.Options.RegularPolygonController;
 import View.Options.RevBuildController;
-import com.sun.javafx.property.adapter.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -17,7 +16,6 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -47,13 +45,14 @@ import m.Visao;
 import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
-import m.poligonos.Nregular;
+import m.poligonos.Poligono;
 import m.poligonos.Vertice;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
 import utils.ioScene.InputScene;
 import utils.ioScene.OutputScene;
+import utils.math.PMath;
 
 /**
  *
@@ -287,12 +286,12 @@ public class MainController implements Initializable {
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
                     
                     Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
-                    //getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newPoint);
-                    //mundo.addTempPoint(newPoint);
+                    getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newPoint);
+                    mundo.addTempPoint(newPoint);
                     
-                    Nregular newreg = new Nregular(6, 66, newPoint);
-                    getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newreg);
-                    mundo.addObject(newreg);
+                    //Nregular newreg = new Nregular(6, 66, newPoint);
+                    //getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newreg);
+                    //mundo.addObject(newreg);
                 }
             }
             paintStuff();
@@ -306,14 +305,14 @@ public class MainController implements Initializable {
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
                     
                     Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
-                    System.out.println("VERT LATERAL: " + newPoint);
-                    //getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newPoint);
+                    //System.out.println("VERT LATERAL: " + newPoint);
+                    getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newPoint);
                     //System.out.println("VERT MUNDO: " + newPoint);
-                    //mundo.addTempPoint(newPoint);
+                    mundo.addTempPoint(newPoint);
                     
-                    Nregular newreg = new Nregular(6, 66, newPoint);
-                    getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newreg);
-                    mundo.addObject(newreg);
+                    //Nregular newreg = new Nregular(6, 66, newPoint);
+                    //getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newreg);
+                    //mundo.addObject(newreg);
                 }
             }
             paintStuff();
@@ -327,13 +326,13 @@ public class MainController implements Initializable {
                     //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
                     
                     Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
-                    Vertice newPointCP = new Vertice(newPoint);
-                    //getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newPoint);
-                    //mundo.addTempPoint(newPoint);
+                    //Vertice newPointCP = new Vertice(newPoint);
+                    getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newPoint);
+                    mundo.addTempPoint(newPoint);
                     
-                    Nregular newreg = new Nregular(6, 66, newPointCP);
-                    getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newreg);
-                    mundo.addObject(newreg);
+                    //Nregular newreg = new Nregular(6, 66, newPointCP);
+                    //getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newreg);
+                    //mundo.addObject(newreg);
                 }
             }
             paintStuff();
@@ -355,7 +354,7 @@ public class MainController implements Initializable {
                 graphs.beginPath();
                 
                 Vertice point1 = obj.getPoint(0);
-                System.out.println("Vista: " + vista.getVisao() + ". Point: " + point1);
+                //System.out.println("Vista: " + vista.getVisao() + ". Point: " + point1);
                 Vertice point2 = null;
                 for (int i=1; i<obj.getNumberOfPoints(); i++){
                     point2 = obj.getPoint(i);
@@ -433,7 +432,12 @@ public class MainController implements Initializable {
     }
     
     public void finalizeTempPoints(){
-        
+        System.out.println("FINALIZE");
+        List<Vertice> lista = mundo.getTempPointsCopy();
+        //Poligono pol = Poligono.build(lista);
+        mundo.addObject(PMath.attemptBuildingFromPlanes(lista));
+        mundo.clearTemp();
+        paintStuff();
     }
     
     private Vista getVistaFromVisao(Visao vis){

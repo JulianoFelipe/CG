@@ -148,9 +148,9 @@ public class VMath {
         return Double.isInfinite(m);
     }
     
-    public static void main(String...args){
-        Vertice a = new Vertice((float) 2, (float)3);
-        Vertice b = new Vertice((float) 8, (float)1);
+    //public static void main(String...args){
+        //Vertice a = new Vertice((float) 2, (float)3);
+        //Vertice b = new Vertice((float) 8, (float)1);
         /*Vertice c = new Vertice( 2, 2);
         Vertice d = new Vertice( 3, 4);
         
@@ -168,13 +168,13 @@ public class VMath {
         
         System.out.println(lista);*/
         
-        System.out.println("SLOPE INTER: " + Arrays.toString(slopeInterceptForm(new Aresta(a, b))));
+        //System.out.println("SLOPE INTER: " + Arrays.toString(slopeInterceptForm(new Aresta(a, b))));
         //System.out.println("SLOPE: " + lineSlope(new Aresta(a, b)));
-        System.out.println("Is Hor: " + isLineHorizontal(a, b));
-        System.out.println("Is Ver: " + isLineVertical(a, b));
+        //System.out.println("Is Hor: " + isLineHorizontal(a, b));
+        //System.out.println("Is Ver: " + isLineVertical(a, b));
         
-        System.out.println(movimentoSegundoParaPrimeiro(a, b));
-    }
+        //System.out.println(movimentoSegundoParaPrimeiro(a, b));
+    //}
     
     /**
      * Movimento do segundo vértice em relação ao primeiro.

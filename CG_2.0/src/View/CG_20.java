@@ -5,6 +5,7 @@
  */
 package View;
 
+import java.util.List;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -15,9 +16,11 @@ import m.Vista;
 import m.World;
 import m.pipeline.OrtPipeline;
 import m.pipeline.PersPipeline;
+import m.poligonos.Face;
 import m.poligonos.Poligono;
 import utils.config.StandardConfigCam;
 import utils.config.StandardConfigWinView;
+import utils.math.PMath;
 
 /**
  *
@@ -48,7 +51,9 @@ public class CG_20 extends Application {
         };
         
         Poligono pol = new Poligono(pol_mat);
-        mundo.addObject(pol);
+        List<Face> lista = PMath.attemptBuildingFromPlanes(pol);
+
+        mundo.addObject(lista);
         
         //PaintController paint = new PaintController();
         //RegularPolygonController regular = new RegularPolygonController();

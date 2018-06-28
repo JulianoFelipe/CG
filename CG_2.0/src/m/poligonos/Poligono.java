@@ -1,7 +1,7 @@
 package m.poligonos;
 
 import java.awt.Color;
-import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Logger;
 
 
@@ -149,4 +149,20 @@ public class Poligono extends CGObject{
     return null;
     }*/
 //</editor-fold>
+    
+    //FACTORY METHOD
+    
+    public static Poligono build(List<Vertice> lista){
+        float[][] point = new float[4][lista.size()];
+        
+        for (int i=0; i<lista.size(); i++){
+            Vertice ith = lista.get(i);
+            point[0][i] = ith.getX();
+            point[1][i] = ith.getY();
+            point[2][i] = ith.getZ();
+            point[3][i] = 1;
+        }
+        
+        return new Poligono (point);
+    }
 }
