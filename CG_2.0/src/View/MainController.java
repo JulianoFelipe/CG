@@ -32,6 +32,8 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -45,7 +47,6 @@ import m.Visao;
 import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
-import m.poligonos.Poligono;
 import m.poligonos.Vertice;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
@@ -61,7 +62,7 @@ import utils.math.PMath;
 public class MainController implements Initializable {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
     
-    @FXML private MenuBar menu;
+    @FXML private MenuBar  menu;
     @FXML private MenuItem salvar;
     @FXML private MenuItem carregar;
     @FXML private MenuItem limparCena;
@@ -178,79 +179,233 @@ public class MainController implements Initializable {
     }
     
     private void initializeViewToolbars(){
+        //<editor-fold defaultstate="collapsed" desc="Frente">
         frenteCamParams.setOnAction((ActionEvent event) -> {
             System.out.println(getVistaFromVisao(Visao.Frontal).getPipelineCamera());
             ManualCamController controller = new ManualCamController(
-                getVistaFromVisao(Visao.Frontal).getPipelineCamera(), Visao.Frontal
+                    getVistaFromVisao(Visao.Frontal).getPipelineCamera(), Visao.Frontal
             );
-            
+
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
                 //System.out.println("CAM MUDOU. PROPAGANDO.");
                 getVistaFromVisao(Visao.Frontal).getPipelineCamera().set(newValue);
                 paintStuff();
             });
-            
+
             final Stage dialog = getManualCamWindow(controller);
             dialog.setTitle("Câmera Frontal");
             dialog.show();
         });
         frenteCamAuto.setOnAction((ActionEvent event) -> {
-            throw new UnsupportedOperationException("Not supported yet.");
+            frente.getParent().getParent().setStyle("-fx-border-color: blue");
+            frente.setFocusTraversable(true);
+            frente.addEventFilter(MouseEvent.ANY, (e) -> frente.requestFocus());
+            frente.setOnKeyPressed((KeyEvent event1) -> {
+
+                KeyCode pressed = event1.getCode();
+                Vista frenteVista = getVistaFromVisao(Visao.Frontal);
+                Vertice vrp    = frenteVista.getPipelineCamera().getVRP();
+                Vertice p      = frenteVista.getPipelineCamera().getP();
+                Vertice viewUp = frenteVista.getPipelineCamera().getViewUp();
+                switch (pressed){
+                    case Q:
+                        vrp.setZ(vrp.getZ() - (float) 1);
+                          p.setZ(  p.getZ() - (float) 1);
+                        break;
+                    case E:
+                        vrp.setZ(vrp.getZ() + (float) 1);
+                          p.setZ(  p.getZ() + (float) 1);
+                        break;
+                    case W:
+                        vrp.setY(vrp.getY() + (float) 1);
+                          p.setY(  p.getY() + (float) 1);
+                        break;
+                    case A:
+                        vrp.setX(vrp.getX() + (float) 1);
+                          p.setX(  p.getX() + (float) 1);
+                        break;
+                    case S:
+                        vrp.setY(vrp.getY() - (float) 1);
+                          p.setY(  p.getY() - (float) 1);
+                        break;
+                    case D:
+                        vrp.setX(vrp.getX() - (float) 1);
+                          p.setX(  p.getX() - (float) 1);
+                        break;
+                    case ESCAPE:
+                        frente.setOnKeyPressed(null);
+                        frente.getParent().getParent().setStyle("-fx-border-color: black");
+                        return;
+                }
+                frenteVista.getPipe().getCamera().set(new Camera(viewUp, vrp, p));
+                paintStuff();
+            });
         });
+        //</editor-fold>
         
+        //<editor-fold defaultstate="collapsed" desc="Lateral">
         lateralCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
-                getVistaFromVisao(Visao.Lateral).getPipelineCamera(), Visao.Lateral
+                    getVistaFromVisao(Visao.Lateral).getPipelineCamera(), Visao.Lateral
             );
-            
+
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
                 getVistaFromVisao(Visao.Lateral).getPipelineCamera().set(newValue);
                 paintStuff();
             });
-            
+
             final Stage dialog = getManualCamWindow(controller);
             dialog.setTitle("Câmera Lateral");
             dialog.show();
         });
         lateralCamAuto.setOnAction((ActionEvent event) -> {
-            throw new UnsupportedOperationException("Not supported yet.");
+            lateral.getParent().getParent().setStyle("-fx-border-color: blue");
+            lateral.setFocusTraversable(true);
+            lateral.addEventFilter(MouseEvent.ANY, (e) -> lateral.requestFocus());
+            lateral.setOnKeyPressed((KeyEvent event1) -> {
+
+                KeyCode pressed = event1.getCode();
+                Vista lateralVista = getVistaFromVisao(Visao.Lateral);
+                Vertice vrp    = lateralVista.getPipelineCamera().getVRP();
+                Vertice p      = lateralVista.getPipelineCamera().getP();
+                Vertice viewUp = lateralVista.getPipelineCamera().getViewUp();
+                switch (pressed){
+                    case Q:
+                        vrp.setX(vrp.getX() - (float) 1);
+                          p.setX(  p.getX() - (float) 1);
+                        break;
+                    case E:
+                        vrp.setX(vrp.getX() + (float) 1);
+                          p.setX(  p.getX() + (float) 1);
+                        break;
+                    case W:
+                        vrp.setY(vrp.getY() + (float) 1);
+                          p.setY(  p.getY() + (float) 1);
+                        break;
+                    case A:
+                        vrp.setZ(vrp.getZ() + (float) 1);
+                          p.setZ(  p.getZ() + (float) 1);
+                        break;
+                    case S:
+                        vrp.setY(vrp.getY() - (float) 1);
+                          p.setY(  p.getY() - (float) 1);
+                        break;
+                    case D:
+                        vrp.setZ(vrp.getZ() - (float) 1);
+                          p.setZ(  p.getZ() - (float) 1);
+                        break;
+                    case ESCAPE:
+                        lateral.setOnKeyPressed(null);
+                        lateral.getParent().getParent().setStyle("-fx-border-color: black");
+                        return;
+                }
+                lateralVista.getPipe().getCamera().set(new Camera(viewUp, vrp, p));
+                paintStuff();
+            });
         });
+        //</editor-fold>
         
+        //<editor-fold defaultstate="collapsed" desc="Topo">
         topoCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
-                getVistaFromVisao(Visao.Topo).getPipelineCamera(), Visao.Topo
+                    getVistaFromVisao(Visao.Topo).getPipelineCamera(), Visao.Topo
             );
-            
+
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
                 getVistaFromVisao(Visao.Topo).getPipelineCamera().set(newValue);
                 paintStuff();
             });
-            
+
             final Stage dialog = getManualCamWindow(controller);
             dialog.setTitle("Câmera Topo");
             dialog.show();
         });
         topoCamAuto.setOnAction((ActionEvent event) -> {
-            throw new UnsupportedOperationException("Not supported yet.");
-        });
-        
-        persCamParams.setOnAction((ActionEvent event) -> {
-            ManualCamController controller = new ManualCamController(
-                getVistaFromVisao(Visao.Perspectiva).getPipelineCamera(), Visao.Perspectiva
-            );
-            
-            controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
-                getVistaFromVisao(Visao.Perspectiva).getPipelineCamera().set(newValue);
+            topo.getParent().getParent().setStyle("-fx-border-color: blue");
+            topo.setFocusTraversable(true);
+            topo.addEventFilter(MouseEvent.ANY, (e) -> topo.requestFocus());
+            topo.setOnKeyPressed((KeyEvent event1) -> {
+
+                KeyCode pressed = event1.getCode();
+                Vista topVista = getVistaFromVisao(Visao.Topo);
+                Vertice vrp    = topVista.getPipelineCamera().getVRP();
+                Vertice p      = topVista.getPipelineCamera().getP();
+                Vertice viewUp = topVista.getPipelineCamera().getViewUp();
+                switch (pressed){
+                    case Q:
+                        vrp.setY(vrp.getY() - (float) 1);
+                          p.setY(  p.getY() - (float) 1);
+                        break;
+                    case E:
+                        vrp.setY(vrp.getY() + (float) 1);
+                          p.setY(  p.getY() + (float) 1);
+                        break;
+                    case W:
+                        vrp.setZ(vrp.getZ() + (float) 1);
+                          p.setZ(  p.getZ() + (float) 1);
+                        break;
+                    case A:
+                        vrp.setX(vrp.getX() + (float) 1);
+                          p.setX(  p.getX() + (float) 1);
+                        break;
+                    case S:
+                        vrp.setZ(vrp.getZ() - (float) 1);
+                          p.setZ(  p.getZ() - (float) 1);
+                        break;
+                    case D:
+                        vrp.setX(vrp.getX() - (float) 1);
+                          p.setX(  p.getX() - (float) 1);
+                        break;
+                    case ESCAPE:
+                        perspectiva.setOnKeyPressed(null);
+                        perspectiva.getParent().getParent().setStyle("-fx-border-color: black");
+                        return;
+                }
+                topVista.getPipe().getCamera().set(new Camera(viewUp, vrp, p));
                 paintStuff();
             });
-            
-            final Stage dialog = getManualCamWindow(controller);
-            dialog.setTitle("Câmera Perspectiva");
-            dialog.show();
         });
+        //</editor-fold>
+        
+        //<editor-fold defaultstate="collapsed" desc="Perspectiva">
         persCamAuto.setOnAction((ActionEvent event) -> {
-            throw new UnsupportedOperationException("Not supported yet.");
+            perspectiva.getParent().getParent().setStyle("-fx-border-color: blue");
+            perspectiva.setFocusTraversable(true);
+            perspectiva.addEventFilter(MouseEvent.ANY, (e) -> perspectiva.requestFocus());
+            perspectiva.setOnKeyPressed((KeyEvent event1) -> {
+
+                KeyCode pressed = event1.getCode();
+                Vista pers = getVistaFromVisao(Visao.Perspectiva);
+                Vertice vrp = pers.getPipelineCamera().getVRP();
+                switch (pressed){
+                    case Q:
+                        vrp.setX(vrp.getX() - (float) 0.1);
+                        break;
+                    case E:
+                        vrp.setX(vrp.getX() + (float) 0.1);
+                        break;
+                    case W:
+                        vrp.setY(vrp.getY() - (float) 0.1);
+                        break;
+                    case A:
+                        vrp.setZ(vrp.getZ() - (float) 0.1);
+                        break;
+                    case S:
+                        vrp.setY(vrp.getY() + (float) 0.1);
+                        break;
+                    case D:
+                        vrp.setZ(vrp.getZ() + (float) 0.1);
+                        break;
+                    case ESCAPE:
+                        perspectiva.setOnKeyPressed(null);
+                        perspectiva.getParent().getParent().setStyle("-fx-border-color: black");
+                        return;
+                }
+                pers.getPipe().getCamera().setVRP(vrp);
+                paintStuff();
+            });
         });
+        //</editor-fold>
     }
     
     private Stage getManualCamWindow(ManualCamController controller){
@@ -328,6 +483,26 @@ public class MainController implements Initializable {
                     Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
                     //Vertice newPointCP = new Vertice(newPoint);
                     getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newPoint);
+                    mundo.addTempPoint(newPoint);
+                    
+                    //Nregular newreg = new Nregular(6, 66, newPointCP);
+                    //getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newreg);
+                    //mundo.addObject(newreg);
+                }
+            }
+            paintStuff();
+        });
+        
+        perspectiva.setOnMouseClicked((MouseEvent e) -> {
+            System.out.println("Pers Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
+            if (CURRENT_SEL == REVOLUCAO_SEL){
+                if (current_pol == CriacaoPrevolucao.free){
+                    //mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
+                    //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
+                    
+                    Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
+                    //Vertice newPointCP = new Vertice(newPoint);
+                    getVistaFromVisao(Visao.Perspectiva).getPipe().reverseConversion(newPoint);
                     mundo.addTempPoint(newPoint);
                     
                     //Nregular newreg = new Nregular(6, 66, newPointCP);
@@ -432,7 +607,6 @@ public class MainController implements Initializable {
     }
     
     public void finalizeTempPoints(){
-        System.out.println("FINALIZE");
         List<Vertice> lista = mundo.getTempPointsCopy();
         //Poligono pol = Poligono.build(lista);
         mundo.addObject(PMath.attemptBuildingFromPlanes(lista));

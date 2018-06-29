@@ -194,14 +194,14 @@ public class PMath {
         return attemptBuildingFromPlanes(pol);
     }
     
-    public static void main(String...args){
+    /*public static void main(String...args){
         float[][] pol_mat = {
             {  30,  35,  25,  20,  30},
             {   2,   4,   3,   1,  10},
             {  25,  20,  18,  23,  (float) 22.5},
             {   1,   1,   1,   1,   1}
             //  A    B    C    D    E
-        };
+        };*/
         
         /*List<List<Vertice>> lista = combinationsOf3(pol_mat);
         
@@ -216,12 +216,12 @@ public class PMath {
         
         System.out.println(buildPlane(p, q, r));*/
         
-        Poligono pol = new Poligono(pol_mat);
+        /*Poligono pol = new Poligono(pol_mat);
         List<Face> listaFaces = attemptBuildingFromPlanes(pol);
         
         for (Face f : listaFaces){
             System.out.println(f);
             MMath.printMatrix(f.getPointMatrix());
-        }
-    }
+        }*/
+    //}
 }

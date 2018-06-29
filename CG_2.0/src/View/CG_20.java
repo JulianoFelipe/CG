@@ -65,6 +65,7 @@ public class CG_20 extends Application {
         
         Scene scene = new Scene(root);
         
+        stage.setTitle("Modelador JSA (CG)");
         stage.setScene(scene);
         stage.show();
     }
