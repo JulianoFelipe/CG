@@ -47,6 +47,7 @@ import m.Visao;
 import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
+import m.poligonos.Movimento;
 import m.poligonos.Vertice;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
@@ -54,6 +55,7 @@ import resource.description.Transformacoes;
 import utils.ioScene.InputScene;
 import utils.ioScene.OutputScene;
 import utils.math.PMath;
+import utils.math.VMath;
 
 /**
  *
@@ -357,8 +359,8 @@ public class MainController implements Initializable {
                           p.setX(  p.getX() - (float) 1);
                         break;
                     case ESCAPE:
-                        perspectiva.setOnKeyPressed(null);
-                        perspectiva.getParent().getParent().setStyle("-fx-border-color: black");
+                        topo.setOnKeyPressed(null);
+                        topo.getParent().getParent().setStyle("-fx-border-color: black");
                         return;
                 }
                 topVista.getPipe().getCamera().set(new Camera(viewUp, vrp, p));
@@ -368,6 +370,21 @@ public class MainController implements Initializable {
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Perspectiva">
+        persCamParams.setOnAction((ActionEvent event) -> {
+            ManualCamController controller = new ManualCamController(
+                getVistaFromVisao(Visao.Perspectiva).getPipelineCamera(), Visao.Perspectiva
+            );
+            
+            controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
+                getVistaFromVisao(Visao.Perspectiva).getPipelineCamera().set(newValue);
+                paintStuff();
+            });
+                    
+            final Stage dialog = getManualCamWindow(controller);
+            dialog.setTitle("Câmera Perspectiva");
+            dialog.show();
+        });
+        
         persCamAuto.setOnAction((ActionEvent event) -> {
             perspectiva.getParent().getParent().setStyle("-fx-border-color: blue");
             perspectiva.setFocusTraversable(true);
@@ -398,15 +415,57 @@ public class MainController implements Initializable {
                         break;
                     case ESCAPE:
                         perspectiva.setOnKeyPressed(null);
+                        perspectiva.setOnMouseDragged(null);
+                        previousX = previousY = -1;
                         perspectiva.getParent().getParent().setStyle("-fx-border-color: black");
                         return;
                 }
                 pers.getPipe().getCamera().setVRP(vrp);
                 paintStuff();
             });
+            perspectiva.setOnMouseDragged((MouseEvent event1) -> {
+                int currentX = (int) event1.getX(),
+                    currentY = (int) event1.getY();
+                
+                if (previousX == -1){
+                    previousX = currentX;
+                    previousY = currentY;
+                    return;
+                }
+
+                Vertice primeiro = new Vertice(previousX, previousY),
+                        segundo  = new Vertice (currentX, currentY);
+                
+                Movimento vert = VMath.movimentoVertical(primeiro, segundo);
+                Movimento hori = VMath.movimentoHorizontal(primeiro, segundo);
+                
+                Vista pers = getVistaFromVisao(Visao.Perspectiva);
+                Vertice p = pers.getPipelineCamera().getP();
+                
+                if (vert == Movimento.Cima){
+                    p.setY(p.getY() + (float)0.01);
+                    p.setZ(p.getZ() + (float)0.1);
+                } else if (vert == Movimento.Baixo){
+                    p.setY(p.getY() - (float)0.01);
+                    p.setZ(p.getZ() - (float)0.1);
+                }
+                
+                if (hori == Movimento.Esquerda){
+                    p.setX(p.getX() + (float)0.01);
+                    p.setZ(p.getZ() + (float)0.1);
+                } else if (hori == Movimento.Direita){
+                    p.setX(p.getX() - (float)0.01);
+                    p.setZ(p.getZ() - (float)0.1);
+                }
+                
+                pers.getPipelineCamera().setP(p);
+                paintStuff();
+            });
         });
         //</editor-fold>
     }
+    private int previousX=-1, previousY=-1;
+    
     
     private Stage getManualCamWindow(ManualCamController controller){
         Pane pane = null;
