@@ -7,7 +7,6 @@ package m.poligonos;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -18,6 +17,9 @@ public abstract class CGObject implements Serializable{
     protected static long INSTANCES;
     protected final float[][] pointMatrix;
     protected long ID;
+    
+    protected float[] ka = {0,0,0}, ks = {0,0,0}, kd = {0,0,0,0}; 
+    protected boolean isChromatic = true;
     
     protected CGObject(int numberOfPoints){ 
         this.ID = INSTANCES++;
@@ -85,7 +87,7 @@ public abstract class CGObject implements Serializable{
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final Poligono other = (Poligono) obj;
+        final CGObject other = (CGObject) obj;
         return this.ID == other.ID;
     }
     
@@ -98,10 +100,11 @@ public abstract class CGObject implements Serializable{
         return INSTANCES;
     }
     
+    //<editor-fold defaultstate="collapsed" desc="Get/Set points">
     public Vertice getPoint(int i){
         return new Vertice(pointMatrix[0][i],
-                           pointMatrix[1][i],
-                           pointMatrix[2][i]);
+                pointMatrix[1][i],
+                pointMatrix[2][i]);
     }
     
     public void setPoint(int i, Vertice v){
@@ -137,4 +140,50 @@ public abstract class CGObject implements Serializable{
             throw new IllegalArgumentException("Matriz de pontos não possui número de coordenadas válido: " + newMatPoints);
         }
     }
+    
+    public Vertice getCentroide(){
+        float maxX = pointMatrix[0][0],
+                maxY = pointMatrix[1][0],
+                maxZ = pointMatrix[2][0];
+        
+        float minX = pointMatrix[0][0],
+                minY = pointMatrix[1][0],
+                minZ = pointMatrix[2][0];
+        
+        for (int i=1; i<pointMatrix[0].length; i++){
+            float x = pointMatrix[0][i],
+                    y = pointMatrix[0][i],
+                    z = pointMatrix[0][i];
+            
+            maxX = Math.max(maxX, x);
+            minX = Math.min(minX, x);
+            
+            maxY = Math.max(maxY, y);
+            minY = Math.min(minY, y);
+            
+            maxZ = Math.max(maxZ, z);
+            minZ = Math.min(minZ, z);
+        }
+        
+        return new Vertice( (float)((maxX+minX)/2), (float)((maxY+minY)/2), (float)((maxZ+minZ)/2));
+    }
+//</editor-fold>
+
+    //<editor-fold defaultstate="collapsed" desc="Get/Set Ks">
+    public boolean isChromatic() { return isChromatic; }
+    
+    public void setIsChromatic(boolean isAchromatic) { this.isChromatic = isAchromatic; }
+    
+    public Vertice getKa() { return new Vertice(ka[0], ka[1], ka[2]); }
+    
+    public void setKa(Vertice ka) { this.ka[0] = ka.getX(); this.ka[1] = ka.getY(); this.ka[2] = ka.getZ(); }
+    
+    public Vertice getKs() { return new Vertice(ks[0], ks[1], ks[2]); }
+    
+    public void setKs(Vertice ks) { this.ks[0] = ks.getX(); this.ks[1] = ks.getY(); this.ks[2] = ks.getZ(); }
+    
+    public Vertice getKd() { Vertice v = new Vertice(kd[0], kd[1], kd[2]); v.setW(kd[3]); return v; }
+    
+    public void setKd(Vertice kd) { this.kd[0] = kd.getX(); this.kd[1] = kd.getY(); this.kd[2] = kd.getZ(); this.kd[3] = kd.getW(); }
+//</editor-fold>
 }

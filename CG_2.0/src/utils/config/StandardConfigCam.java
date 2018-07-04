@@ -20,7 +20,7 @@ public class StandardConfigCam {
     private static final Camera TOPO_CAM    = new Camera( new Vertice( 0, 0,-1), new Vertice( 0, 10,  0), new Vertice(0, 0, 0) );
     private static final Camera PERS_CAM    = new Camera( new Vertice( 0, 1, 0), new Vertice(50, 15, 30), new Vertice(0, 0, 0) );
     //                                                                 X  Y  Z               X    Y   Z               X  Y  Z 
-    public static final float  PERS_DP = 500;
+    public static final float  PERS_DP = 100;
     
     public static Camera getStandardCamera(Visao vis){
         switch (vis){

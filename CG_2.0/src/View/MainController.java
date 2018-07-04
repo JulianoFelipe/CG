@@ -7,6 +7,7 @@ package View;
 
 import View.Config.ManualCamController;
 import View.Options.PaintController;
+import View.Options.PolySelectController;
 import View.Options.RegularPolygonController;
 import View.Options.RevBuildController;
 import java.io.File;
@@ -87,6 +88,7 @@ public class MainController implements Initializable {
     @FXML private MenuItem persCamAuto;
     
     private World mundo;
+    private CGObject selected_obj = null;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -460,12 +462,14 @@ public class MainController implements Initializable {
                 
                 pers.getPipelineCamera().setP(p);
                 paintStuff();
+                
+                previousX = currentX;
+                previousY = currentY;
             });
         });
         //</editor-fold>
     }
     private int previousX=-1, previousY=-1;
-    
     
     private Stage getManualCamWindow(ManualCamController controller){
         Pane pane = null;
@@ -492,81 +496,90 @@ public class MainController implements Initializable {
     //<editor-fold defaultstate="collapsed" desc="Operações em cima dos Canvas">
     private void initializeCanvases(){
         frente.setOnMouseClicked((MouseEvent e) -> {
+            Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
             System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.free){
-                    //mundo.addTempPoint(new Vertice((float) -34, (float) 9));
-                    //mundo.addTempPoint(new Vertice((float) e.getX(), (float) e.getY()));
-                    //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
-                    
-                    Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
-                    getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newPoint);
-                    mundo.addTempPoint(newPoint);
+                if (current_pol == CriacaoPrevolucao.free){                    
+                    getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(clicked);
+                    mundo.addTempPoint(clicked);
                     
                     //Nregular newreg = new Nregular(6, 66, newPoint);
                     //getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newreg);
                     //mundo.addObject(newreg);
+                }
+            } else if (CURRENT_SEL == FERRAMENTA_SEL){
+                if (current_ferr == Ferramentas.Select){
+                    for (CGObject obj : getVistaFromVisao(Visao.Frontal).get2Dobjects()){
+                        if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
+                            selected_obj = obj;
+                            selectController.objectProperty().set(obj);
+                            paintStuff();
+                            return;
+                        }
+                    }
+                    
+                    selected_obj = null;
+                    selectController.objectProperty().set(null);
                 }
             }
             paintStuff();
         });
         
         lateral.setOnMouseClicked((MouseEvent e) -> {
+            Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
             System.out.println("Lateral Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.free){
-                    //mundo.addTempPoint(new Vertice(0, (float) e.getX(), (float) e.getY()));
-                    //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
-                    
-                    Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
-                    //System.out.println("VERT LATERAL: " + newPoint);
-                    getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newPoint);
-                    //System.out.println("VERT MUNDO: " + newPoint);
-                    mundo.addTempPoint(newPoint);
+                if (current_pol == CriacaoPrevolucao.free){                   
+                    getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(clicked);
+                    mundo.addTempPoint(clicked);
                     
                     //Nregular newreg = new Nregular(6, 66, newPoint);
                     //getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newreg);
                     //mundo.addObject(newreg);
+                }  else if (CURRENT_SEL == FERRAMENTA_SEL){
+                    if (current_ferr == Ferramentas.Select){
+                        for (CGObject obj : getVistaFromVisao(Visao.Frontal).get2Dobjects()){
+                            if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
+                                selected_obj = obj;
+                                selectController.objectProperty().set(obj);
+                                paintStuff();
+                                return;
+                            }
+                        }
+
+                        selected_obj = null;
+                        selectController.objectProperty().set(null);
+                    }
                 }
             }
             paintStuff();
         });
         
         topo.setOnMouseClicked((MouseEvent e) -> {
+            Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
             System.out.println("Topo Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
                 if (current_pol == CriacaoPrevolucao.free){
-                    //mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
-                    //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
-                    
-                    Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
-                    //Vertice newPointCP = new Vertice(newPoint);
-                    getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newPoint);
-                    mundo.addTempPoint(newPoint);
+                    getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(clicked);
+                    mundo.addTempPoint(clicked);
                     
                     //Nregular newreg = new Nregular(6, 66, newPointCP);
                     //getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newreg);
                     //mundo.addObject(newreg);
-                }
-            }
-            paintStuff();
-        });
-        
-        perspectiva.setOnMouseClicked((MouseEvent e) -> {
-            System.out.println("Pers Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
-            if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.free){
-                    //mundo.addTempPoint(new Vertice((float) e.getX(), 0, (float) e.getY()));
-                    //frente.getGraphicsContext2D().fillOval(e.getX(), e.getY(), 5, 5);
-                    
-                    Vertice newPoint = new Vertice((float) e.getX(), (float) e.getY());
-                    //Vertice newPointCP = new Vertice(newPoint);
-                    getVistaFromVisao(Visao.Perspectiva).getPipe().reverseConversion(newPoint);
-                    mundo.addTempPoint(newPoint);
-                    
-                    //Nregular newreg = new Nregular(6, 66, newPointCP);
-                    //getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newreg);
-                    //mundo.addObject(newreg);
+                } else if (CURRENT_SEL == FERRAMENTA_SEL){
+                    if (current_ferr == Ferramentas.Select){
+                        for (CGObject obj : getVistaFromVisao(Visao.Frontal).get2Dobjects()){
+                            if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
+                                selected_obj = obj;
+                                selectController.objectProperty().set(obj);
+                                paintStuff();
+                                return;
+                            }
+                        }
+
+                        selected_obj = null;
+                        selectController.objectProperty().set(null);
+                    }
                 }
             }
             paintStuff();
@@ -574,7 +587,6 @@ public class MainController implements Initializable {
     }
     
     private void paintStuff(){
-        System.out.println("PAINT");
         clearCanvases();
         
         for (Vista vista : mundo.getVistas()){
@@ -586,6 +598,12 @@ public class MainController implements Initializable {
             List<CGObject> objs = vista.get2Dobjects();
             for (CGObject obj : objs){
                 graphs.beginPath();
+
+                if (selected_obj!=null && obj.getID()==(selected_obj.getID())){
+                    graphs.setStroke(Color.RED);
+                } else {
+                    graphs.setStroke(Color.BLACK);
+                }
                 
                 Vertice point1 = obj.getPoint(0);
                 //System.out.println("Vista: " + vista.getVisao() + ". Point: " + point1);
@@ -615,8 +633,7 @@ public class MainController implements Initializable {
             graphs.beginPath();           
             Vertice point1 = vertices.get(0);
             graphs.fillOval(point1.getX(), point1.getY(), 5, 5);
-            if (vista.getVisao().equals(Visao.Lateral))
-                System.out.println("Point: " + point1);
+
             Vertice point2 = null;
             for (int i=1; i<vertices.size(); i++){
                 point2 = vertices.get(i);
@@ -699,6 +716,8 @@ public class MainController implements Initializable {
     private RegularPolygonController regularControl;
     private Parent revBuildOption;
     private RevBuildController revBuildController;
+    private Parent selectOption;
+    private PolySelectController selectController;
     
     @FXML //Clicar na árvore de ferramentas
     private void onMouseClickedToolsListener(MouseEvent e){
@@ -747,6 +766,19 @@ public class MainController implements Initializable {
         }
     }
     
+    private void loadSelect(){
+        if (selectController == null){
+            selectController = new PolySelectController(selected_obj);
+        }
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/PolySelect.fxml"));
+            loader.setController(selectController);
+            selectOption = loader.load();
+        } catch (IOException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        }
+    }
+    
     private void loadRevPorPontos(){
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/RevBuildOption.fxml"));
@@ -768,6 +800,8 @@ public class MainController implements Initializable {
                         options.getChildren().add(paintOption);
                         break;
                     case Select:
+                        if (selectOption == null) loadSelect();
+                        options.getChildren().add(selectOption);
                         break;
                     case Delete:
                         break;

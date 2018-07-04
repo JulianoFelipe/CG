@@ -38,8 +38,16 @@ public class PMath {
      * @return Verdadeiro se v próximo à qualquer vértice de p.
      */
     @Deprecated
-    public static boolean proximoDeQualquerVerticeDoPoligono(Poligono p, Vertice v){
-        return p.getPointList().stream().map((ver) -> VMath.distancia(ver, v)).anyMatch((d) -> (d < CLOSE_THRESHOLD));
+    public static boolean proximoDeQualquerVerticeDoPoligono(CGObject p, Vertice v){
+        for (int i=0; i<p.getNumberOfPoints(); i++){
+            Vertice ve = p.getPoint(i);
+            double dist = VMath.distancia(ve, v);
+            if (dist < CLOSE_THRESHOLD) return true;
+        }
+        
+        return false;
+        
+        //return p.getPointList().stream().map((ver) -> VMath.distancia(ver, v)).anyMatch((d) -> (d < CLOSE_THRESHOLD));
     }
     
     /**
