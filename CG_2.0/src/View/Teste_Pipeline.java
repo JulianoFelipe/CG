@@ -26,8 +26,8 @@ public class Teste_Pipeline {
     public static void main(String[] args) {
         
         Vertice ViewUp = new Vertice(0, 1, 0);
-        Vertice VRP    = new Vertice((float) 10, (float) 0, (float) 30);
-        Vertice P      = new Vertice(10, 0, 0);
+        Vertice VRP    = new Vertice((float) 10, (float) 50, (float) 30);
+        Vertice P      = new Vertice(10, 50, 0);
         
         MMath.printMatrix(VRP.getPointMatrix());
         
@@ -37,7 +37,7 @@ public class Teste_Pipeline {
         CGViewport view = new CGViewport(new Vertice(0, 0),
                                      new Vertice(320, 240) );
         
-        OrtPipeline pipe = new OrtPipeline(Visao.Frontal, cam, win, view);
+        OrtPipeline pipe = new OrtPipeline(Visao.Lateral, cam, win, view);
         //PersPipeline pipe = new PersPipeline(17, cam, win, view);
         
         System.out.println("\n\nMATRIZ SRU,SRC");

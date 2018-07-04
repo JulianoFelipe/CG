@@ -177,6 +177,8 @@ public class MainController implements Initializable {
         
         limparCena.setOnAction((ActionEvent event) -> {
             mundo.clearAll();
+            selected_obj = null;
+            if (selectController != null) selectController.objectProperty().set(null);
             paintStuff();
             
         });

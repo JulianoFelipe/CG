@@ -98,7 +98,6 @@ public class Vista implements Observer{
             clearAll();
             addObject(mundo.getObjectsCopy());
             addTempPoint(mundo.getTempPointsCopy());
-            System.out.println("Updated at Vista");
         }
     }
     
