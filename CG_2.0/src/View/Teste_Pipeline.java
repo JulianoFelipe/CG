@@ -37,7 +37,7 @@ public class Teste_Pipeline {
         CGViewport view = new CGViewport(new Vertice(0, 0),
                                      new Vertice(320, 240) );
         
-        OrtPipeline pipe = new OrtPipeline(Visao.Lateral, cam, win, view);
+        OrtPipeline pipe = new OrtPipeline(Visao.Topo, cam, win, view);
         //PersPipeline pipe = new PersPipeline(17, cam, win, view);
         
         System.out.println("\n\nMATRIZ SRU,SRC");

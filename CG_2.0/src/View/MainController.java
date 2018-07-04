@@ -285,20 +285,20 @@ public class MainController implements Initializable {
                           p.setX(  p.getX() + (float) 1);
                         break;
                     case W:
-                        vrp.setY(vrp.getY() + (float) 1);
-                          p.setY(  p.getY() + (float) 1);
-                        break;
-                    case A:
                         vrp.setZ(vrp.getZ() + (float) 1);
                           p.setZ(  p.getZ() + (float) 1);
                         break;
-                    case S:
-                        vrp.setY(vrp.getY() - (float) 1);
-                          p.setY(  p.getY() - (float) 1);
+                    case A:
+                        vrp.setY(vrp.getY() + (float) 1);
+                          p.setY(  p.getY() + (float) 1);
                         break;
-                    case D:
+                    case S:
                         vrp.setZ(vrp.getZ() - (float) 1);
                           p.setZ(  p.getZ() - (float) 1);
+                        break;
+                    case D:
+                        vrp.setY(vrp.getY() - (float) 1);
+                          p.setY(  p.getY() - (float) 1);
                         break;
                     case ESCAPE:
                         lateral.setOnKeyPressed(null);

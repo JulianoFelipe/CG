@@ -84,8 +84,8 @@ public class OrtPipeline extends CGPipeline{
         float[][] pointMat = object.getPointMatrix();
         float[] proportions = jpProportions();
         for (int i=0; i<object.getNumberOfPoints(); i++){
-            pointMat[0][i] = (pointMat[0][i] * proportions[0]) - cam.getVRP().getX();
-            pointMat[1][i] = (pointMat[1][i] * proportions[1]) - cam.getVRP().getY();
+            pointMat[0][i] = (pointMat[0][i] - cam.getVRP().getX()) * proportions[0];
+            pointMat[1][i] = (pointMat[1][i] - cam.getVRP().getY()) * proportions[1];
             pointMat[2][i] = 0;
         }
     }
@@ -94,9 +94,8 @@ public class OrtPipeline extends CGPipeline{
         float[][] pointMat = object.getPointMatrix();
         float[] proportions = jpProportions();
         for (int i=0; i<object.getNumberOfPoints(); i++){
-            float temp =     (pointMat[0][i] * proportions[1]) - cam.getVRP().getZ();
-            pointMat[0][i] = (pointMat[1][i] * proportions[0]) - cam.getVRP().getY();
-            pointMat[1][i] = temp;
+            pointMat[0][i] = (pointMat[1][i] - cam.getVRP().getY()) * proportions[0];
+            pointMat[1][i] = (pointMat[2][i] - cam.getVRP().getZ()) * proportions[1];
             pointMat[2][i] = 0;
         }
     }
@@ -105,9 +104,10 @@ public class OrtPipeline extends CGPipeline{
         float[][] pointMat = object.getPointMatrix();
         float[] proportions = jpProportions();
         for (int i=0; i<object.getNumberOfPoints(); i++){
-            pointMat[0][i] = (pointMat[0][i] * proportions[0]) - cam.getVRP().getX();
-            pointMat[1][i] = (pointMat[2][i] * proportions[1]) - cam.getVRP().getZ();
-            pointMat[2][i]  = 0;
+            pointMat[0][i] = (pointMat[0][i] - cam.getVRP().getX()) * proportions[0];
+            pointMat[1][i] = (pointMat[2][i] - cam.getVRP().getZ()) * proportions[1];
+            pointMat[2][i] = 0;
+            
         }
     }
 //</editor-fold>
@@ -201,10 +201,9 @@ public class OrtPipeline extends CGPipeline{
         float[][] pointMat = object.getPointMatrix();
         float[] proportions = jpProportions();
         for (int i=0; i<object.getNumberOfPoints(); i++){
-            float temp =     (pointMat[0][i] / proportions[1]) + cam.getVRP().getZ();
-            pointMat[0][i] = (pointMat[1][i] / proportions[0]) + cam.getVRP().getY();
-            pointMat[1][i] = temp;
-            pointMat[2][i] = 0;
+            pointMat[2][i] = (pointMat[1][i] / proportions[0]) + cam.getVRP().getZ();
+            pointMat[1][i] = (pointMat[0][i] / proportions[1]) + cam.getVRP().getY();
+            pointMat[0][i] = 0;
         }
     }
     
@@ -212,9 +211,9 @@ public class OrtPipeline extends CGPipeline{
         float[][] pointMat = object.getPointMatrix();
         float[] proportions = jpProportions();
         for (int i=0; i<object.getNumberOfPoints(); i++){
-            pointMat[0][i] = (pointMat[0][i] * proportions[0]) - cam.getVRP().getX();
-            pointMat[1][i] = (pointMat[2][i] * proportions[1]) - cam.getVRP().getZ();
-            pointMat[2][i]  = 0;
+            pointMat[0][i] = (pointMat[0][i] / proportions[0]) + cam.getVRP().getX();
+            pointMat[2][i] = (pointMat[1][i] / proportions[1]) + cam.getVRP().getZ();
+            pointMat[1][i] = 0;
         }
     }
 //</editor-fold>
