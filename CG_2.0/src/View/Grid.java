@@ -7,6 +7,8 @@ package View;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.Event;
+import javafx.event.EventType;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -30,7 +32,10 @@ public class Grid extends ImageView{
     private int cellSizePX = 50;
     private Color gridColor = Color.RED;
     private int gridThickness = 2;
-       
+    
+    private boolean showGrid = true;
+    private boolean showAxisIcon = true;
+    
     public Grid(Canvas canvas, Image axis, int cellSizePX) {
         this.AXIS = axis;
         this.cellSizePX = cellSizePX;
@@ -66,16 +71,19 @@ public class Grid extends ImageView{
         GraphicsContext graph = drawableGrid.getGraphicsContext2D();
         graph.clearRect(0, 0, drawableGrid.getWidth(), drawableGrid.getHeight());
         
-        graph.drawImage(AXIS, X_MARGIN, calcLowerY(AXIS, drawableGrid, Y_MARGIN));
+        if (showAxisIcon)
+            graph.drawImage(AXIS, X_MARGIN, calcLowerY(AXIS, drawableGrid, Y_MARGIN));
         
-        graph.setStroke(Color.RED); //Cor da linha
-        graph.setLineWidth(5); //Espessura da linha
+        if (showGrid){
+            graph.setStroke(gridColor); //Cor da linha
+            graph.setLineWidth(gridThickness); //Espessura da linha
 
-          //HERE
-        graph.strokeLine(0, 0, drawableGrid.getWidth(), drawableGrid.getHeight());
+            //HERE
+            graph.strokeLine(0, 0, drawableGrid.getWidth(), drawableGrid.getHeight());
 
 
-          //END
+            //END
+        }
         
         SnapshotParameters parameters = new SnapshotParameters();
         parameters.setFill(Color.TRANSPARENT);
@@ -88,17 +96,30 @@ public class Grid extends ImageView{
     }
     
     public void setGridColor(Color color){
-        if (color != null)
+        if (color != null){
             this.gridColor = color;
+            redraw();
+        }
     }
     
     public void setGridThickness(int thick){
-        if (thick > 0)
+        if (thick > 0){
             this.gridThickness = thick;
+            redraw();
+        }
+    }
+        
+    public void showGrid(boolean show){
+        if (showGrid != show){
+            this.showGrid = show;
+            redraw();
+        }        
     }
     
-    public void setGridProperties(Color color, int thickness){
-        setGridColor(color);
-        setGridThickness(thickness);
+    public void showAxisIcon(boolean show){
+        if (showAxisIcon != show){
+            this.showAxisIcon = show;
+            redraw();
+        }  
     }
 }

@@ -20,6 +20,8 @@ import java.util.logging.Logger;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -28,8 +30,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -71,6 +76,13 @@ public class MainController implements Initializable {
     @FXML private MenuItem salvar;
     @FXML private MenuItem carregar;
     @FXML private MenuItem limparCena;
+    @FXML private CheckMenuItem showGrid;
+    @FXML private CheckMenuItem showAxisIcon;
+    @FXML private CheckMenuItem showAxis;
+    @FXML private MenuItem factors;
+    @FXML private Slider      gridThickness;
+    @FXML private Slider      gridOpacity;
+    @FXML private ColorPicker gridColor;
     
     @FXML private TreeView<String> tools;
     @FXML private AnchorPane options;
@@ -102,45 +114,54 @@ public class MainController implements Initializable {
         initializeResizeAndCanvasHUD(); //Coloca Grids e listeners de resize
         initializeCanvases(); //Listeners para clicks nos canvas (Exceto perspectiva)
         
+        //checkConfig();
+
         paintStuff();
     }
+    
+    //<editor-fold defaultstate="collapsed" desc="Alterações nos grids">
+    
+    private Grid frenteGrid;
+    private Grid lateralGrid;
+    private Grid topoGrid;
+    private Grid persGrid;
     
     private void initializeResizeAndCanvasHUD(){
         StackPane parentPane = (StackPane) frente.getParent();
         parentPane.resize(frente.getWidth(), frente.getHeight());
         frente.widthProperty().bind(parentPane.widthProperty());
         frente.heightProperty().bind(parentPane.heightProperty());
-        Grid grid = new Grid(frente, Visao.Frontal);
-        grid.setOpacity(0.35);
-        /*grid.setFocusTraversable(true);*/ grid.setMouseTransparent(true);
-        parentPane.getChildren().add(grid);
+        frenteGrid = new Grid(frente, Visao.Frontal);
+        frenteGrid.setOpacity(0.35);
+        /*grid.setFocusTraversable(true);*/ frenteGrid.setMouseTransparent(true);
+        parentPane.getChildren().add(frenteGrid);
         
         parentPane = (StackPane) lateral.getParent();
         parentPane.resize(lateral.getWidth(), lateral.getHeight());
         lateral.widthProperty().bind(parentPane.widthProperty());
         lateral.heightProperty().bind(parentPane.heightProperty());
-        grid = new Grid(lateral, Visao.Lateral);
-        grid.setOpacity(0.35);
-        /*grid.setFocusTraversable(true);*/ grid.setMouseTransparent(true);
-        parentPane.getChildren().add(grid);
+        lateralGrid = new Grid(lateral, Visao.Lateral);
+        lateralGrid.setOpacity(0.35);
+        /*grid.setFocusTraversable(true);*/ lateralGrid.setMouseTransparent(true);
+        parentPane.getChildren().add(lateralGrid);
         
         parentPane = (StackPane) topo.getParent();
         parentPane.resize(topo.getWidth(), topo.getHeight());
         topo.widthProperty().bind(parentPane.widthProperty());
         topo.heightProperty().bind(parentPane.heightProperty());
-        grid = new Grid(topo, Visao.Topo);
-        grid.setOpacity(0.35);
-        /*grid.setFocusTraversable(true);*/ grid.setMouseTransparent(true);
-        parentPane.getChildren().add(grid);
+        topoGrid = new Grid(topo, Visao.Topo);
+        topoGrid.setOpacity(0.35);
+        /*grid.setFocusTraversable(true);*/ topoGrid.setMouseTransparent(true);
+        parentPane.getChildren().add(topoGrid);
         
         parentPane = (StackPane) perspectiva.getParent();
         parentPane.resize(perspectiva.getWidth(), perspectiva.getHeight());
         perspectiva.widthProperty().bind(parentPane.widthProperty());
         perspectiva.heightProperty().bind(parentPane.heightProperty());
-        grid = new Grid(perspectiva, Visao.Perspectiva);
-        grid.setOpacity(0.35);
+        persGrid = new Grid(perspectiva, Visao.Perspectiva);
+        persGrid.setOpacity(0.35);
         /*grid.setFocusTraversable(true); grid.setMouseTransparent(true);*/ //Sem click na perspectiva mesmo...
-        parentPane.getChildren().add(grid);
+        parentPane.getChildren().add(persGrid);
         
         ////Atualização de pintura
         ChangeListener<Number> canvasSizeListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -155,7 +176,10 @@ public class MainController implements Initializable {
         topo.heightProperty().addListener(canvasSizeListener);
         perspectiva.widthProperty() .addListener(canvasSizeListener);
         perspectiva.heightProperty().addListener(canvasSizeListener);
+        
+        mundo.addAxis();
     }
+//</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Listeners gerais para barra de menu e barras de ferramentas">
     private void initializeTools(){
@@ -190,6 +214,64 @@ public class MainController implements Initializable {
     }
     
     private void initializeMenuBar(){
+        showGrid.setOnAction((ActionEvent event) -> {
+            boolean show = showGrid.selectedProperty().get();
+            frenteGrid.showGrid(show);
+            lateralGrid.showGrid(show);
+            topoGrid.showGrid(show);
+            persGrid.showGrid(show);
+        });
+        
+        showAxisIcon.setOnAction((ActionEvent event) -> {
+            boolean show = showAxisIcon.selectedProperty().get();
+            frenteGrid.showAxisIcon(show);
+            lateralGrid.showAxisIcon(show);
+            topoGrid.showAxisIcon(show);
+            persGrid.showAxisIcon(show);
+        });
+        
+        showAxis.setOnAction((ActionEvent event) -> {
+            boolean show = showAxis.selectedProperty().get();
+            if (show){
+                mundo.addAxis();
+            } else {
+                mundo.removeAxis();
+            }
+            paintStuff();
+        });
+        
+        factors.setOnAction((ActionEvent event) -> {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        });
+        
+        /*gridThickness.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            System.out.println("GRID THICK: OLD=" + oldValue + " New="+ newValue);
+        });*/ //Muitos updates se não fazer um check com "valueChangingProperty()"
+        gridThickness.setOnMouseReleased((Event event) -> {
+            int thickness = gridThickness.valueProperty().intValue();
+            frenteGrid.setGridThickness(thickness);
+            lateralGrid.setGridThickness(thickness);
+            topoGrid.setGridThickness(thickness);
+            persGrid.setGridThickness(thickness);
+        });
+        
+        gridOpacity.setOnMouseReleased((Event event) -> {
+            double opacity = gridOpacity.valueProperty().get();
+            frenteGrid.setOpacity(opacity);
+            lateralGrid.setOpacity(opacity);
+            topoGrid.setOpacity(opacity);
+            persGrid.setOpacity(opacity);
+        });
+        
+        gridColor.valueProperty().set(Color.RED);
+        gridColor.valueProperty().addListener((ObservableValue<? extends Color> observable, Color oldValue, Color newValue) -> {
+            Color color = newValue;
+            frenteGrid.setGridColor(color);
+            lateralGrid.setGridColor(color);
+            topoGrid.setGridColor(color);
+            persGrid.setGridColor(color);
+        });
+        
         salvar.setOnAction((ActionEvent event) -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
@@ -218,9 +300,9 @@ public class MainController implements Initializable {
                     List<CGObject> objectsList = InputScene.getListFromFile(file);
                     mundo.clearAll();
                     //mundo.addObject(objectsList);
-                    for (CGObject obj : objectsList){
+                    objectsList.forEach((obj) -> {
                         mundo.addObject(obj);
-                    }
+                    });
                     paintStuff();
                 } catch (IOException ex) {
                     Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);

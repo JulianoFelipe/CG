@@ -52,19 +52,19 @@ public class CG_20 extends Application {
             //  A    B    C    D    E
         };
         
-        Aresta x_axis = new Aresta(new Vertice(0,0,0), new Vertice(5000,0,0));
-        Aresta y_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,5000,0));
-        Aresta z_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,5000));
+        /*Aresta x_axis = new Aresta(new Vertice(-5000,0,0), new Vertice(5000,0,0));
+        Aresta y_axis = new Aresta(new Vertice(0,-5000,0), new Vertice(0,5000,0));
+        Aresta z_axis = new Aresta(new Vertice(0,0,-5000), new Vertice(0,0,5000));*/
         
-        Aresta mx_axis = new Aresta(new Vertice(0,0,0), new Vertice(-5000,0,0));
+        /*Aresta mx_axis = new Aresta(new Vertice(0,0,0), new Vertice(-5000,0,0));
         Aresta my_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,-5000,0));
-        Aresta mz_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,-5000));
+        Aresta mz_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,-5000));*/
         
         Poligono pol = new Poligono(pol_mat);
         List<Face> lista = PMath.attemptBuildingFromPlanes(pol);
 
         mundo.addObject(lista);
-        mundo.addObject(x_axis, y_axis, z_axis, mx_axis, my_axis, mz_axis);
+        //mundo.addObject(x_axis, y_axis, z_axis);//, mx_axis, my_axis, mz_axis);
         
         //PaintController paint = new PaintController();
         //RegularPolygonController regular = new RegularPolygonController();

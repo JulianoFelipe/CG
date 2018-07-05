@@ -14,7 +14,6 @@ import java.util.logging.Logger;
 import m.pipeline.CGPipeline;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
-import utils.math.MMath;
 
 /**
  *
@@ -107,5 +106,14 @@ public class Vista implements Observer{
     
     public CGPipeline getPipe(){
         return pipe;
+    }
+    
+    public void remove(long id){
+        for (CGObject obj : objetos){
+            if (obj.getID() == id){
+                objetos.remove(obj);
+                return;
+            }
+        }
     }
 }

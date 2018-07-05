@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import m.poligonos.Aresta;
 import m.poligonos.CGObject;
@@ -27,14 +28,47 @@ public class World {
     private final List<Vertice> tempPoints;
     private List<Vista> vistas;
     
+    private final List<CGObject> axis = new ArrayList<>();
+    private boolean addedAxisFlag = false;
+    
     private World() {       
         objetos    = new ArrayList();
         tempPoints = new ArrayList();
+        
+        Aresta x_axis = new Aresta(new Vertice(0,0,0), new Vertice(5000,0,0));
+        Aresta y_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,5000,0));
+        Aresta z_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,5000));
+        
+        Aresta mx_axis = new Aresta(new Vertice(0,0,0), new Vertice(-5000,0,0));
+        Aresta my_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,-5000,0));
+        Aresta mz_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,-5000));
+        
+        axis.add( x_axis);
+        axis.add( y_axis);
+        axis.add( z_axis);
+        axis.add(mx_axis);
+        axis.add(my_axis);
+        axis.add(mz_axis);
     }
     
     private World(List<CGObject> lista){
         objetos    = new ArrayList(lista);
         tempPoints = new ArrayList();
+        
+        Aresta x_axis = new Aresta(new Vertice(0,0,0), new Vertice(5000,0,0));
+        Aresta y_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,5000,0));
+        Aresta z_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,5000));
+        
+        Aresta mx_axis = new Aresta(new Vertice(0,0,0), new Vertice(-5000,0,0));
+        Aresta my_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,-5000,0));
+        Aresta mz_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,-5000));
+        
+        axis.add( x_axis);
+        axis.add( y_axis);
+        axis.add( z_axis);
+        axis.add(mx_axis);
+        axis.add(my_axis);
+        axis.add(mz_axis);
     }
     
     public void setPlanes(Vista...planes){
@@ -139,5 +173,37 @@ public class World {
         vistas.forEach((vista) -> {
             vista.clearAll();
         });
+        
+        if (addedAxisFlag){
+            addedAxisFlag = false;
+            addAxis();
+        }
     }    
+    
+    public void addAxis(){
+        if (addedAxisFlag) return;
+        
+        addObject(axis);
+        addedAxisFlag = true;
+    }
+    
+    public void removeAxis(){
+        axis.forEach((CGObject axisObj) -> {
+            removeObject(axisObj.getID());
+            vistas.forEach((vista) -> {
+                vista.remove(axisObj.getID());
+            });
+        });
+        
+        addedAxisFlag = false;
+    }
+    
+    public void removeObject(long id){
+        for (CGObject obj : objetos){
+            if (obj.getID() == id){
+                objetos.remove(obj);
+                return;
+            }
+        }
+    }
 }

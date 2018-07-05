@@ -23,6 +23,52 @@
                         <MenuItem fx:id="limparCena" mnemonicParsing="false" text="Limpar Cena" />
                   </items>
                 </Menu>
+                  <Menu mnemonicParsing="false" text="Editar">
+                    <items>
+                        <Menu mnemonicParsing="false" text="Exibir">
+                           <items>
+                              <CheckMenuItem fx:id="showAxisIcon" mnemonicParsing="false" selected="true" text="Ícones de eixos" />
+                              <CheckMenuItem fx:id="showGrid" mnemonicParsing="false" selected="true" text="Linhas de grade" />
+                              <CheckMenuItem fx:id="showAxis" mnemonicParsing="false" selected="true" text="Linhas de eixo" />
+                           </items>
+                        </Menu>
+                        <Menu mnemonicParsing="false" text="Grade">
+                          <items>
+                            <MenuItem mnemonicParsing="false" text="Cor">
+                                 <graphic>
+                                    <ColorPicker fx:id="gridColor" editable="true" />
+                                 </graphic>
+                              </MenuItem>
+                              <MenuItem mnemonicParsing="false" text="Espessura">
+                                 <graphic>
+                                    <Slider fx:id="gridThickness" blockIncrement="2.0" majorTickUnit="2.0" max="10.0" min="1.0" minorTickCount="1" showTickLabels="true" showTickMarks="true" snapToTicks="true" style="-fx-background-color: GRAY;" value="2.0" />
+                                 </graphic>
+                              </MenuItem>
+                              <MenuItem mnemonicParsing="false" text="Opacidade">
+                                 <graphic>
+                                    <Slider fx:id="gridOpacity" blockIncrement="0.05" majorTickUnit="0.25" max="1.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" style="-fx-background-color: GRAY;" value="0.35" />
+                                 </graphic>
+                              </MenuItem>
+                          </items>
+                        </Menu>
+                      <MenuItem fx:id="factors" mnemonicParsing="false" text="Fatores de alteração" />
+                    </items>
+                  </Menu>
+                  <Menu mnemonicParsing="false" text="Renderização">
+                     <items>
+                        <CheckMenuItem mnemonicParsing="false" text="Lazy Loading" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <RadioMenuItem mnemonicParsing="false" text="Wireframe s/ ocultação">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="RenderGroup" />
+                           </toggleGroup>
+                        </RadioMenuItem>
+                        <RadioMenuItem mnemonicParsing="false" text="Flat Shading" toggleGroup="$RenderGroup" />
+                        <RadioMenuItem mnemonicParsing="false" text="Gouraud Shading" toggleGroup="$RenderGroup" />
+                        <RadioMenuItem mnemonicParsing="false" text="Phong Shading" toggleGroup="$RenderGroup" />
+                        <RadioMenuItem mnemonicParsing="false" text="Ray Tracing" toggleGroup="$RenderGroup" />
+                     </items>
+                  </Menu>
               </menus>
                <BorderPane.margin>
                   <Insets />
