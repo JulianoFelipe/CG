@@ -48,16 +48,16 @@
                 <RowConstraints maxHeight="1.7976931348623157E308" minHeight="10.0" prefHeight="409.0" vgrow="SOMETIMES" />
               </rowConstraints>
                <children>
-                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;">
+                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.hgrow="SOMETIMES" GridPane.vgrow="SOMETIMES">
                      <children>
-                        <HBox maxHeight="35.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
+                        <HBox maxHeight="35.0" minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;" VBox.vgrow="SOMETIMES">
                            <children>
-                              <Label alignment="CENTER" prefHeight="35.0" prefWidth="69.0" text="Frente (X, Y)">
+                              <Label alignment="CENTER" minWidth="-Infinity" prefHeight="35.0" prefWidth="69.0" text="Frente (X, Y)" HBox.hgrow="NEVER">
                                  <HBox.margin>
                                     <Insets left="5.0" />
                                  </HBox.margin>
                               </Label>
-                              <Pane prefHeight="35.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                              <Pane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="200.0" HBox.hgrow="SOMETIMES" />
                               <MenuButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="48.0">
                                 <items>
                                   <MenuItem fx:id="frenteCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
@@ -76,31 +76,23 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane minHeight="0.0" minWidth="0.0">
+                        <StackPane minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES">
                            <children>
                               <Canvas fx:id="frente" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
-                              <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
-                                 <image>
-                                    <Image url="@../resource/images/Frontal.png" />
-                                 </image>
-                                 <StackPane.margin>
-                                    <Insets bottom="5.0" left="5.0" />
-                                 </StackPane.margin>
-                              </ImageView>
                            </children>
                         </StackPane>
                      </children>
                   </VBox>
-                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1">
+                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.hgrow="SOMETIMES" GridPane.vgrow="SOMETIMES">
                      <children>
-                        <HBox maxHeight="35.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
+                        <HBox maxHeight="35.0" minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;" VBox.vgrow="SOMETIMES">
                            <children>
-                              <Label alignment="CENTER" prefHeight="35.0" prefWidth="69.0" text="Lateral (Y, Z)">
+                              <Label alignment="CENTER" minWidth="-Infinity" prefHeight="35.0" prefWidth="69.0" text="Lateral (Y, Z)" HBox.hgrow="NEVER">
                                  <HBox.margin>
                                     <Insets left="5.0" />
                                  </HBox.margin>
                               </Label>
-                              <Pane prefHeight="35.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                              <Pane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="200.0" style="-: ;" HBox.hgrow="SOMETIMES" />
                               <MenuButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="48.0">
                                  <graphic>
                                     <ImageView>
@@ -119,31 +111,23 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane>
+                        <StackPane minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES">
                            <children>
                               <Canvas fx:id="lateral" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
-                              <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
-                                 <image>
-                                    <Image url="@../resource/images/Lateral.png" />
-                                 </image>
-                                 <StackPane.margin>
-                                    <Insets bottom="5.0" left="5.0" />
-                                 </StackPane.margin>
-                              </ImageView>
                            </children>
                         </StackPane>
                      </children>
                   </VBox>
-                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.rowIndex="1">
+                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="1" GridPane.vgrow="SOMETIMES">
                      <children>
-                        <HBox maxHeight="35.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
+                        <HBox maxHeight="35.0" minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
                            <children>
-                              <Label alignment="CENTER" prefHeight="35.0" prefWidth="69.0" text="Topo (X, Z)">
+                              <Label alignment="CENTER" minWidth="-Infinity" prefHeight="35.0" prefWidth="69.0" text="Topo (X, Z)" HBox.hgrow="NEVER">
                                  <HBox.margin>
                                     <Insets left="5.0" />
                                  </HBox.margin>
                               </Label>
-                              <Pane prefHeight="35.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                              <Pane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="200.0" HBox.hgrow="SOMETIMES" />
                               <MenuButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="48.0">
                                  <graphic>
                                     <ImageView>
@@ -162,31 +146,23 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane>
+                        <StackPane minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES">
                            <children>
                               <Canvas fx:id="topo" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
-                              <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
-                                 <image>
-                                    <Image url="@../resource/images/Topo.png" />
-                                 </image>
-                                 <StackPane.margin>
-                                    <Insets bottom="5.0" left="5.0" />
-                                 </StackPane.margin>
-                              </ImageView>
                            </children>
                         </StackPane>
                      </children>
                   </VBox>
-                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                  <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="1" GridPane.vgrow="SOMETIMES">
                      <children>
-                        <HBox maxHeight="35.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
+                        <HBox maxHeight="35.0" minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
                            <children>
-                              <Label alignment="CENTER" prefHeight="35.0" prefWidth="69.0" text="Perspectiva">
+                              <Label alignment="CENTER" minWidth="-Infinity" prefHeight="35.0" prefWidth="69.0" text="Perspectiva" HBox.hgrow="NEVER">
                                  <HBox.margin>
                                     <Insets left="5.0" />
                                  </HBox.margin>
                               </Label>
-                              <Pane prefHeight="35.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                              <Pane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="200.0" HBox.hgrow="SOMETIMES" />
                               <MenuButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="48.0">
                                  <graphic>
                                     <ImageView>
@@ -205,17 +181,9 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane>
+                        <StackPane minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES">
                            <children>
                               <Canvas fx:id="perspectiva" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
-                              <ImageView disable="true" focusTraversable="true" opacity="0.35" pickOnBounds="true" preserveRatio="true" StackPane.alignment="BOTTOM_LEFT">
-                                 <image>
-                                    <Image url="@../resource/images/Perspectiva.png" />
-                                 </image>
-                                 <StackPane.margin>
-                                    <Insets bottom="5.0" left="5.0" />
-                                 </StackPane.margin>
-                              </ImageView>
                            </children>
                         </StackPane>
                      </children>

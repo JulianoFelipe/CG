@@ -87,7 +87,7 @@ public class Teste_Grid extends Application {
         stage.setTitle("Where's Batman?");
         stage.setScene(new Scene(batman));
         stage.show();
-        stage.setResizable(false);
+        //stage.setResizable(false);
     }
 
     public static void main(String[] args) {

@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -38,6 +39,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
@@ -93,13 +95,66 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mundo = World.getInstance();
-        
+                
         initializeTools(); //Listeners para a barra esquerda de ferramentas
         initializeMenuBar(); //Listeners para a barra de menu superior
         initializeViewToolbars(); //Listeners para as 4 barras de ferramentas das views
+        initializeResizeAndCanvasHUD(); //Coloca Grids e listeners de resize
         initializeCanvases(); //Listeners para clicks nos canvas (Exceto perspectiva)
         
         paintStuff();
+    }
+    
+    private void initializeResizeAndCanvasHUD(){
+        StackPane parentPane = (StackPane) frente.getParent();
+        parentPane.resize(frente.getWidth(), frente.getHeight());
+        frente.widthProperty().bind(parentPane.widthProperty());
+        frente.heightProperty().bind(parentPane.heightProperty());
+        Grid grid = new Grid(frente, Visao.Frontal);
+        grid.setOpacity(0.35);
+        /*grid.setFocusTraversable(true);*/ grid.setMouseTransparent(true);
+        parentPane.getChildren().add(grid);
+        
+        parentPane = (StackPane) lateral.getParent();
+        parentPane.resize(lateral.getWidth(), lateral.getHeight());
+        lateral.widthProperty().bind(parentPane.widthProperty());
+        lateral.heightProperty().bind(parentPane.heightProperty());
+        grid = new Grid(lateral, Visao.Lateral);
+        grid.setOpacity(0.35);
+        /*grid.setFocusTraversable(true);*/ grid.setMouseTransparent(true);
+        parentPane.getChildren().add(grid);
+        
+        parentPane = (StackPane) topo.getParent();
+        parentPane.resize(topo.getWidth(), topo.getHeight());
+        topo.widthProperty().bind(parentPane.widthProperty());
+        topo.heightProperty().bind(parentPane.heightProperty());
+        grid = new Grid(topo, Visao.Topo);
+        grid.setOpacity(0.35);
+        /*grid.setFocusTraversable(true);*/ grid.setMouseTransparent(true);
+        parentPane.getChildren().add(grid);
+        
+        parentPane = (StackPane) perspectiva.getParent();
+        parentPane.resize(perspectiva.getWidth(), perspectiva.getHeight());
+        perspectiva.widthProperty().bind(parentPane.widthProperty());
+        perspectiva.heightProperty().bind(parentPane.heightProperty());
+        grid = new Grid(perspectiva, Visao.Perspectiva);
+        grid.setOpacity(0.35);
+        /*grid.setFocusTraversable(true); grid.setMouseTransparent(true);*/ //Sem click na perspectiva mesmo...
+        parentPane.getChildren().add(grid);
+        
+        ////Atualização de pintura
+        ChangeListener<Number> canvasSizeListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
+            paintStuff();
+        };
+        
+        frente.widthProperty() .addListener(canvasSizeListener);
+        frente.heightProperty().addListener(canvasSizeListener);
+        lateral.widthProperty() .addListener(canvasSizeListener);
+        lateral.heightProperty().addListener(canvasSizeListener);
+        topo.widthProperty() .addListener(canvasSizeListener);
+        topo.heightProperty().addListener(canvasSizeListener);
+        perspectiva.widthProperty() .addListener(canvasSizeListener);
+        perspectiva.heightProperty().addListener(canvasSizeListener);
     }
     
     //<editor-fold defaultstate="collapsed" desc="Listeners gerais para barra de menu e barras de ferramentas">

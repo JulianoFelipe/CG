@@ -19,9 +19,8 @@ public enum Eixo {
     Eixo_XYZ(Eixo_X.flags | Eixo_Y.flags | Eixo_Z.flags);
     
     private int flags;
-
+    
     private Eixo(int flags) {
         this.flags = flags;
     }
-    
 }

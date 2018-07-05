@@ -5,10 +5,26 @@
  */
 package m;
 
+import javafx.scene.image.Image;
+
 /**
  *
  * @author JFPS
  */
 public enum Visao {
-    Frontal, Lateral, Topo, Perspectiva;
+    Frontal    (new Image("/resource/images/Frontal.png")),
+    Lateral    (new Image("/resource/images/Lateral.png")),
+    Topo       (new Image("/resource/images/Topo.png")),
+    Perspectiva(new Image("/resource/images/Perspectiva.png"));
+    
+    private final Image image;
+    private Visao (Image img){
+        this.image = img;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+    
+    
 }
