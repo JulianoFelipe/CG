@@ -86,7 +86,7 @@ public class Vertice extends CGObject{
     
     @Override
     public String toString() {
-        return "("+getX()+";"+getY()+";" + getZ() + ")";
+        return "("+getX()+";"+getY()+";" + getZ() + ";" + getW() + ")";
     }
     
     @Override

@@ -8,12 +8,11 @@ package utils.math;
 //import Model.Poligono;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
-import m.poligonos.Aresta;
 import m.poligonos.CGObject;
 import m.poligonos.Face;
+import m.poligonos.PointObject;
 import m.poligonos.Poligono;
 import m.poligonos.Vertice;
 
@@ -127,7 +126,7 @@ public class PMath {
         return ret;
     }
     
-    /*private static boolean planesAreEqual(float[] plane1, float[] plane2){
+    private static boolean planesAreEqual(float[] plane1, float[] plane2){
         Vertice v1 = new Vertice(plane1[0], plane1[1], plane1[2]);
         v1.setW(plane1[3]);
         VMath.normalizar(v1);
@@ -140,7 +139,7 @@ public class PMath {
             && (v1.getX()==v2.getX()) //uso de curto circuito
             && (v1.getY()==v2.getY()) //torna mais eficiente que começar
             && (v1.getZ()==v2.getZ()); //com x; já que planos paralelos teria tudo menos W igual.
-    }*/
+    }
     
     private static boolean pointBelongsToPlane(Vertice plane, Vertice point){
         double res = (plane.getX()*point.getX()) // a * point.getX()
@@ -164,16 +163,22 @@ public class PMath {
             numberOfPoints = object.getNumberOfPoints();
         
         Vertice plane1;
-        
-        HashSet<Vertice> existingPlanes = new HashSet<>();
+        System.out.println("COMS: " + numberOfCombs);
+        HashSet<Integer> existingPlanes = new HashSet<>();
         List<Vertice> currentPlane;
         List<Face> listaDeFaces = new ArrayList<>();
         for (int i=0; i<numberOfCombs; i++){
             plane1 = buildPlane(um.get(i), dois.get(i), tres.get(i));
 
-            if (existingPlanes.contains(plane1)) //Essa combinação é referente à um plano já testao? Se sim, pula
+            if (existingPlanes.size()>0 && existingPlanes.contains(plane1.hashCode())){ 
+                //Essa combinação é referente à um plano já testado? Se sim, pula
                 continue;
-            existingPlanes.add(plane1);
+            } 
+            //Coloquei só Hash mesmo podendo dar falsos positivos (em relação à conter
+            //planos), pois é uma alteração fácil que altera várias duplicadas de planos
+            //orientados em sentidos diferentes (e.g. o "mesmo" plano só que um para cima
+            //e outro para baixo)
+            existingPlanes.add(plane1.hashCode());
             
             //Por que não adicionar os pontos do plane1 na face aqui?
             //...
@@ -196,18 +201,26 @@ public class PMath {
     
     public static List<Face> attemptBuildingFromPlanes(List<Vertice> lista){
         if (lista.size() < 3) return null;
-        
-        Poligono pol = Poligono.build(lista);
-        
+
+        PointObject pol = PointObject.build(lista);
+
         return attemptBuildingFromPlanes(pol);
     }
-    
+
     /*public static void main(String...args){
-        float[][] pol_mat = {
+        /*float[][] pol_mat = {
             {  30,  35,  25,  20,  30},
             {   2,   4,   3,   1,  10},
             {  25,  20,  18,  23,  (float) 22.5},
             {   1,   1,   1,   1,   1}
+            //  A    B    C    D    E
+        };*/
+        
+        /*float[][] pol_mat = {
+            {  0,  00,   0,  00},
+            {  0,  10,  00,  10},
+            {  0,   0,  10,  10},
+            {  1,   1,   1,   1}
             //  A    B    C    D    E
         };*/
         
@@ -224,7 +237,7 @@ public class PMath {
         
         System.out.println(buildPlane(p, q, r));*/
         
-        /*Poligono pol = new Poligono(pol_mat);
+        /*PointObject pol = new PointObject(pol_mat);
         List<Face> listaFaces = attemptBuildingFromPlanes(pol);
         
         for (Face f : listaFaces){

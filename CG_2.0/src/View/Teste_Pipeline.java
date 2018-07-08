@@ -10,7 +10,7 @@ import m.CGViewport;
 import m.Visao;
 import m.CGWindow;
 import m.pipeline.OrtPipeline;
-import m.poligonos.Poligono;
+import m.poligonos.PointObject;
 import m.poligonos.Vertice;
 import utils.math.MMath;
 
@@ -62,7 +62,7 @@ public class Teste_Pipeline {
             //  A    B    C    D    E
         };
         
-        Poligono pol = new Poligono(pol_mat);
+        PointObject pol = new PointObject(pol_mat);
         
         System.out.println("\nMATRIZ DE PONTOS");
         MMath.printMatrix(pol_mat);

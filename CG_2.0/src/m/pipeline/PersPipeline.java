@@ -102,4 +102,9 @@ public class PersPipeline extends CGPipeline{
     public Visao getVisao() {
         return Visao.Perspectiva;
     }
+
+    @Override
+    public float getDP() {
+        return DP;
+    }
 }

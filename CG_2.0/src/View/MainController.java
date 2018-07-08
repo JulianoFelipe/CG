@@ -21,7 +21,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -32,6 +31,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
@@ -100,6 +100,11 @@ public class MainController implements Initializable {
     @FXML private MenuItem topoCamAuto;
     @FXML private MenuItem persCamParams;
     @FXML private MenuItem persCamAuto;
+    
+    @FXML private Label frenteZoom;
+    @FXML private Label lateralZoom;
+    @FXML private Label topoZoom;
+    @FXML private Label persZoom;
     
     private World mundo;
     private CGObject selected_obj = null;
@@ -351,13 +356,13 @@ public class MainController implements Initializable {
                 Vertice p      = frenteVista.getPipelineCamera().getP();
                 Vertice viewUp = frenteVista.getPipelineCamera().getViewUp();
                 switch (pressed){
-                    case Q:
-                        vrp.setZ(vrp.getZ() - (float) 1);
-                          p.setZ(  p.getZ() - (float) 1);
+                    case Z:
+                        //vrp.setZ(vrp.getZ() - (float) 1);
+                        //  p.setZ(  p.getZ() - (float) 1);
                         break;
-                    case E:
-                        vrp.setZ(vrp.getZ() + (float) 1);
-                          p.setZ(  p.getZ() + (float) 1);
+                    case C:
+                        //vrp.setZ(vrp.getZ() + (float) 1);
+                        //  p.setZ(  p.getZ() + (float) 1);
                         break;
                     case W:
                         vrp.setY(vrp.getY() + (float) 1);
@@ -413,13 +418,13 @@ public class MainController implements Initializable {
                 Vertice p      = lateralVista.getPipelineCamera().getP();
                 Vertice viewUp = lateralVista.getPipelineCamera().getViewUp();
                 switch (pressed){
-                    case Q:
-                        vrp.setX(vrp.getX() - (float) 1);
-                          p.setX(  p.getX() - (float) 1);
+                    case Z:
+                        //vrp.setX(vrp.getX() - (float) 1);
+                        //  p.setX(  p.getX() - (float) 1);
                         break;
-                    case E:
-                        vrp.setX(vrp.getX() + (float) 1);
-                          p.setX(  p.getX() + (float) 1);
+                    case C:
+                        //vrp.setX(vrp.getX() + (float) 1);
+                        //  p.setX(  p.getX() + (float) 1);
                         break;
                     case W:
                         vrp.setZ(vrp.getZ() + (float) 1);
@@ -475,13 +480,13 @@ public class MainController implements Initializable {
                 Vertice p      = topVista.getPipelineCamera().getP();
                 Vertice viewUp = topVista.getPipelineCamera().getViewUp();
                 switch (pressed){
-                    case Q:
-                        vrp.setY(vrp.getY() - (float) 1);
-                          p.setY(  p.getY() - (float) 1);
+                    case Z:
+                        //vrp.setY(vrp.getY() - (float) 1);
+                        //  p.setY(  p.getY() - (float) 1);
                         break;
-                    case E:
-                        vrp.setY(vrp.getY() + (float) 1);
-                          p.setY(  p.getY() + (float) 1);
+                    case C:
+                        //vrp.setY(vrp.getY() + (float) 1);
+                        //  p.setY(  p.getY() + (float) 1);
                         break;
                     case W:
                         vrp.setZ(vrp.getZ() + (float) 1);
@@ -582,22 +587,26 @@ public class MainController implements Initializable {
                 
                 Vista pers = getVistaFromVisao(Visao.Perspectiva);
                 Vertice p = pers.getPipelineCamera().getP();
+                float dp = pers.getPipe().getDP();
                 
                 if (vert == Movimento.Cima){
                     p.setY(p.getY() + (float)0.01);
-                    p.setZ(p.getZ() + (float)0.1);
+                    //p.setZ(p.getZ() + (float)0.1);
                 } else if (vert == Movimento.Baixo){
                     p.setY(p.getY() - (float)0.01);
-                    p.setZ(p.getZ() - (float)0.1);
+                    //p.setZ(p.getZ() - (float)0.1);
                 }
                 
                 if (hori == Movimento.Esquerda){
                     p.setX(p.getX() + (float)0.01);
-                    p.setZ(p.getZ() + (float)0.1);
+                    //p.setZ(p.getZ() + (float)0.1);
                 } else if (hori == Movimento.Direita){
                     p.setX(p.getX() - (float)0.01);
-                    p.setZ(p.getZ() - (float)0.1);
+                    //p.setZ(p.getZ() - (float)0.1);
                 }
+                
+                //double newZ = Math.sqrt((dp*dp)-(p.getY()*p.getY())-(p.getX()*p.getX()));
+                //p.setZ((float) newZ);
                 
                 pers.getPipelineCamera().setP(p);
                 paintStuff();

@@ -9,7 +9,7 @@ package m.poligonos;
  *
  * @author JFPS
  */
-public class Nregular extends Poligono {
+public class Nregular extends PointObject {
     private int noLados;
     private int radius;
     private Vertice center;

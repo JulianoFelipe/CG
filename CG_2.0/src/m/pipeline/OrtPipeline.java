@@ -276,6 +276,11 @@ public class OrtPipeline extends CGPipeline{
         return vista;
     }
 
+    @Override
+    public float getDP() {
+        return (float) 0.;
+    }
+
     //<editor-fold defaultstate="collapsed" desc="Matrizes Ortogonais">
     protected static final class MatrizOrtografica{
         protected static final float[][] MAT_FRENTE = {

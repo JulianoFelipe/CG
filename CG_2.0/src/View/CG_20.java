@@ -18,6 +18,7 @@ import m.pipeline.OrtPipeline;
 import m.pipeline.PersPipeline;
 import m.poligonos.Aresta;
 import m.poligonos.Face;
+import m.poligonos.PointObject;
 import m.poligonos.Poligono;
 import m.poligonos.Vertice;
 import utils.config.StandardConfigCam;
@@ -60,7 +61,7 @@ public class CG_20 extends Application {
         Aresta my_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,-5000,0));
         Aresta mz_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,-5000));*/
         
-        Poligono pol = new Poligono(pol_mat);
+        PointObject pol = new PointObject(pol_mat);
         List<Face> lista = PMath.attemptBuildingFromPlanes(pol);
 
         mundo.addObject(lista);

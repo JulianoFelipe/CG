@@ -9,12 +9,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 import m.poligonos.Aresta;
 import m.poligonos.CGObject;
 import m.poligonos.Face;
 import m.poligonos.Nregular;
+import m.poligonos.PointObject;
 import m.poligonos.Poligono;
 import m.poligonos.Vertice;
 
@@ -160,6 +160,8 @@ public class World {
             deepCopied = new Poligono( (Poligono) obj);
         } else if (obj instanceof Nregular){
             deepCopied = new Nregular( (Nregular) obj);
+        } else if (obj instanceof PointObject){
+            deepCopied = new PointObject( (PointObject) obj);
         } else {
             throw new IllegalArgumentException("Sub-tipo de CGObject não previsto para cópia.");
         }
