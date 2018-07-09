@@ -90,4 +90,11 @@ public final class Index2 {
         }
         return true;
     }
+    
+    public static Index2 of(String key){
+        int i1 = Integer.parseInt(key.charAt(0) + "");
+        int i2 = Integer.parseInt(key.charAt(1) + "");
+        
+        return new Index2(i1, i2);
+    }
 }

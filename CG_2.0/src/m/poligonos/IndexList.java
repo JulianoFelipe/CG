@@ -39,5 +39,9 @@ public final class IndexList {
         return "IndexList{" + "indexes=" + Arrays.toString(indexes) + '}';
     }
     
-    
+    public static IndexList builder(int...indexes){
+        int[] arr = new int[indexes.length];        
+        System.arraycopy(indexes, 0, arr, 0, indexes.length);
+        return new IndexList(arr);
+    }
 }

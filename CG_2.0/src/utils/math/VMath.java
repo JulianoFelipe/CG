@@ -15,6 +15,14 @@ import m.poligonos.Vertice;
  * @author Juliano
  */
 public class VMath {
+    
+    public static Vertice obterNormal(Vertice a, Vertice b, Vertice c){
+        Vertice ab = new Vertice(b.getX()-a.getX(), b.getY()-a.getY(), b.getZ()-a.getZ());
+        Vertice ac = new Vertice(c.getX()-a.getX(), c.getY()-a.getY(), c.getZ()-a.getZ());
+        
+        return VMath.produtoVetorial(ab, ac);
+    }
+    
     public static void normalizar(Vertice v) {
         double norma;
         norma = Math.sqrt((v.getX() * v.getX()) + 

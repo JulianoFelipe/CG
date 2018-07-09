@@ -15,4 +15,6 @@ import m.poligonos.CGObject;
  */
 public interface Shader {
     public void shade(float[][] matrix, List<CGObject> objetosSRT, Canvas canvas);
+    
+    public void operate(float[][] test, Operator op);
 }

@@ -19,5 +19,14 @@ public class CGShader implements Shader{
     public void shade(float[][] matrix, List<CGObject> objetosSRT, Canvas canvas) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public void operate(float[][] test, Operator op) {
+        op.operator(test);
+        
+        Operator aa = (float[][] points) -> {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        };
+    }
     
 }
