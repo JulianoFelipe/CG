@@ -5,6 +5,7 @@
  */
 package m.poligonos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,21 +13,35 @@ import java.util.List;
  * @author JFPS
  */
 public class PointObject extends CGObject{
-    public PointObject(PointObject p){
-        super(p.getPointMatrix(), p.getID());
-    }
+    protected List<Vertice> lista;
     
-    public PointObject(float[][] pointMatrix, long ID){
-        super(pointMatrix, ID);    
+    public PointObject(PointObject p){
+        super(p);
+        lista = new ArrayList(p.getNumberOfPoints()+5);
+        
+        p.lista.forEach((v) -> {
+            lista.add(new Vertice(v));
+        });
     }
     
     public PointObject(float[][] pointMatrix){
-        super(pointMatrix);     
+        super();  
+        lista = new ArrayList(pointMatrix[0].length);
+        
+        for (int i=0; i<pointMatrix[0].length; i++){
+            lista.add(new Vertice(
+                pointMatrix[0][i],
+                pointMatrix[1][i],
+                pointMatrix[2][i]
+            ));
+        }
     }
-    
-    protected PointObject(long ID, int numberOfPoints){ super(ID,numberOfPoints); }
-    
-    protected PointObject(int numberOfPoints){ super(numberOfPoints); }
+        
+    protected PointObject(int numberOfPoints){ 
+        super();
+        
+        lista = new ArrayList(numberOfPoints);
+    }
     
     @Override
     public String toString(){
@@ -45,5 +60,32 @@ public class PointObject extends CGObject{
         }
         
         return new PointObject (point);
+    }
+
+    @Override
+    public List<? extends Vertice> getPoints() {
+        return lista;
+    }
+
+    @Override
+    public int getNumberOfPoints() {
+        return lista.size();
+    }
+
+    @Override
+    public Vertice get(int i) {
+        return lista.get(i);
+    }
+
+    @Override
+    public void set(int i, Vertice point) {
+        lista.get(i).copyAttributes(point);
+    }
+
+    @Override
+    public void updateInternals(CGObject updatedObj) {
+        for (int i=0; i<lista.size(); i++){
+            lista.get(i).copyAttributes(updatedObj.get(i));
+        }
     }
 }

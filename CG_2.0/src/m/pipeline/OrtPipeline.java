@@ -5,6 +5,9 @@
  */
 package m.pipeline;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import m.Camera;
 import m.CGViewport;
 import m.Visao;
@@ -45,102 +48,125 @@ public class OrtPipeline extends CGPipeline{
    
     //<editor-fold defaultstate="collapsed" desc="Conversão Mundo -> Tela">
     @Override
-    public void convert2D(CGObject object) {
+    public void convert2D(Vertice vertice) {
         if (!isCameraStraight()){
             //Se a câmera NÃO está "olhando reto para o ponto",
             //faça a conversão com a função abaixo
-            standardConversion(object);
+            standardConversion(vertice);
             return;
         }
-        
+        System.out.println("IN VERT: " + vertice);
         //Se a câmera está "olhando reto para o ponto"
         //Faça as conversões abaixo
         switch(vista){
-            case Frontal:
-                frontalConversion(object);
-                break;
-            case Lateral:
-                lateralConversion(object);
-                break;
-            case Topo:
-                topConversion(object);
-                break;
-            default:
-                throw new UnsupportedOperationException("Conversão reversa ortográfica não implementada para: " + vista);
+            case Frontal: frontalConversion(vertice); break;
+            case Lateral: lateralConversion(vertice); break;
+            case Topo:    topConversion(vertice);     break;
+            default: throw new UnsupportedOperationException("Conversão reversa ortográfica não implementada para: " + vista);
         }
-        
+        System.out.println("OUT VER: " + vertice);
     }
-    
+
+    @Override
+    public void convert2D(CGObject object) {
+        //Por que substituir esse método?
+        //Caso a câmera não estiver reta, o método "standardConversion(Vertice)"
+        //será chamado para cada ponto, e será criado uma lista para cada conversão, o que é desnecessário.
+        //Uma alternativa seria fazer um método para "MMath.mult(matriz,vertice)", mas...
+        if (!isCameraStraight()){
+            standardConversion(object); return;
+        }
+
+        switch(vista){
+            case Frontal: object.getPoints().forEach((v) -> { frontalConversion(v); }); break;
+            case Lateral: object.getPoints().forEach((v) -> { lateralConversion(v); }); break;
+            case Topo:    object.getPoints().forEach((v) -> { topConversion(v);     }); break;
+            default: throw new UnsupportedOperationException("Conversão reversa ortográfica não implementada para: " + vista);
+        }
+    }
+        
     private void standardConversion(CGObject object){
         //Using synthetic cam
-        float[][] retPoints = MMath.multiplicar(get3DPipelineMatrix(), object.getPointMatrix());
-        retPoints = MMath.removeFactor(retPoints);
-        retPoints = MMath.multiplicar(getMatrixJP(), retPoints);
+        MMath.multiplicar(get3DPipelineMatrix(), object.getPoints());
+        //retPoints = MMath.removeFactor(retPoints);
+        MMath.multiplicar(getMatrixJP(), object.getPoints());
+    }
+    
+    private void standardConversion(Vertice v){
+        //Using synthetic cam
+        List<Vertice> lista = new ArrayList();
+        lista.add(v);
         
-        object.setAll(retPoints);
+        MMath.multiplicar(get3DPipelineMatrix(), lista);
+        
+        //retPoints = MMath.removeFactor(retPoints); //No need
+        //MMath.mult quando passa lista controla até onde multiplica com base nas linhas
+        //da matriz A, então o fator não será multiplicado
+
+        MMath.multiplicar(getMatrixJP(), lista); 
     }
     
-    private void frontalConversion(CGObject object){
-        float[][] pointMat = object.getPointMatrix();
-        float[] proportions = jpProportions();
-        for (int i=0; i<object.getNumberOfPoints(); i++){
-            pointMat[0][i] = (pointMat[0][i] - cam.getVRP().getX()) * proportions[0];
-            pointMat[1][i] = (pointMat[1][i] - cam.getVRP().getY()) * proportions[1];
-            pointMat[2][i] = 0;
-        }
+    private void frontalConversion(Vertice v){
+        v.setAll(
+            (v.getX() - cam.getVRP().getX()) * jpProportions[0],
+            (v.getY() - cam.getVRP().getY()) * jpProportions[1],
+            0
+        );
     }
     
-    private void lateralConversion(CGObject object){
-        float[][] pointMat = object.getPointMatrix();
-        float[] proportions = jpProportions();
-        for (int i=0; i<object.getNumberOfPoints(); i++){
-            pointMat[0][i] = (pointMat[1][i] - cam.getVRP().getY()) * proportions[0];
-            pointMat[1][i] = (pointMat[2][i] - cam.getVRP().getZ()) * proportions[1];
-            pointMat[2][i] = 0;
-        }
+    private void lateralConversion(Vertice v){ 
+        v.setAll(
+            ((v.getY() - cam.getVRP().getY()) * jpProportions[0]),
+            ((v.getZ() - cam.getVRP().getZ()) * jpProportions[1]),
+            (0)
+        );
     }
     
-    private void topConversion(CGObject object){
-        float[][] pointMat = object.getPointMatrix();
-        float[] proportions = jpProportions();
-        for (int i=0; i<object.getNumberOfPoints(); i++){
-            pointMat[0][i] = (pointMat[0][i] - cam.getVRP().getX()) * proportions[0];
-            pointMat[1][i] = (pointMat[2][i] - cam.getVRP().getZ()) * proportions[1];
-            pointMat[2][i] = 0;
-            
-        }
+    private void topConversion(Vertice v){  
+        v.setAll(
+            (v.getX() - cam.getVRP().getX()) * jpProportions[0],
+            (v.getZ() - cam.getVRP().getZ()) * jpProportions[1],
+            0
+        );            
     }
 //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Conversão Tela -> Mundo">
     @Override
-    public void reverseConversion(CGObject object) {
+    public void reverseConversion(Vertice vertice) {
         if (!isCameraStraight()){
             //Se a câmera NÃO está "olhando reto para o ponto",
             //faça a conversão com a função abaixo
-            standardReverseConversion(object);
+            standardReverseConversion(vertice);
             return;
         }
         
         //Se a câmera está "olhando reto para o ponto"
         //Faça as conversões abaixo
         switch(vista){
-            case Frontal:
-                reverseFrontalConversion(object);
-                break;
-            case Lateral:
-                reverseLateralConversion(object);
-                break;
-            case Topo:
-                reverseTopConversion(object);
-                break;
-            default:
-                throw new UnsupportedOperationException("Conversão reversa ortográfica não implementada para: " + vista);
+            case Frontal: reverseFrontalConversion(vertice); break;
+            case Lateral: reverseLateralConversion(vertice); break;
+            case Topo:    reverseTopConversion(vertice);     break;
+            default: throw new UnsupportedOperationException("Conversão reversa ortográfica não implementada para: " + vista);
+        }
+    }
+    
+    @Override
+    public void reverseConversion(CGObject object) {
+        if (!isCameraStraight()){
+            standardReverseConversion(object); return;
+        }
+
+        switch(vista){
+            case Frontal: object.getPoints().forEach((v) -> { reverseFrontalConversion(v); }); break;
+            case Lateral: object.getPoints().forEach((v) -> { reverseLateralConversion(v); }); break;
+            case Topo:    object.getPoints().forEach((v) -> { reverseTopConversion(v);     }); break;
+            default: throw new UnsupportedOperationException("Conversão reversa ortográfica não implementada para: " + vista);
         }
     }
     
     private void standardReverseConversion(CGObject object){
-        float[][] retPoints = MMath.removeFactor(object.getPointMatrix());
+        //float[][] retPoints = MMath.removeFactor(object.getPoints());
         
         /*System.out.println("OBJ POINTS: ");
         MMath.printMatrix(retPoints);
@@ -153,21 +179,21 @@ public class OrtPipeline extends CGPipeline{
         //MMath.printMatrix(invJP);
         
         if (invJP != null)
-            retPoints = MMath.multiplicar(invJP, retPoints);
+            MMath.multiplicar(invJP, object.getPoints());
         
         /*System.out.println("POINTS AFTER INV JP: ");
         MMath.printMatrix(retPoints);
         System.out.println("MATRIX PROJ: ");
         MMath.printMatrix(getMatrixProj());*/
         
-        retPoints = MMath.addFactor(retPoints);
+        //retPoints = MMath.addFactor(retPoints);
         invJP = MMath.invert4x4Matrix(getMatrixProj());
         
         //System.out.println("INV MATRIX PROJ: ");
         //MMath.printMatrix(invJP);
         
         if (invJP != null)
-            retPoints = MMath.multiplicar(invJP, retPoints);
+            MMath.multiplicar(invJP, object.getPoints());
         
         /*System.out.println("POINTS AFTER INV JP: ");
         MMath.printMatrix(retPoints);
@@ -179,42 +205,59 @@ public class OrtPipeline extends CGPipeline{
         //MMath.printMatrix(invJP);
         
         if (invJP != null)
-            retPoints = MMath.multiplicar(invJP, retPoints);
+            MMath.multiplicar(invJP, object.getPoints());
         
         //System.out.println("POINTS AFTER INV SRUSRC: ");
         //MMath.printMatrix(retPoints);
         
-        object.setAll(retPoints);
+        //object.setAll(retPoints);
     }
     
-    private void reverseFrontalConversion(CGObject object){
-        float[][] pointMat = object.getPointMatrix();
-        float[] proportions = jpProportions();
-        for (int i=0; i<object.getNumberOfPoints(); i++){
-            pointMat[0][i] = (pointMat[0][i] / proportions[0]) + cam.getVRP().getX();
-            pointMat[1][i] = (pointMat[1][i] / proportions[1]) + cam.getVRP().getY();
-            pointMat[2][i] = 0;
-        }
+    private void standardReverseConversion(Vertice v){
+        List<Vertice> lista = new ArrayList();
+        lista.add(v);
+        
+        //float[][] retPoints = MMath.removeFactor(v.getPoints());
+        //No need
+        
+        float[][] invJP = MMath.invert3x3Matrix(getMatrixJP());       
+        if (invJP != null)
+            MMath.multiplicar(invJP, lista);
+        
+        //retPoints = MMath.addFactor(retPoints); //No need either
+        invJP = MMath.invert4x4Matrix(getMatrixProj());     
+        if (invJP != null)
+            MMath.multiplicar(invJP, lista);
+                
+        invJP = MMath.invert4x4Matrix(getMatrizSRUsrc());
+        if (invJP != null)
+            MMath.multiplicar(invJP, lista);
     }
     
-    private void reverseLateralConversion(CGObject object){
-        float[][] pointMat = object.getPointMatrix();
-        float[] proportions = jpProportions();
-        for (int i=0; i<object.getNumberOfPoints(); i++){
-            pointMat[2][i] = (pointMat[1][i] / proportions[0]) + cam.getVRP().getZ();
-            pointMat[1][i] = (pointMat[0][i] / proportions[1]) + cam.getVRP().getY();
-            pointMat[0][i] = 0;
-        }
+    private void reverseFrontalConversion(Vertice v){
+        v.setAll(
+            (v.getX() / jpProportions[0]) + cam.getVRP().getX(),
+            (v.getY() / jpProportions[1]) + cam.getVRP().getY(),
+            0
+        );
     }
     
-    private void reverseTopConversion(CGObject object){
-        float[][] pointMat = object.getPointMatrix();
-        float[] proportions = jpProportions();
-        for (int i=0; i<object.getNumberOfPoints(); i++){
-            pointMat[0][i] = (pointMat[0][i] / proportions[0]) + cam.getVRP().getX();
-            pointMat[2][i] = (pointMat[1][i] / proportions[1]) + cam.getVRP().getZ();
-            pointMat[1][i] = 0;
-        }
+    private void reverseLateralConversion(Vertice v){
+        float copyY=v.getY(), copyX=v.getX();      
+        v.setAll(
+            0,
+            (copyX / jpProportions[1]) + cam.getVRP().getY(),
+            (copyY / jpProportions[0]) + cam.getVRP().getZ()
+        );        
+    }
+    
+    private void reverseTopConversion(Vertice v){        
+        float copyY = v.getY();
+        v.setAll(
+            (v.getX() / jpProportions[0]) + cam.getVRP().getX(),
+            0,
+            (copyY    / jpProportions[1]) + cam.getVRP().getZ()
+        );
     }
 //</editor-fold>
     
@@ -242,16 +285,7 @@ public class OrtPipeline extends CGPipeline{
         }
         return false;
     }
-    
-    private float[] jpProportions(){
-        float[] arr = new float[2];
         
-        arr[0] = viewport.getDeltaU() / window.getDeltaX();
-        arr[1] = viewport.getDeltaV() / window.getDeltaY();
-        
-        return arr;
-    }
-    
     public float[][] get3DPipelineMatrix(){
         //Retorna a matriz final do pipeline
         //Se receber update de camera, alterar changed e calc tudo de novo

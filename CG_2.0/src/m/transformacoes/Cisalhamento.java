@@ -14,100 +14,157 @@ import m.poligonos.Vertice;
  * @author JFPS
  */
 public class Cisalhamento {
-    public CGObject cisalhamento(Eixo axis, double fator, CGObject p){
+    private boolean lockChange = false;
+
+    public Cisalhamento() {
+    }
+    
+    public Cisalhamento(boolean lockChange) {
+        this.lockChange = lockChange;
+    }
+    
+    public void cisalhamento(Eixo axis, double fator, CGObject p){
         switch (axis) {
             case Eixo_X:
-                return cisalhamentoX(fator, p);
+                cisalhamentoX(fator, p);
+                break;
             case Eixo_Y:
-                return cisalhamentoY(fator, p);
+                cisalhamentoY(fator, p);
+                break;
             case Eixo_Z:
-                return cisalhamentoZ(fator, p);
+                cisalhamentoZ(fator, p);
+                break;
             default:
                 throw new UnsupportedOperationException("Não implementado");
         }
     }
     
-    public CGObject cisalhamento(Eixo axis, double fator, CGObject p, final Vertice pontoFixo){
+    public void cisalhamento(Eixo axis, double fator, CGObject p, final Vertice pontoFixo){
         switch (axis) {
             case Eixo_X:
-                return cisalhamentoX(fator, p, pontoFixo);
+                cisalhamentoX(fator, p, pontoFixo);
+                break;
             case Eixo_Y:
-                return cisalhamentoY(fator, p, pontoFixo);
+                cisalhamentoY(fator, p, pontoFixo);
+                break;
             case Eixo_Z:
-                return cisalhamentoZ(fator, p, pontoFixo);
+                cisalhamentoZ(fator, p, pontoFixo);
+                break;
             default:
                 throw new UnsupportedOperationException("Não implementado");
         }
     }
     
-    public CGObject cisalhamentoX(double fator, CGObject p){
+    public void cisalhamentoX(double fator, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             
-            p.setPoint(i, 
+            p.get(i).setAll( 
                 (float) (copy.getX() + (fator*copy.getY())), 
                 (float) (copy.getY()),
                 (float) (copy.getZ())
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject cisalhamentoY(double fator, CGObject p){
+    public void cisalhamentoY(double fator, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             
-            p.setPoint(i, 
+            p.get(i).setAll( 
                 (float) (copy.getX()), 
                 (float) (copy.getY() + (fator*copy.getX())),
                 (float) (copy.getZ())
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject cisalhamentoZ(double fator, CGObject p){
+    public void cisalhamentoZ(double fator, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             
-            p.setPoint(i, 
+            p.get(i).setAll(  
                 (float) (copy.getX()), 
                 (float) (copy.getY()),
                 (float) (copy.getY() + (fator*copy.getX()))
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject cisalhamentoX(double graus, CGObject p, final Vertice pontoFixo){    
-        if (pontoFixo == null) return cisalhamentoX(graus, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = cisalhamentoX(graus, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
-        return p;
+    public void cisalhamentoX(double graus, CGObject p, final Vertice pontoFixo){    
+        if (pontoFixo == null){
+            cisalhamentoX(graus, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        cisalhamentoX(graus, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
         
-    public CGObject cisalhamentoY(double graus, CGObject p, final Vertice pontoFixo){
-        if (pontoFixo == null) return cisalhamentoY(graus, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = cisalhamentoY(graus, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
-        return p;
-    }
-    
-    public CGObject cisalhamentoZ(double graus, CGObject p, final Vertice pontoFixo){
-        if (pontoFixo == null) return cisalhamentoZ(graus, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = cisalhamentoY(graus, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
-        return p;
-    }
+    public void cisalhamentoY(double graus, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            cisalhamentoY(graus, p);
+            return;
+        }
         
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        cisalhamentoY(graus, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
+    }
     
+    public void cisalhamentoZ(double graus, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            cisalhamentoZ(graus, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        cisalhamentoY(graus, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
+    }
+
+    public boolean isLockChange() {
+        return lockChange;
+    }
+
+    public void setLockChange(boolean lockChange) {
+        this.lockChange = lockChange;
+    }
 }

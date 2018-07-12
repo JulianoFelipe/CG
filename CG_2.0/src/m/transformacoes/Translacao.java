@@ -15,21 +15,31 @@ import m.poligonos.Vertice;
  */
 public class Translacao{
     
-    public CGObject transladar(int unidadesX, int unidadesY, int unidadesZ, CGObject p){
+    private boolean lockChange = false;
+
+    public Translacao() {
+    }
+    
+    public Translacao(boolean lockChange) {
+        this.lockChange = lockChange;
+    }
+    
+    public void transladar(int unidadesX, int unidadesY, int unidadesZ, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
-            p.setPoint(i, 
+            Vertice copy = p.get(i);
+            p.get(i).setAll( 
                 (copy.getX() + unidadesX), 
                 (copy.getY() + unidadesY),
                 (copy.getZ() + unidadesZ)
             );
         }
         
-        return p;
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject transladar(Eixo axis, int unidades, CGObject p){
+    public void transladar(Eixo axis, int unidades, CGObject p){
         int unidadesX=0, unidadesY=0, unidadesZ=0;
         switch(axis){
             case Eixo_X:   unidadesX = unidades; break;
@@ -41,6 +51,15 @@ public class Translacao{
             case Eixo_XYZ: unidadesX = unidadesY = unidadesZ = unidades; break;
         }
         
-        return transladar(unidadesX, unidadesY, unidadesZ, p);
+        transladar(unidadesX, unidadesY, unidadesZ, p);
+        //p.changedProperty().set(true);
+    }
+
+    public boolean isLockChange() {
+        return lockChange;
+    }
+
+    public void setLockChange(boolean lockChange) {
+        this.lockChange = lockChange;
     }
 }

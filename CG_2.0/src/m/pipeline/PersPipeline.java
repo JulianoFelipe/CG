@@ -5,12 +5,14 @@
  */
 package m.pipeline;
 
+import java.util.ArrayList;
 import java.util.List;
 import m.Camera;
 import m.CGViewport;
 import m.Visao;
 import m.CGWindow;
 import m.poligonos.CGObject;
+import m.poligonos.Vertice;
 import utils.config.StandardConfigCam;
 import utils.config.StandardConfigWinView;
 import utils.math.MMath;
@@ -37,24 +39,36 @@ public class PersPipeline extends CGPipeline{
 //</editor-fold>
        
     @Override
-    public void convert2D(CGObject object) {
-        //MMath.printMatrix(object.getPointMatrix());
-        
-        float[][] retPoints = MMath.multiplicar(get3DPipelineMatrix(), object.getPointMatrix());
-        retPoints = persMatrixSwitcheroo(retPoints); 
-        retPoints = MMath.removeFactor(retPoints);
-        retPoints = MMath.multiplicar(getMatrixJP(), retPoints);
-
-        object.setAll(retPoints);
-        
-        //System.out.println("AFTER CHANGE");
-        //MMath.printMatrix(object.getPointMatrix());
+    public void convert2D(Vertice v) {
+        List<Vertice> lista = new ArrayList(); lista.add(v);
+        MMath.multiplicar(get3DPipelineMatrix(), lista);
+        persMatrixSwitcheroo(v); 
+        MMath.multiplicar(getMatrixJP(), lista);
     }
 
     @Override
-    public void reverseConversion(CGObject object) {
-        float[][] retPoints = MMath.multiplicar(getMatrizSRCsru(), object.getPointMatrix());
-        object.setAll(retPoints);
+    public void convert2D(CGObject obj) {
+        //MMath.printMatrix(object.getPoints());
+        //float[][] retPoints = MMath.multiplicar(get3DPipelineMatrix(), object.getPoints());
+        //retPoints = persMatrixSwitcheroo(retPoints); 
+        //retPoints = MMath.removeFactor(retPoints);
+        //retPoints = MMath.multiplicar(getMatrixJP(), retPoints);
+        //object.setAll(retPoints);
+        //System.out.println("AFTER CHANGE");
+        //MMath.printMatrix(object.getPoints());
+        
+        MMath.multiplicar(get3DPipelineMatrix(), obj.getPoints());
+        persMatrixSwitcheroo(obj); 
+        //MMath.removeFactor(retPoints);
+        MMath.multiplicar(getMatrixJP(), obj.getPoints());
+    }
+    
+    @Override
+    public void reverseConversion(Vertice v) {
+        //float[][] retPoints = MMath.multiplicar(getMatrizSRCsru(), object.getPoints());
+        //object.setAll(retPoints);
+        
+        throw new IllegalArgumentException("Reversão para PersPipeline não implementada.");
     }
         
     public float[][] get3DPipelineMatrix(){
@@ -81,21 +95,36 @@ public class PersPipeline extends CGPipeline{
         };
     }
     
-    protected float[][] persMatrixSwitcheroo(float[][] pointMatrix){
-        int noPoints = pointMatrix[0].length;
+    protected void persMatrixSwitcheroo(Vertice v){
+        float fator = v.getW();
         
-        float[][] result = new float[4][noPoints];
+        v.setAll(
+            v.getX() / fator,
+            v.getY() / fator,
+            1 //v.getZ() / fator
+        );
+    }
+    
+    protected void persMatrixSwitcheroo(CGObject obj){
+        int noPoints = obj.getNumberOfPoints();
+        
         for (int i = 0; i < noPoints; i++) {
-            float fator = pointMatrix[3][i];
-            result[0][i]   = pointMatrix[0][i] / fator;
-            result[1][i]   = pointMatrix[1][i] / fator;
-            //result[2][i]   = pointMatrix[2][i] / fator;
-            //result[3][i]   = pointMatrix[3][i] / fator;
-            result[2][i]   = 1;
-            //result[3][i]   = 1;
+            Vertice copy = obj.get(i);
+            float fator = copy.getW();
+            
+            obj.get(i).setAll(
+                copy.getX() / fator,
+                copy.getY() / fator,
+                1 //copy.getZ() / fator
+            );
+            
+            //result[0][i]   = pointMatrix[0][i] / fator;
+            //result[1][i]   = pointMatrix[1][i] / fator;
+            ////result[2][i]   = pointMatrix[2][i] / fator;
+            ////result[3][i]   = pointMatrix[3][i] / fator;
+            //result[2][i]   = 1;
+            ////result[3][i]   = 1;
         }
-
-        return result;
     }
 
     @Override

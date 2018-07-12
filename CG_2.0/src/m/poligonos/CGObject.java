@@ -6,8 +6,9 @@
 package m.poligonos;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 
 /**
  *
@@ -15,72 +16,64 @@ import java.util.List;
  */
 public abstract class CGObject implements Serializable{
     protected static long INSTANCES;
-    protected final float[][] pointMatrix;
-    protected long ID;
+    protected final long ID;
     
-    protected float[] ka = {0,0,0}, ks = {0,0,0}, kd = {0,0,0,0}; 
+    protected float[] ka, kd, ks; 
     protected boolean isChromatic = true;
+    protected boolean setK=false;
     
-    protected CGObject(int numberOfPoints){ 
+    protected BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    
+    protected CGObject(){ 
         this.ID = INSTANCES++;
-        pointMatrix = new float [4][numberOfPoints];
     }
     
-    protected CGObject(long ID, int numberOfPoints){ 
-        this.ID = ID;
-        pointMatrix = new float [4][numberOfPoints];
+    protected CGObject(CGObject obj){
+        this.ID = obj.ID;
     }
     
-    protected CGObject(float[][] pointMatrixCp, long ID) {
-        this.ID = ID;
+    public abstract List<? extends Vertice> getPoints();
+       
+    public abstract int getNumberOfPoints(); 
+    
+    public abstract Vertice get(int i);
+    
+    public abstract void set(int i, Vertice point);
+
+    public abstract void updateInternals(CGObject updatedObj);
+    
+    public boolean equalPoints(CGObject that){
+        if (this.getNumberOfPoints() != that.getNumberOfPoints())
+            return false;
         
-        pointMatrix = new float[4][pointMatrixCp[0].length]; //Se der erro não é matriz de pontos adequada
-        for(int i = 0; i < pointMatrixCp[0].length; i++){
-            pointMatrix[0][i] = pointMatrixCp[0][i];
-            pointMatrix[1][i] = pointMatrixCp[1][i];
-            pointMatrix[2][i] = pointMatrixCp[2][i];
-            pointMatrix[3][i] = pointMatrixCp[3][i];
+        for (int i=0; i<this.getNumberOfPoints(); i++){
+            if (!this.get(i).equalPoints(that.get(i)))
+                return false;
         }
+        return true;
     }
     
-    protected CGObject(float[][] pointMatrix) {
-        this(pointMatrix, INSTANCES++);
-        //System.out.println("HERE!");
-        //System.out.println(Arrays.deepToString(pointMatrix));
+    public BooleanProperty changedProperty() {
+        return changedProperty;
     }
     
-    public float[][] getPointMatrix(){
-        return pointMatrix;
-    }
-    
-    public List<Vertice> getPointList(){
-        List<Vertice> lista = new ArrayList();
-        for (int i=0; i<pointMatrix[0].length; i++){
-            lista.add(new Vertice(pointMatrix[0][i],
-                                  pointMatrix[1][i],
-                                  pointMatrix[2][i]));
-        }
+    /*public void operate(Operator op){
         
-        return lista;
-    }
-    
-    public int getNumberOfPoints(){
-        return pointMatrix[0].length;
-    }
+    }*/
     
     public long getID(){
         return ID;
     }
     
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         int hash = 7;
         hash = 47 * hash + (int) (this.ID ^ (this.ID >>> 32));
         return hash;
     }
     
     @Override
-    public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (obj == null) {
             return false;
         }
@@ -95,95 +88,76 @@ public abstract class CGObject implements Serializable{
     public String toString(){
         return "CGObject: ID=" + ID + "; Points=" + getNumberOfPoints() + ".";
     }
-
-    public static long getINSTANCES() {
-        return INSTANCES;
-    }
     
-    //<editor-fold defaultstate="collapsed" desc="Get/Set points">
-    public Vertice getPoint(int i){
-        return new Vertice(pointMatrix[0][i],
-                pointMatrix[1][i],
-                pointMatrix[2][i]);
-    }
-    
-    public void setPoint(int i, Vertice v){
-        pointMatrix[0][i] = v.getX();
-        pointMatrix[1][i] = v.getY();
-        pointMatrix[2][i] = v.getZ();
-        pointMatrix[3][i] = v.getW();
-    }
-    
-    public void setPoint(int i, float x, float y, float z){
-        pointMatrix[0][i] = x;
-        pointMatrix[1][i] = y;
-        pointMatrix[2][i] = z;
-        pointMatrix[3][i] = 1;
-    }
-    
-    public void setAll(float[][] pointMatrix){
-        int newMatPoints = pointMatrix.length;
-        
-        if (newMatPoints == 2){
-            for (int i=0; i<getNumberOfPoints(); i++){
-                setPoint(i, pointMatrix[0][i], pointMatrix[1][i], 0);
-            }
-        } else if (newMatPoints == 3){
-            for (int i=0; i<getNumberOfPoints(); i++){
-                setPoint(i, pointMatrix[0][i], pointMatrix[1][i], pointMatrix[2][i]);
-            }
-        } else if (newMatPoints == 4) {
-            for (int i=0; i<getNumberOfPoints(); i++){
-                setPoint(i, pointMatrix[0][i], pointMatrix[1][i], pointMatrix[2][i]);
-            }
-        } else {
-            throw new IllegalArgumentException("Matriz de pontos não possui número de coordenadas válido: " + newMatPoints);
-        }
-    }
-    
-    public Vertice getCentroide(){
-        float maxX = pointMatrix[0][0],
-                maxY = pointMatrix[1][0],
-                maxZ = pointMatrix[2][0];
-        
-        float minX = pointMatrix[0][0],
-                minY = pointMatrix[1][0],
-                minZ = pointMatrix[2][0];
-        
-        for (int i=1; i<pointMatrix[0].length; i++){
-            float x = pointMatrix[0][i],
-                    y = pointMatrix[0][i],
-                    z = pointMatrix[0][i];
-            
-            maxX = Math.max(maxX, x);
-            minX = Math.min(minX, x);
-            
-            maxY = Math.max(maxY, y);
-            minY = Math.min(minY, y);
-            
-            maxZ = Math.max(maxZ, z);
-            minZ = Math.min(minZ, z);
-        }
-        
-        return new Vertice( (float)((maxX+minX)/2), (float)((maxY+minY)/2), (float)((maxZ+minZ)/2));
-    }
-//</editor-fold>
-
     //<editor-fold defaultstate="collapsed" desc="Get/Set Ks">
     public boolean isChromatic() { return isChromatic; }
     
     public void setIsChromatic(boolean isAchromatic) { this.isChromatic = isAchromatic; }
     
-    public Vertice getKa() { return new Vertice(ka[0], ka[1], ka[2]); }
+    public float[] getKa() { if (!setK) return null; else return new float[]{ka[0], ka[1], ka[2]}; }
+        
+    public float[] getKd() { if (!setK) return null; else return new float[] {kd[0], kd[1], kd[2]}; }
     
-    public void setKa(Vertice ka) { this.ka[0] = ka.getX(); this.ka[1] = ka.getY(); this.ka[2] = ka.getZ(); }
+    public float[] getKs() { if (!setK) return null; else return new float[] {ks[0], ks[1], ks[2], ks[3]}; }
     
-    public Vertice getKs() { return new Vertice(ks[0], ks[1], ks[2]); }
+    /*
+    public void setKa(float kaRed, float kaGreen, float kaBlue) {
+        if (setK){
+            this.ka[0] = kaRed; this.ka[1] = kaGreen; this.ka[2] = kaBlue; 
+        } else {
+            setK = true;
+            ka = new float[]{
+                kaRed, kaGreen, kaBlue
+            };
+        }
+        changedProperty.set(true);
+    }
     
-    public void setKs(Vertice ks) { this.ks[0] = ks.getX(); this.ks[1] = ks.getY(); this.ks[2] = ks.getZ(); }
+    public void setKd(float kdRed, float kdGreen, float kdBlue) {
+        if (setK){
+            this.kd[0] = kdRed; this.kd[1] = kdGreen; this.kd[2] = kdBlue; 
+        } else {
+            setK = true;
+            kd = new float[]{
+                kdRed, kdGreen, kdBlue
+            };
+        } 
+        changedProperty.set(true);
+    }
     
-    public Vertice getKd() { Vertice v = new Vertice(kd[0], kd[1], kd[2]); v.setW(kd[3]); return v; }
+    public void setKd(float ksRed, float ksGreen, float ksBlue, float ksn) { 
+        if (setK){
+            this.ks[0] = ksRed; this.ks[1] = ksGreen; this.ks[2] = ksBlue; this.ks[3] = ksn; 
+        } else {
+            setK = true;
+            ks = new float[]{
+                ksRed, ksGreen, ksBlue, ksn
+            };
+        }
+        changedProperty.set(true);
+    }*/
     
-    public void setKd(Vertice kd) { this.kd[0] = kd.getX(); this.kd[1] = kd.getY(); this.kd[2] = kd.getZ(); this.kd[3] = kd.getW(); }
+    public void setAllK(float[] ka, float[] kd, float[] ks){
+        if (setK){
+            this.ka[0] = ka[0]; this.ka[1] = ka[1]; this.ka[2] = ka[2]; 
+            this.kd[0] = kd[0]; this.kd[1] = kd[1]; this.kd[2] = kd[2]; 
+            this.ks[0] = ks[0]; this.ks[1] = ks[1]; this.ks[2] = ks[2]; this.ks[3] = ks[3]; 
+        } else {
+            setK = true;
+            
+            this.ka = new float[]{
+                ka[0], ka[1], ka[2]
+            };
+            this.kd = new float[]{
+                kd[0], kd[1], kd[2]
+            };
+            this.ks = new float[]{
+                ks[0], ks[1], ks[2], ks[3]
+            };
+        }
+        changedProperty.set(true);
+    }
+    
+    public boolean isKset(){ return setK; }
 //</editor-fold>
 }

@@ -5,6 +5,7 @@
  */
 package m.poligonos;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,32 +13,53 @@ import java.util.List;
  * @author JFPS
  */
 public class Face extends CGObject{ //extends CGObject{
-    //private List<Aresta> listaAresta;
+    private List<Vertice> list;
     
     public Face (List<Vertice> lista){
-        super(lista.size());
-        
-        for (int i=0; i<lista.size(); i++){
-            Vertice v = lista.get(i);
-            pointMatrix[0][i] = v.getX();
-            pointMatrix[1][i] = v.getY();
-            pointMatrix[2][i] = v.getZ();
-            pointMatrix[3][i] = v.getW();
-        }
+        super();
+        list = lista; //SHALLOW COPY Problem
     }
-    
-    //Não pode ser adicionado por já ter outro construtor como o mesmo nome
-    /*public Face (List<Aresta> lista){
-        super(lista.size()*2);
-        throw new IllegalArgumentException("Arrumar implementação");
-    }*/
-    
+        
     public Face (Face f){
-        super(f.pointMatrix, f.ID);
+        super(f);
+        list = new ArrayList(f.list.size()+5);
+        f.getPoints().forEach((v) -> {
+            list.add(new Vertice(v));
+        });
     }
    
     @Override
     public String toString(){
         return "Face: ID=" + ID + "; Points=" + getNumberOfPoints() + ".";
+    }
+
+    @Override
+    public List<Vertice> getPoints() {
+        return list;
+    }
+
+    @Override
+    public int getNumberOfPoints() {
+        return list.size();
+    }
+
+    @Override
+    public Vertice get(int i) {
+        return list.get(i);
+    }
+
+    @Override
+    public void set(int i, Vertice point) {
+        list.get(i).copyAttributes(point);
+    }
+    
+    @Override
+    public void updateInternals(CGObject updatedObj) {
+        if (!(updatedObj instanceof Face)) throw new IllegalArgumentException("Não é uma instância de Face."); //Is this Right?
+
+        Face updated = (Face) updatedObj;
+        
+        for (int i=0; i<list.size(); i++)
+           list.get(i).copyAttributes(updated.get(i));
     }
 }

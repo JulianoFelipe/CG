@@ -24,6 +24,7 @@ public abstract class CGPipeline extends Observable implements Pipeline{
     protected final CGViewport viewport;
     
     protected float[][] matrixJP;
+    protected float[] jpProportions;
     protected boolean sruSRCchanged=true;
     
     protected CGPipeline(Camera cam, CGWindow window, CGViewport viewport) {
@@ -36,6 +37,7 @@ public abstract class CGPipeline extends Observable implements Pipeline{
         this.viewport = viewport;
         this.viewport.addObserver(this);
         
+        jpProportions = new float[2];
         updateMatrixJP();
     }
     
@@ -107,7 +109,7 @@ public abstract class CGPipeline extends Observable implements Pipeline{
               vmin   = viewport.getVmin(),
               vmax   = viewport.getVmax(),
               deltaV = viewport.getDeltaV();
-        
+              
         float xmin   = window.getXmin(),
               deltaX = window.getDeltaX(),
               ymin   = window.getYmin(),
@@ -115,7 +117,10 @@ public abstract class CGPipeline extends Observable implements Pipeline{
         
         float del_UX = (deltaU/deltaX),
               del_VY = ((vmin-vmax)/deltaY); 
-                
+           
+        jpProportions[0] = del_UX;
+        jpProportions[1] = deltaV / deltaY;
+        
         matrixJP = new float[][] {
            {del_UX,      0, ((-xmin*del_UX)+umin)},
            {     0, del_VY, ((-ymin*del_VY)+vmax)},

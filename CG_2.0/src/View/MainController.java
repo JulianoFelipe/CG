@@ -56,6 +56,7 @@ import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
 import m.poligonos.Movimento;
+import m.poligonos.Nregular;
 import m.poligonos.Vertice;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
@@ -651,8 +652,8 @@ public class MainController implements Initializable {
                     getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(clicked);
                     mundo.addTempPoint(clicked);
                     
-                    //Nregular newreg = new Nregular(6, 66, newPoint);
-                    //getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newreg);
+                    //Nregular newreg = new Nregular(6, 66, clicked);
+                    //////getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newreg);
                     //mundo.addObject(newreg);
                 }
             } else if (CURRENT_SEL == FERRAMENTA_SEL){
@@ -753,16 +754,16 @@ public class MainController implements Initializable {
                     graphs.setStroke(Color.BLACK);
                 }
                 
-                Vertice point1 = obj.getPoint(0);
+                Vertice point1 = obj.get(0);
                 //System.out.println("Vista: " + vista.getVisao() + ". Point: " + point1);
                 Vertice point2 = null;
                 for (int i=1; i<obj.getNumberOfPoints(); i++){
-                    point2 = obj.getPoint(i);
+                    point2 = obj.get(i);
                     graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
                     //graphs.moveTo(point1.getX(), point.getY());
                     point1 = point2;
                 }
-                graphs.strokeLine(point1.getX(), point1.getY(), obj.getPoint(0).getX(),obj.getPoint(0).getY());
+                graphs.strokeLine(point1.getX(), point1.getY(), obj.get(0).getX(),obj.get(0).getY());
                 //graphs.fill();
                 graphs.closePath();
             }

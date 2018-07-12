@@ -29,7 +29,7 @@ public class Teste_Pipeline {
         Vertice VRP    = new Vertice((float) 10, (float) 50, (float) 30);
         Vertice P      = new Vertice(10, 50, 0);
         
-        MMath.printMatrix(VRP.getPointMatrix());
+        System.out.println(VRP);
         
         Camera cam = new Camera(ViewUp, VRP, P);
        
@@ -84,9 +84,9 @@ public class Teste_Pipeline {
         //newRes = MMath.multiplicar(pipe.getMatrixJP(), newRes);
         
         pipe.convert2D(pol);
-        float[][] newRes = pol.getPointMatrix();
+        //float[][] newRes = pol.getPoints();
         
         System.out.println("\nMATRIZ RESULTANTE");
-        MMath.printMatrix(newRes);
+        System.out.println(pol.getPoints());
     }
 }

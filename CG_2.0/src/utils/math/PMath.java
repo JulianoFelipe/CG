@@ -5,7 +5,7 @@
  */
 package utils.math;
 
-//import Model.Poligono;
+//import Model.WE_Poliedro;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -13,7 +13,7 @@ import java.util.List;
 import m.poligonos.CGObject;
 import m.poligonos.Face;
 import m.poligonos.PointObject;
-import m.poligonos.Poligono;
+import m.poligonos.we_edge.WE_Poliedro;
 import m.poligonos.Vertice;
 
 //import Model.Vertice;
@@ -39,7 +39,7 @@ public class PMath {
     @Deprecated
     public static boolean proximoDeQualquerVerticeDoPoligono(CGObject p, Vertice v){
         for (int i=0; i<p.getNumberOfPoints(); i++){
-            Vertice ve = p.getPoint(i);
+            Vertice ve = p.get(i);
             double dist = VMath.distancia(ve, v);
             if (dist < CLOSE_THRESHOLD) return true;
         }
@@ -61,8 +61,8 @@ public class PMath {
      * @return Vértice próximo de v, ou null, caso não exista.
      */
     @Deprecated
-    public static Vertice verticeProximoDeQualquerVerticeDoPoligono(Poligono p, Vertice v){
-        for (Vertice ver : p.getPointList()){
+    public static Vertice verticeProximoDeQualquerVerticeDoPoligono(WE_Poliedro p, Vertice v){
+        for (Vertice ver : p.getPoints()){
             if (VMath.distancia(ver, v) < CLOSE_THRESHOLD){
                 return ver;
             }
@@ -89,6 +89,40 @@ public class PMath {
                 Vertice doisV = new Vertice(pointMatrix[0][j], pointMatrix[1][j], pointMatrix[2][j]);
                 for (k=j+1; k<elements; k++){
                     Vertice tresV = new Vertice(pointMatrix[0][k], pointMatrix[1][k], pointMatrix[2][k]);
+                    count++;
+                    
+                    um.add(umV);
+                    dois.add(doisV);
+                    tres.add(tresV);
+                }
+            }
+        }
+        
+        List<List<Vertice>> ret = new ArrayList();
+        ret.add(um);
+        ret.add(dois);
+        ret.add(tres);
+        return ret;
+    }
+    
+    private static List<List<Vertice>> combinationsOf3(List<? extends Vertice> pointMatrix){
+        int elements = pointMatrix.size();
+        
+        if (elements < 3) return null;
+        
+        int i,j,k;
+        int count = 0; // nCr, onde r=3  (Combinação de n elementos tomados 3 a 3)
+        
+        List<Vertice> um   = new ArrayList<>();
+        List<Vertice> dois = new ArrayList<>();
+        List<Vertice> tres = new ArrayList<>();
+        
+        for (i=0; i<elements; i++){
+            Vertice umV = pointMatrix.get(i);
+            for(j=i+1; j<elements; j++){
+                Vertice doisV = pointMatrix.get(j);
+                for (k=j+1; k<elements; k++){
+                    Vertice tresV = pointMatrix.get(k);
                     count++;
                     
                     um.add(umV);
@@ -153,7 +187,7 @@ public class PMath {
     public static List<Face> attemptBuildingFromPlanes(CGObject object){
         if (object.getNumberOfPoints() < 3) return null;
         
-        List<List<Vertice>> combinacoes = combinationsOf3(object.getPointMatrix());
+        List<List<Vertice>> combinacoes = combinationsOf3(object.getPoints());
         
         List<Vertice> um   = combinacoes.get(0);
         List<Vertice> dois = combinacoes.get(1);
@@ -163,7 +197,7 @@ public class PMath {
             numberOfPoints = object.getNumberOfPoints();
         
         Vertice plane1;
-        System.out.println("COMS: " + numberOfCombs);
+        //System.out.println("COMS: " + numberOfCombs);
         HashSet<Integer> existingPlanes = new HashSet<>();
         List<Vertice> currentPlane;
         List<Face> listaDeFaces = new ArrayList<>();
@@ -185,7 +219,7 @@ public class PMath {
             currentPlane = new ArrayList();
             
             for (int j=0; j<numberOfPoints; j++){
-                Vertice local = object.getPoint(j);
+                Vertice local = object.get(j);
 
                 if (pointBelongsToPlane(plane1, local)){
                     currentPlane.add(local);
@@ -242,7 +276,7 @@ public class PMath {
         
         for (Face f : listaFaces){
             System.out.println(f);
-            MMath.printMatrix(f.getPointMatrix());
+            MMath.printMatrix(f.getPoints());
         }*/
     //}
 }

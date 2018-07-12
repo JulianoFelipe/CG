@@ -10,7 +10,6 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -18,11 +17,8 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.TextField;
-import m.Camera;
-import m.Visao;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
-import utils.config.StandardConfigCam;
 
 /**
  *
@@ -120,74 +116,67 @@ public class PolySelectController implements Initializable {
     }
     
     private void setFields(CGObject obj){
-        setTextFields(kaR, kaG, kaB, obj.getKa());
-        setTextFields(kdR, kdG, kdB, obj.getKd());
-        setTextFields(ksR, ksG, ksB, obj.getKs());
-
+        if (obj.isKset()){
+            setTextFields(kaR, kaG, kaB, obj.getKa());
+            setTextFields(kdR, kdG, kdB, obj.getKd());
+            setTextFields(ksR, ksG, ksB, obj.getKs());
+            ksN.setText(String.valueOf(obj.getKs()[3]));
+        }
+        
         objType.  setText(obj.getClass().getSimpleName());
         objID.    setText(String.valueOf(obj.getID()));
         objPoints.setText(String.valueOf(obj.getNumberOfPoints()));
-        ksN.      setText(Float.toString(obj.getKs().getW()));
         isChromatic.selectedProperty().set(obj.isChromatic());
+        
     }
        
     private void propagate(){
         if (changeColorGamut==false
                  && changeKA==false
                  && changeKD==false
-                 &&changeKS==false)
+                 && changeKS==false)
             return;
+                
+        float[] newKa,
+                newKd,
+                newKs;
         
-        CGObject localCopy = objProperty.get();
-        
-        Vertice newKa = localCopy.getKa(),
-                newKd = localCopy.getKd(),
-                newKs = localCopy.getKs();
-        
-        if (changeKA){
-            newKa = new Vertice(
+        if (changeKA || changeKD || changeKS){
+            newKa = new float[]{
                 Float.parseFloat( kaR.textProperty().get() ),
                 Float.parseFloat( kaG.textProperty().get() ),
                 Float.parseFloat( kaB.textProperty().get() )
-            );
-            changeKA = false;
-        }
-        
-        if (changeKD){
-            newKd = new Vertice(
+            };
+            
+            newKd = new float[]{
                 Float.parseFloat( kdR.textProperty().get() ),
                 Float.parseFloat( kdG.textProperty().get() ),
                 Float.parseFloat( kdB.textProperty().get() )
-            );
-            changeKD = false;
-        }
-        
-        if (changeKS){
-            newKs = new Vertice(
+            };
+
+            newKs = new float[]{
                 Float.parseFloat( ksR.textProperty().get() ),
                 Float.parseFloat( ksG.textProperty().get() ),
-                Float.parseFloat( ksB.textProperty().get() )
-            );
-            newKs.setW(Float.parseFloat(ksN.textProperty().get()));
-            changeKA = false;
+                Float.parseFloat( ksB.textProperty().get() ),
+                Float.parseFloat( ksN.textProperty().get() )
+            };
+            
+            objProperty.get().setAllK(newKa, newKd, newKs);
+            changeKA = changeKD = changeKS = false;
         }
-        
-        localCopy.setKa(newKa);
-        localCopy.setKd(newKd);
-        localCopy.setKs(newKs);
-        
+                
         if (changeColorGamut){
-            localCopy.setIsChromatic(isChromatic.selectedProperty().get());
+            objProperty.get().setIsChromatic(isChromatic.selectedProperty().get());
             changeColorGamut = false;
         }
         
-        objProperty.set( localCopy );
+        //objProperty.set( localCopy );
     }
     
-    private void setTextFields(TextField x, TextField y, TextField z, Vertice newValue){
-        x.textProperty().set(String.valueOf(newValue.getX()));
-        y.textProperty().set(String.valueOf(newValue.getY()));
-        z.textProperty().set(String.valueOf(newValue.getZ()));
+    private void setTextFields(TextField x, TextField y, TextField z, float[] newValue){
+        x.textProperty().set(String.valueOf(newValue[0]));
+        y.textProperty().set(String.valueOf(newValue[1]));
+        z.textProperty().set(String.valueOf(newValue[2]));
     }
     
     private void setTextFields(TextField x, TextField y, TextField z, String newValue){

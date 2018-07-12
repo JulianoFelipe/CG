@@ -15,9 +15,7 @@ public class Nregular extends PointObject {
     private Vertice center;
 
     //<editor-fold defaultstate="collapsed" desc="Constrututores">
-    private float[][] buildNsided(double pos){
-        float[][] lista = new float[4][noLados];
-        
+    private void buildNsided(double pos){       
         double x,y;
         double angulo = pos;
         double increment = 2*Math.PI/ noLados;
@@ -25,10 +23,8 @@ public class Nregular extends PointObject {
             x = center.getX() + ( radius * Math.cos(angulo));
             y = center.getY() + ( radius * Math.sin(angulo));
             
-            setPoint(i, (float) x, (float) y, 0);
+            lista.add(new Vertice((float) x, (float) y));
         }
-        
-        return lista;
     }
     
     public Nregular(int noLados, int radius, Vertice center) {
@@ -36,7 +32,7 @@ public class Nregular extends PointObject {
     }
     
     public Nregular(int noLados, int radius, Vertice center, double pos){
-        super(noLados); //Valido sempre?
+        super(noLados); //Valido sempre? noLados=noPontos?
         this.radius = radius;
         this.noLados = noLados;
         this.center = center;
@@ -45,12 +41,12 @@ public class Nregular extends PointObject {
     }
     
     public Nregular(Nregular nregular){
-        super(nregular.ID, nregular.noLados); //Valido sempre?
+        super(nregular); //Valido sempre?
         this.radius  = nregular.radius;
         this.noLados = nregular.noLados;
         this.center  = nregular.center;
         
-        buildNsided(0.);
+        //buildNsided(0.);
     }
 //</editor-fold>
     

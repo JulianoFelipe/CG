@@ -1,5 +1,7 @@
 package m.poligonos;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import utils.math.VMath;
 
@@ -9,13 +11,15 @@ import utils.math.VMath;
  *
  * @author Anderson
  */
-public class Aresta extends CGObject{   
+public class Aresta extends CGObject{
+    protected static final int NO_POINTS = 2;
+    
     /**
      * Vertice Inicial (vInicial) e final (vFinal)
      */
-    private Vertice vInicial;
-    private Vertice vFinal;
-
+    protected Vertice vInicial;
+    protected Vertice vFinal;
+    
     private float maxY;
     private float minY;
     private float maxX;
@@ -32,34 +36,20 @@ public class Aresta extends CGObject{
      * @param A Aresta a ser copiada
      */
     public Aresta(Aresta A) {
-        super(new float[][] {
-            {A.vInicial.getX(), A.vFinal.getX()},
-            {A.vInicial.getY(), A.vFinal.getY()},
-            {A.vInicial.getZ(), A.vFinal.getZ()},
-            {                1,               1}},
-            A.ID);
+        super(A);
+
+        this.vInicial = new Vertice(A.vInicial);
+        this.vFinal   = new Vertice(A.vFinal);
         
-        this.vInicial = A.vInicial;
-        this.vFinal = A.vFinal;
+        this.maxX = A.maxX;
+        this.minX = A.minX;
+        this.maxY = A.maxY;
+        this.minY = A.minY;
         
-        if (this.vInicial.getX() > this.vFinal.getX()){
-            maxX = this.vInicial.getX();
-            minX = this.vFinal.getX();
-        } else {
-            maxX = this.vFinal.getX();
-            minX = this.vInicial.getX();
-        }
-        
-        if (this.vInicial.getY() > this.vFinal.getY()){
-            maxY = this.vInicial.getY();
-            minY = this.vFinal.getY();
-        } else {
-            maxY = this.vFinal.getY();
-            minY = this.vInicial.getY();
-        }
-        
-        interceptX = minX;
-        changed = true;
+        this.changed = A.changed;
+        this.slope = A.slope;
+        this.b = A.b;
+        this.interceptX = A.interceptX;
     }
     
     /**
@@ -68,12 +58,7 @@ public class Aresta extends CGObject{
      * @param F Vertice Final
      */
     public Aresta(Vertice I, Vertice F) {
-        super(new float[][] {
-            {I.getX(), F.getX()},
-            {I.getY(), F.getY()},
-            {I.getZ(), F.getZ()},
-            {       1,        1}
-        });
+        super();
         
         this.vInicial = I;
         this.vFinal = F;
@@ -190,8 +175,7 @@ public class Aresta extends CGObject{
         return "Aresta: ID=" + ID + "; Points={" + vInicial.toString() + "," + vFinal.toString() + "}";
     }
     
-    @Override
-    public int hashCode() {
+    public int hash() {
         int hash = 7;
         hash = 17 * hash + Objects.hashCode(this.vInicial);
         hash = 17 * hash + Objects.hashCode(this.vFinal);
@@ -203,8 +187,7 @@ public class Aresta extends CGObject{
      * @param obj
      * @return 
      */
-    @Override
-    public boolean equals(Object obj) {
+    public boolean equalsT(Object obj) {
         if (obj == null) {
             return false;
         }
@@ -216,5 +199,78 @@ public class Aresta extends CGObject{
             return false;
         }
         return this.vFinal.equals(other.vFinal);
+    }
+
+    @Override
+    public int getNumberOfPoints() {
+        return NO_POINTS;
+    }
+
+    @Override
+    public Vertice get(int i) {
+        switch (i) {
+            case 0:
+                return vInicial;
+            case 1:
+                return vFinal;
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public void set(int i, Vertice point) {
+        if (i == 0){
+            vInicial.copyAttributes(point);
+        } else if (i == 1){
+            vFinal.copyAttributes(point);
+        }
+    }
+
+    @Override
+    public List<Vertice> getPoints() {
+        List<Vertice> newL = new ArrayList();
+        newL.add(vInicial);
+        newL.add(vFinal);
+        return newL;
+    }
+    
+    public static void main(String...args){
+        Vertice I = new Vertice(0, 0, 0);
+        Vertice F = new Vertice(10, 10, 10);
+        
+        Aresta a = new Aresta(I, F);
+        System.out.println(a.getPoints());
+        I.setX(666);
+        System.out.println(a.getPoints());
+    }
+
+    @Override
+    public void updateInternals(CGObject updatedObj) {
+        if (!(updatedObj instanceof Aresta)) throw new IllegalArgumentException("Não é uma instância de Aresta."); //Is this Right?
+
+        Aresta updated = (Aresta) updatedObj;
+        
+        vInicial.copyAttributes(updated.vInicial);
+        vFinal.  copyAttributes(updated.vFinal);
+
+        if (this.vInicial.getX() > this.vFinal.getX()){
+            maxX = this.vInicial.getX();
+            minX = this.vFinal.getX();
+        } else {
+            maxX = this.vFinal.getX();
+            minX = this.vInicial.getX();
+        }
+        
+        if (this.vInicial.getY() > this.vFinal.getY()){
+            maxY = this.vInicial.getY();
+            minY = this.vFinal.getY();
+        } else {
+            maxY = this.vFinal.getY();
+            minY = this.vInicial.getY();
+        }
+        
+        interceptX = minX;
+        changed = true;
     }
 }

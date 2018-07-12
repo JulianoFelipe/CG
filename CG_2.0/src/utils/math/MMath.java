@@ -5,7 +5,10 @@
  */
 package utils.math;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+import m.poligonos.Vertice;
 
 /**
  * Matrix math
@@ -14,35 +17,41 @@ import java.util.Arrays;
  */
 public class MMath {
 
-    /**
-     * Simples multiplicação de matrizes. Tão simples que os princípios de
-     * localidade referencial não são atendidos de nenhuma maneira. :D
-     *
-     * @param A Primeira matriz.
-     * @param B Segunda matriz.
-     * @return Produto das matrizes
-     */
-    public static double[][] multiplicar(double[][] A, double[][] B) {
+    public static void multiplicar(float[][] A, List<? extends Vertice> points) {
         int aRows = A.length;
         int aColumns = A[0].length;
-        int bRows = B.length;
-        int bColumns = B[0].length;
+        int bColumns = points.size();
 
-        if (aColumns != bRows) {
-            throw new IllegalArgumentException("A:Rows: " + aColumns + " did not match B:Columns " + bRows + ".");
-        }
-
-        double[][] C = new double[aRows][bColumns];
-
-        for (int i = 0; i < aRows; i++) { // aRow
-            for (int j = 0; j < bColumns; j++) { // bColumn
-                for (int k = 0; k < aColumns; k++) { // aColumn
-                    C[i][j] += A[i][k] * B[k][j];
+         if (aColumns == 3){
+            for (int i = 0; i < aRows; i++) { // aRow
+                for (int j = 0; j < bColumns; j++) { // bColumn
+                    Vertice copy = points.get(j);
+                    
+                    float res = (A[i][0]*copy.getX()) + (A[i][1]*copy.getY()) + (A[i][2]*copy.getZ());
+                    switch (i) {
+                        case 0: points.get(j).setX(res); break;
+                        case 1: points.get(j).setY(res); break;
+                        case 2: points.get(j).setZ(res); break;
+                    }
                 }
             }
+        } else if (aColumns == 4){
+            for (int i = 0; i < aRows; i++) { // aRow
+                for (int j = 0; j < bColumns; j++) { // bColumn
+                    Vertice copy = points.get(j);
+                    
+                    float res = (A[i][0]*copy.getX()) + (A[i][1]*copy.getY()) + (A[i][2]*copy.getZ()) + (A[i][3]*copy.getW());
+                    switch (i) {
+                        case 0: points.get(j).setX(res); break;
+                        case 1: points.get(j).setY(res); break;
+                        case 2: points.get(j).setZ(res); break;
+                        case 3: points.get(j).setW(res); break;
+                    }
+                }
+            }
+        } else {
+            throw new IllegalArgumentException("Manual matrix multiplication unrolling not implemented for: " + aColumns);
         }
-
-        return C;
     }
 
     /*Amazing precision*/
@@ -517,5 +526,20 @@ public class MMath {
 
         System.out.println("RES");
         printMatrix(res);*/
+        
+        /*float[][] pol_mat = {
+            { 1, 0, 0},//, 0},
+            { 0, 1, 0, 0},
+            { 0, 0, 1, -10}//,
+            //{ 0, 0, 0, 1}
+        };
+        
+        List<Vertice> lista = new ArrayList();
+        lista.add(new Vertice(1, 2, 0));
+        System.out.println(lista);
+        
+        MMath.multiplicar(pol_mat, lista);
+        
+        System.out.println(lista);*/
     //}
 }

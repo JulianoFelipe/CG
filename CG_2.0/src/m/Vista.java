@@ -70,6 +70,25 @@ public class Vista implements Observer{
         });
     }
     
+    public void setObject(int index, CGObject obj){
+        pipe.convert2D(obj);
+        objetos.set(index, obj);
+    }
+    
+    public void remove(CGObject obj){
+        objetos.remove(obj);
+    }
+    
+    public void setLastTempPoint(Vertice v){
+        pipe.convert2D(v);
+        tempPoints.set(tempPoints.size()-1, v);
+    }
+    
+    public void setTempPoint(int index, Vertice v){
+        pipe.convert2D(v);
+        tempPoints.set(index, v);
+    }
+    
     public List<CGObject> get2Dobjects(){
         return objetos;
     }
@@ -94,9 +113,7 @@ public class Vista implements Observer{
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof CGPipeline){
-            clearAll();
-            addObject(mundo.getObjectsCopy());
-            addTempPoint(mundo.getTempPointsCopy());
+            mundo.updateAll();
         }
     }
     

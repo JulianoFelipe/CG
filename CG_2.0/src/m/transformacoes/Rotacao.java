@@ -13,81 +13,136 @@ import m.poligonos.Vertice;
  * @author JFPS
  */
 public class Rotacao{
-    public CGObject rotacaoZ(double graus, CGObject p){
+    private boolean lockChange = false;
+
+    public Rotacao() {
+    }
+    
+    public Rotacao(boolean lockChange) {
+        this.lockChange = lockChange;
+    }
+    
+    public void rotacaoZ(double graus, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             double x = copy.getX(), y = copy.getY(), z = copy.getZ();
             double sin = Math.sin(graus);
             double cos = Math.cos(graus);
             
-            p.setPoint(i, 
+            p.get(i).setAll( 
                 (float) ((x*cos)-(y*sin)), 
                 (float) ((x*sin)+(y*cos)),
                 (float) (z)
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject rotacaoX(double graus, CGObject p){
+    public void rotacaoX(double graus, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             double x = copy.getX(), y = copy.getY(), z = copy.getZ();
             double sin = Math.sin(graus);
             double cos = Math.cos(graus);
             
-            p.setPoint(i, 
+            p.get(i).setAll( 
                 (float) (x), 
                 (float) ((y*cos)-(z*sin)),
                 (float) ((y*sin)+(z*cos))
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject rotacaoY(double graus, CGObject p){
+    public void rotacaoY(double graus, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             double x = copy.getX(), y = copy.getY(), z = copy.getZ();
             double sin = Math.sin(graus);
             double cos = Math.cos(graus);
 
-            p.setPoint(i, 
+            p.get(i).setAll(
                 (float) ((x*cos)+(z*sin)), 
                 (float) (y),
                 (float) (-(x*sin)+(z*cos))
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject rotacaoZ(double graus, CGObject p, final Vertice pontoFixo){
-        if (pontoFixo == null) return rotacaoZ(graus, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = rotacaoZ(graus, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);        
-        return p;
+    public void rotacaoZ(double graus, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            rotacaoZ(graus, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        rotacaoZ(graus, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);        
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject rotacaoX(double graus, CGObject p, final Vertice pontoFixo){
-        if (pontoFixo == null) return rotacaoX(graus, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = rotacaoX(graus, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);        
-        return p;
+    public void rotacaoX(double graus, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            rotacaoX(graus, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        rotacaoX(graus, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);        
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject rotacaoY(double graus, CGObject p, final Vertice pontoFixo){
-        if (pontoFixo == null) return rotacaoY(graus, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = rotacaoY(graus, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);        
-        return p;
+    public void rotacaoY(double graus, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            rotacaoY(graus, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        rotacaoY(graus, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);        
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
+
+    public boolean isLockChange() {
+        return lockChange;
+    }
+
+    public void setLockChange(boolean lockChange) {
+        this.lockChange = lockChange;
+    }
+    
+    
 }

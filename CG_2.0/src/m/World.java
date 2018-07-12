@@ -10,29 +10,40 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
+import javafx.beans.Observable;
+import javafx.collections.FXCollections;
+import javafx.collections.ListChangeListener.Change;
+import javafx.collections.ObservableList;
 import m.poligonos.Aresta;
 import m.poligonos.CGObject;
 import m.poligonos.Face;
 import m.poligonos.Nregular;
 import m.poligonos.PointObject;
-import m.poligonos.Poligono;
+import m.poligonos.we_edge.WE_Poliedro;
 import m.poligonos.Vertice;
 
 /**
  *
  * @author JFPS
  */
-public class World {
+public final class World {
     private static final Logger LOG = Logger.getLogger("CG_2.0");    
-    private final List<CGObject> objetos;
+    private final ObservableList<CGObject> objetos;
     private final List<Vertice> tempPoints;
     private List<Vista> vistas;
     
     private final List<CGObject> axis = new ArrayList<>();
     private boolean addedAxisFlag = false;
     
+    //https://coderanch.com/t/666722/java/Notify-ObservableList-Listeners-Change-Elements
+    
     private World() {       
-        objetos    = new ArrayList();
+        objetos = FXCollections.observableArrayList((CGObject param) -> {
+            return new Observable[]{ param.changedProperty()};
+        });
+        /*tempPoints = FXCollections.observableArrayList((Vertice param) -> {
+            return new Observable[]{ param.changedProperty()};
+        });*/
         tempPoints = new ArrayList();
         
         Aresta x_axis = new Aresta(new Vertice(0,0,0), new Vertice(5000,0,0));
@@ -49,26 +60,75 @@ public class World {
         axis.add(mx_axis);
         axis.add(my_axis);
         axis.add(mz_axis);
+        
+        objetos.addListener((Change<? extends CGObject> c) -> {
+            while (c.next()) {
+                if (c.wasPermutated()) {
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        throw new UnsupportedOperationException("Permutação de elementos não implementada.");
+                        //System.out.println("Permuted: " + i + " " + objetos.get(i));
+                    }
+                } else if (c.wasUpdated()) {
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        System.out.println("Updated: " + i + " " + objetos.get(i));
+                        for (Vista v : vistas){
+                            v.setObject(i, deepCopy( objetos.get(i) ));
+                        }
+                    }
+                } else {
+                    /*if ( !(tempPoints.isEmpty() && c.getRemovedSize()>0) ){ //if (!(clearEvent)), proceed
+                        c.getRemoved().forEach((removedItem) -> {
+                            System.out.println("Removed: " + removedItem);
+                            vistas.forEach((v) -> {
+                                v.remove(removedItem);
+                            });
+                        });
+                        c.getAddedSubList().forEach((addedItem) -> {
+                            System.out.println("Added: " + addedItem + " Points: " + addedItem.getPoints());
+                            vistas.forEach((v) -> {
+                                v.addObject(deepCopy( addedItem ));
+                            });
+                        });
+                    }*/
+                }
+            }
+        });
+        
+        /*tempPoints.addListener((Change<? extends Vertice> c) -> {
+            while (c.next()) {
+                if (c.wasPermutated()) {
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        throw new UnsupportedOperationException("Permutação de elementos não implementada.");
+                        //System.out.println("TEMP Permuted: " + i + " " + tempPoints.get(i));
+                    }
+                } else if (c.wasUpdated()) {
+                    for (int i = c.getFrom(); i < c.getTo(); ++i) {
+                        System.out.println("TEMP Updated: " + i + " " + tempPoints.get(i));
+                        for (Vista v : vistas){
+                            v.setTempPoint(i, new Vertice(tempPoints.get(i)));
+                        }
+                    }
+                } else {
+                    if ( !(tempPoints.isEmpty() && c.getRemovedSize()>0) ){
+                        /*c.getRemoved().forEach((removedItem) -> {
+                            System.out.println("TEMP Removed: " + removedItem);
+                        });*/
+                        /*c.getAddedSubList().forEach((addedItem) -> {
+                            System.out.println("TEMP Added: " + addedItem);
+                            vistas.forEach((v) -> {
+                                v.addTempPoint(new Vertice(addedItem));
+                            });
+                        });
+                    }
+                }
+            }
+        });*/
     }
     
     private World(List<CGObject> lista){
-        objetos    = new ArrayList(lista);
-        tempPoints = new ArrayList();
+        this();
         
-        Aresta x_axis = new Aresta(new Vertice(0,0,0), new Vertice(5000,0,0));
-        Aresta y_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,5000,0));
-        Aresta z_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,5000));
-        
-        Aresta mx_axis = new Aresta(new Vertice(0,0,0), new Vertice(-5000,0,0));
-        Aresta my_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,-5000,0));
-        Aresta mz_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,-5000));
-        
-        axis.add( x_axis);
-        axis.add( y_axis);
-        axis.add( z_axis);
-        axis.add(mx_axis);
-        axis.add(my_axis);
-        axis.add(mz_axis);
+        this.addObject(lista);
     }
     
     public void setPlanes(Vista...planes){
@@ -150,14 +210,14 @@ public class World {
     private CGObject deepCopy(CGObject obj){
         CGObject deepCopied = null;
         
-        if        (obj instanceof Vertice){
+        /*if        (obj instanceof Vertice){
             deepCopied = new Vertice( (Vertice) obj);
-        } else if (obj instanceof Aresta){
+        } else */if (obj instanceof Aresta){
             deepCopied = new Aresta( (Aresta) obj);
         } else if (obj instanceof Face){
             deepCopied = new Face( (Face) obj);
-        } else if (obj instanceof Poligono){
-            deepCopied = new Poligono( (Poligono) obj);
+        } else if (obj instanceof WE_Poliedro){
+            deepCopied = new WE_Poliedro( (WE_Poliedro) obj);
         } else if (obj instanceof Nregular){
             deepCopied = new Nregular( (Nregular) obj);
         } else if (obj instanceof PointObject){
@@ -183,6 +243,7 @@ public class World {
     }    
     
     public void addAxis(){
+        //System.out.println("ADDED AXIS");
         if (addedAxisFlag) return;
         
         addObject(axis);
@@ -205,6 +266,20 @@ public class World {
             if (obj.getID() == id){
                 objetos.remove(obj);
                 return;
+            }
+        }
+    }
+    
+    public void updateAll(){
+        for (int i=0; i<objetos.size(); i++){
+            for (Vista v : vistas){
+                v.setObject(i, deepCopy(objetos.get(i)));
+            }
+        }
+        
+        for (int i=0; i<tempPoints.size(); i++){
+            for (Vista v : vistas){
+                v.setTempPoint(i, new Vertice(tempPoints.get(i)));
             }
         }
     }

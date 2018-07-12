@@ -1,5 +1,7 @@
 package m.poligonos;
 
+import m.poligonos.we_edge.IndexList;
+import m.poligonos.we_edge.Index2;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -36,9 +38,9 @@ public class PoligonoOld_WingedEdge extends CGObject{
         
     //<editor-fold defaultstate="collapsed" desc="Construtores">     
     public PoligonoOld_WingedEdge(float[][] pointMatrix, List<IndexList> faces){
-        super(pointMatrix);
+        //super(pointMatrix);
         
-        int points = super.getNumberOfPoints();
+        int points = pointMatrix[0].length;
         
         lFaces = new int[faces.size()];
         visibilidade_faces = new boolean[faces.size()];
@@ -180,7 +182,7 @@ public class PoligonoOld_WingedEdge extends CGObject{
     }
     
     public PoligonoOld_WingedEdge(PoligonoOld_WingedEdge p){
-        super(p.getPointMatrix(), p.getID());
+        super(p); //super(p.getPoints(), p.getID());
         
         lAresta_vertices = new ArrayList(p.lAresta_vertices);
         lAresta_faces    = new ArrayList(p.lAresta_faces);
@@ -259,10 +261,10 @@ public class PoligonoOld_WingedEdge extends CGObject{
             
             System.out.println("PRE ARESTA: " + lAresta_faceEsq.get(indexA));
             System.out.println("IND3: " + index3 + " PRE-END: " + lAresta_faceEsq.get(indexA).getInd2());
-            System.out.println("P1: " + getPoint(index1));
-            System.out.println("P2: " + getPoint(index2));
-            System.out.println("P3: " + getPoint(index3));
-            Vertice normal = VMath.obterNormal(getPoint(index1), getPoint(index2), getPoint(index3));
+            System.out.println("P1: " + get(index1));
+            System.out.println("P2: " + get(index2));
+            System.out.println("P3: " + get(index3));
+            Vertice normal = VMath.obterNormal(get(index1), get(index2), get(index3));
             System.out.println(normal);
             VMath.normalizar(normal);
             System.out.println(normal);
@@ -447,5 +449,30 @@ public class PoligonoOld_WingedEdge extends CGObject{
         System.out.println(p.getVisibleFaces());
         p.updateVisibility(cam);
         System.out.println(p.getVisibleFaces());
+    }
+
+    @Override
+    public List<? extends Vertice> getPoints() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public int getNumberOfPoints() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public Vertice get(int i) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void set(int i, Vertice point) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void updateInternals(CGObject updatedObj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

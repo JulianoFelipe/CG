@@ -14,125 +14,190 @@ import m.poligonos.Vertice;
  * @author JFPS
  */
 public class Escala {
-    public CGObject escala(Eixo axis, double fator, CGObject p){
+    private boolean lockChange = false;
+
+    public Escala() {
+    }
+    
+    public Escala(boolean lockChange) {
+        this.lockChange = lockChange;
+    }
+
+    public void escala(Eixo axis, double fator, CGObject p){
         switch (axis) {
             case Eixo_X:
-                return escalaX(fator, p);
+                escalaX(fator, p);
+                break;
             case Eixo_Y:
-                return escalaY(fator, p);
+                escalaY(fator, p);
+                break;
             case Eixo_Z:
-                return escalaZ(fator, p);
+                escalaZ(fator, p);
+                break;
             case Eixo_XYZ:
-                return escalaZ(fator, p);
+                escalaZ(fator, p);
+                break;
             default:
                 throw new UnsupportedOperationException("NÃ£o implementado");
         }
     }
     
-    public CGObject escala(Eixo axis, double fator, CGObject p, final Vertice pontoFixo){
+    public void escala(Eixo axis, double fator, CGObject p, final Vertice pontoFixo){
         switch (axis) {
             case Eixo_X:
-                return escalaX(fator, p, pontoFixo);
+                escalaX(fator, p, pontoFixo);
+                break;
             case Eixo_Y:
-                return escalaY(fator, p, pontoFixo);
+                escalaY(fator, p, pontoFixo);
+                break;
             case Eixo_Z:
-                return escalaZ(fator, p, pontoFixo);
+                escalaZ(fator, p, pontoFixo);
+                break;
             case Eixo_XYZ:
-                return escalaZ(fator, p, pontoFixo);
+                escalaZ(fator, p, pontoFixo);
+                break;
             default:
                 throw new UnsupportedOperationException("NÃ£o implementado");
         }
     }
     
-    public CGObject escalaX(double fator, CGObject p){
+    public void escalaX(double fator, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             
-            p.setPoint(i, 
+            p.get(i).setAll(  
                 (float) (copy.getX() * fator), 
                 (float) (copy.getY()),
                 (float) (copy.getZ())
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject escalaY(double fator, CGObject p){
+    public void escalaY(double fator, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             
-            p.setPoint(i, 
+            p.get(i).setAll( 
                 (float) (copy.getX()), 
                 (float) (copy.getY() * fator),
                 (float) (copy.getZ())
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject escalaZ(double fator, CGObject p){
+    public void escalaZ(double fator, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             
-            p.setPoint(i, 
+            p.get(i).setAll( 
                 (float) (copy.getX()), 
                 (float) (copy.getY()),
                 (float) (copy.getZ() * fator)
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject escalaUniforme(double fator, CGObject p){
+    public void escalaUniforme(double fator, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
-            Vertice copy = p.getPoint(i);
+            Vertice copy = p.get(i);
             
-            p.setPoint(i, 
+            p.get(i).setAll(  
                 (float) (copy.getX() * fator), 
                 (float) (copy.getY() * fator),
                 (float) (copy.getZ() * fator)
             );
         }
-        return p;
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject escalaX(double fator, CGObject p, final Vertice pontoFixo){
-        if (pontoFixo == null) return escalaX(fator, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = escalaX(fator, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
-        return p;
+    public void escalaX(double fator, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            escalaX(fator, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        escalaX(fator, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject escalaY(double fator, CGObject p, final Vertice pontoFixo){
-        if (pontoFixo == null) return escalaY(fator, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = escalaY(fator, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
-        return p;
+    public void escalaY(double fator, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            escalaY(fator, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        escalaY(fator, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject escalaZ(double fator, CGObject p, final Vertice pontoFixo){
-        if (pontoFixo == null) return escalaZ(fator, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = escalaZ(fator, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
-        return p;
+    public void escalaZ(double fator, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            escalaZ(fator, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        escalaZ(fator, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
     
-    public CGObject escalaUniforme(double fator, CGObject p, final Vertice pontoFixo){
-        if (pontoFixo == null) return escalaZ(fator, p);
-        Translacao t = new Translacao();
-        p = t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
-        p = escalaUniforme(fator, p);
-        p = t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
-        return p;
+    public void escalaUniforme(double fator, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            escalaUniforme(fator, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        escalaUniforme(fator, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
     }
 }

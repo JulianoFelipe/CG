@@ -16,11 +16,8 @@ import m.Vista;
 import m.World;
 import m.pipeline.OrtPipeline;
 import m.pipeline.PersPipeline;
-import m.poligonos.Aresta;
 import m.poligonos.Face;
 import m.poligonos.PointObject;
-import m.poligonos.Poligono;
-import m.poligonos.Vertice;
 import utils.config.StandardConfigCam;
 import utils.config.StandardConfigWinView;
 import utils.math.PMath;
@@ -65,6 +62,8 @@ public class CG_20 extends Application {
         List<Face> lista = PMath.attemptBuildingFromPlanes(pol);
 
         mundo.addObject(lista);
+        //mundo.addObject(new Aresta(new Vertice(0,0,0), new Vertice(10,10,10)));
+        
         //mundo.addObject(x_axis, y_axis, z_axis);//, mx_axis, my_axis, mz_axis);
         
         //PaintController paint = new PaintController();

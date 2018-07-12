@@ -4,29 +4,35 @@ package m.poligonos;
  * Classe da estrutura e manipulacao de vertices
  * @author Anderson
  */
-public class Vertice extends CGObject{
+public class Vertice{
+    private static long INSTANCES=0;
+    private final long ID;
+    private float x,y,z,w;
+
+    //private BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    //Sem necessidade porque objetos que tem pontos saberão quando estes forem alterados
+    //(Dependendo do método chamado, por ex.)
+    
     //<editor-fold defaultstate="collapsed" desc="Construtores">   
-    /**
-     * Construtor de vertice
-     * @param x valor para x
-     * @param y valor para y
-     * @param z valor para z
-     */
-    public Vertice(float x, float y, float z) {
-        super(new float[][] { {x}, {y}, {z}, {1} } );
-    }
-    
+
     public Vertice(float x, float y, float z, float w) {
-        super(new float[][] { {x}, {y}, {z}, {w} } );
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
+        
+        ID=INSTANCES++;
+    }
+
+    public Vertice(Vertice A){
+        x = A.x;
+        y = A.y;
+        z = A.z;
+        w = A.w;
+        ID = A.ID;
     }
     
-    /**
-     * Construtor de copia
-     * @param A Vertice a ser copiado
-     */
-    public Vertice(Vertice A){
-        super(new float[][] { {A.getX()}, {A.getY()}, {A.getZ()}, {1} }, A.ID );
-    }
+    public Vertice(float x, float y, float z) { this(x, y, z, (float) 1.0); }
     
     public Vertice(int x, int y, int z) { this((float)x, (float)y, (float)z); }
     
@@ -36,66 +42,62 @@ public class Vertice extends CGObject{
 //</editor-fold>
 
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">
+
     public float getX() {
-        return pointMatrix[0][0];
+        return x;
     }
-    
+
+    public void setX(float x) {
+        this.x = x;
+    }
+
     public float getY() {
-        return pointMatrix[1][0];
+        return y;
+    }
+
+    public void setY(float y) {
+        this.y = y;
     }
 
     public float getZ() {
-        return pointMatrix[2][0];
-    }
-
-    public float getW() {
-        return pointMatrix[3][0];
-    }
-    
-    public void setX(float x) {
-        pointMatrix[0][0] = x;
-    }
-    
-    public void setY(float y) {
-        pointMatrix[1][0] = y;
+        return z;
     }
 
     public void setZ(float z) {
-        pointMatrix[2][0] = z;
+        this.z = z;
+    }
+
+    public float getW() {
+        return w;
     }
 
     public void setW(float w) {
-        pointMatrix[3][0] = w;
+        this.w = w;
     }
     
     public void setAll(float x, float y, float z) {
-        setX(x);
-        setY(y);
-        setZ(z);
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
     
     public void setAll(float x, float y, float z, float w) {
-        setX(x);
-        setY(y);
-        setZ(z);
-        setW(w);
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
     }
-    
-
 //</editor-fold>
     
     @Override
     public String toString() {
-        return "("+getX()+";"+getY()+";" + getZ() + ";" + getW() + ")";
-    }
-    
+        return "Vertice "+ID+"=("+getX()+";"+getY()+";" + getZ() + ";" + getW() + ")";
+    }   
+
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 97 * hash + Float.floatToIntBits(getX());
-        hash = 97 * hash + Float.floatToIntBits(getY());
-        hash = 97 * hash + Float.floatToIntBits(getZ());
-        hash = 97 * hash + Float.floatToIntBits(getW());
+        int hash = 3;
+        hash = 97 * hash + (int) (this.ID ^ (this.ID >>> 32));
         return hash;
     }
 
@@ -111,17 +113,19 @@ public class Vertice extends CGObject{
             return false;
         }
         final Vertice other = (Vertice) obj;
-        if (Float.floatToIntBits(getX()) != Float.floatToIntBits(other.getX())) {
-            return false;
-        }
-        if (Float.floatToIntBits(getY()) != Float.floatToIntBits(other.getY())) {
-            return false;
-        }
-        if (Float.floatToIntBits(getZ()) != Float.floatToIntBits(other.getZ())) {
-            return false;
-        }
-        return Float.floatToIntBits(getW()) == Float.floatToIntBits(other.getW());
+        return this.ID == other.ID;
     }
     
+    public boolean equalPoints(Vertice that){
+        if (this.x!=that.x) return false;
+        if (this.y!=that.y) return false;
+        return this.z == that.z;
+    }
     
+    public void copyAttributes(Vertice v){
+        this.x = v.x;
+        this.y = v.y;
+        this.z = v.z;
+        this.w = v.w;
+    }
 }
