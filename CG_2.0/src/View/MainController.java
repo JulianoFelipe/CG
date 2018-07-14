@@ -51,6 +51,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import m.Camera;
+import m.Eixo;
 import m.Visao;
 import m.Vista;
 import m.World;
@@ -329,6 +330,8 @@ public class MainController implements Initializable {
     
     private void initializeViewToolbars(){
         //<editor-fold defaultstate="collapsed" desc="Frente">
+        float zoom = getVistaFromVisao(Visao.Frontal).getPipe().getProportions();
+        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", zoom));
         frenteCamParams.setOnAction((ActionEvent event) -> {
             System.out.println(getVistaFromVisao(Visao.Frontal).getPipelineCamera());
             ManualCamController controller = new ManualCamController(
@@ -393,6 +396,8 @@ public class MainController implements Initializable {
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Lateral">
+        zoom = getVistaFromVisao(Visao.Lateral).getPipe().getProportions();
+        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", zoom));
         lateralCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                     getVistaFromVisao(Visao.Lateral).getPipelineCamera(), Visao.Lateral
@@ -455,6 +460,8 @@ public class MainController implements Initializable {
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Topo">
+        zoom = getVistaFromVisao(Visao.Topo).getPipe().getProportions();
+        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", zoom));
         topoCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                     getVistaFromVisao(Visao.Topo).getPipelineCamera(), Visao.Topo
@@ -517,6 +524,8 @@ public class MainController implements Initializable {
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Perspectiva">
+        zoom = getVistaFromVisao(Visao.Perspectiva).getPipe().getProportions();
+        persZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", zoom));
         persCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                 getVistaFromVisao(Visao.Perspectiva).getPipelineCamera(), Visao.Perspectiva
@@ -659,7 +668,13 @@ public class MainController implements Initializable {
             } else if (CURRENT_SEL == FERRAMENTA_SEL){
                 if (current_ferr == Ferramentas.Select){
                     for (CGObject obj : getVistaFromVisao(Visao.Frontal).get2Dobjects()){
-                        if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
+                        /*if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
+                            selected_obj = obj;
+                            selectController.objectProperty().set(obj);
+                            paintStuff();
+                            return;
+                        }*/
+                        if (obj.contains(clicked.getX(), clicked.getY(), Eixo.Eixo_XY)){
                             selected_obj = obj;
                             selectController.objectProperty().set(obj);
                             paintStuff();

@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import m.Camera;
+import m.Eixo;
 import utils.math.VMath;
 
 
@@ -15,6 +16,7 @@ import utils.math.VMath;
  *
  * @author 
  */
+@Deprecated
 public class PoligonoOld_WingedEdge extends CGObject{
     //http://www.dtic.mil/dtic/tr/fulltext/u2/755141.pdf
     //https://www.sciencedirect.com/science/article/pii/S0097849307001653
@@ -473,6 +475,16 @@ public class PoligonoOld_WingedEdge extends CGObject{
 
     @Override
     public void updateInternals(CGObject updatedObj) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean contains(float x, float y, Eixo axis) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean insideBoundingBox(float x, float y, Eixo axis) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

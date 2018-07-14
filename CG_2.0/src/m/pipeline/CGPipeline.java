@@ -131,4 +131,9 @@ public abstract class CGPipeline extends Observable implements Pipeline{
     public abstract Visao getVisao();
     
     public abstract float getDP();
+    
+    public float getProportions(){
+        return jpProportions[0];
+    }
+
 }

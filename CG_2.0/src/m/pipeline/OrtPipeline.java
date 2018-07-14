@@ -55,7 +55,7 @@ public class OrtPipeline extends CGPipeline{
             standardConversion(vertice);
             return;
         }
-        System.out.println("IN VERT: " + vertice);
+
         //Se a câmera está "olhando reto para o ponto"
         //Faça as conversões abaixo
         switch(vista){
@@ -64,7 +64,7 @@ public class OrtPipeline extends CGPipeline{
             case Topo:    topConversion(vertice);     break;
             default: throw new UnsupportedOperationException("Conversão reversa ortográfica não implementada para: " + vista);
         }
-        System.out.println("OUT VER: " + vertice);
+
     }
 
     @Override

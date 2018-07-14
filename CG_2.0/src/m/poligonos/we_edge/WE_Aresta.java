@@ -29,9 +29,7 @@ public class WE_Aresta extends Aresta{
 
     public WE_Aresta(WE_Aresta a) {
         super(a);
-        
-        esquerda = new WE_Face(a.esquerda);
-        direita  = new WE_Face(a.direita);
+        //Copia só as coords e ID para não criar cópias desnecessárias das esq_... e dir_...
     }
     
     //<editor-fold defaultstate="collapsed" desc="Getters e Setters">

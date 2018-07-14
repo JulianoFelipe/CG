@@ -7,11 +7,13 @@ package m.poligonos;
 
 import java.util.ArrayList;
 import java.util.List;
+import m.Eixo;
 
 /**
  *
  * @author JFPS
  */
+@Deprecated
 public class PointObject extends CGObject{
     protected List<Vertice> lista;
     
@@ -87,5 +89,15 @@ public class PointObject extends CGObject{
         for (int i=0; i<lista.size(); i++){
             lista.get(i).copyAttributes(updatedObj.get(i));
         }
+    }
+
+    @Override
+    public boolean contains(float x, float y, Eixo axis) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public boolean insideBoundingBox(float x, float y, Eixo axis) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }

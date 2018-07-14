@@ -25,7 +25,7 @@ public class WE_Vertice extends Vertice{
 
     public WE_Vertice(WE_Vertice v) {
         super(v);
-        arestaIncidente = new WE_Aresta(v.arestaIncidente);
+        //arestaIncidente = new WE_Aresta(v.arestaIncidente);
     }
     
     public WE_Aresta getArestaIncidente() {

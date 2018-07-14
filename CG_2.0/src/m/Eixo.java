@@ -23,4 +23,14 @@ public enum Eixo {
     private Eixo(int flags) {
         this.flags = flags;
     }
+    
+    public static Eixo eixoFromVisao(Visao visao){
+        switch (visao){
+            case Frontal: return Eixo_XY;
+            case Lateral: return Eixo_YZ;
+            case Topo:    return Eixo_XZ;
+            case Perspectiva: return Eixo_XYZ;
+            default: throw new IllegalArgumentException("Visão não esperada: " + visao);
+        }
+    }
 }

@@ -9,6 +9,7 @@ import java.io.Serializable;
 import java.util.List;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import m.Eixo;
 
 /**
  *
@@ -40,6 +41,10 @@ public abstract class CGObject implements Serializable{
     
     public abstract void set(int i, Vertice point);
 
+    public abstract boolean contains(float x, float y, Eixo axis);
+    
+    public abstract boolean insideBoundingBox(float x, float y, Eixo axis);
+    
     public abstract void updateInternals(CGObject updatedObj);
     
     public boolean equalPoints(CGObject that){

@@ -71,8 +71,8 @@ public class Vista implements Observer{
     }
     
     public void setObject(int index, CGObject obj){
-        pipe.convert2D(obj);
-        objetos.set(index, obj);
+        objetos.get(index).updateInternals(obj);
+        pipe.convert2D(objetos.get(index));
     }
     
     public void remove(CGObject obj){
@@ -80,13 +80,13 @@ public class Vista implements Observer{
     }
     
     public void setLastTempPoint(Vertice v){
-        pipe.convert2D(v);
-        tempPoints.set(tempPoints.size()-1, v);
+        tempPoints.get(tempPoints.size()-1).copyAttributes(v);
+        pipe.convert2D(tempPoints.get(tempPoints.size()-1));
     }
     
     public void setTempPoint(int index, Vertice v){
-        pipe.convert2D(v);
-        tempPoints.set(index, v);
+        tempPoints.get(index).copyAttributes(v);
+        pipe.convert2D(tempPoints.get(index));
     }
     
     public List<CGObject> get2Dobjects(){

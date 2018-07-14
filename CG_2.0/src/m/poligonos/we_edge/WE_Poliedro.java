@@ -2,10 +2,12 @@ package m.poligonos.we_edge;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import m.Eixo;
 import m.poligonos.CGObject;
-import m.poligonos.Face;
 import m.poligonos.Vertice;
 
 /**
@@ -19,6 +21,10 @@ public class WE_Poliedro extends CGObject {
     private List<WE_Face>    listaDeFaces;
     private final boolean[] visibilidade_faces;
 
+    private float min_x, max_x,
+                  min_y, max_y,
+                  min_z, max_z;
+    
     public WE_Poliedro(float[][] pointMatrix, List<IndexList> faces) {
         super();
 
@@ -27,8 +33,20 @@ public class WE_Poliedro extends CGObject {
         listaDeArestas = new ArrayList();
         listaDeVertices = new ArrayList(pointMatrix[0].length + 3);
 
-        for (int i = 0; i < pointMatrix[0].length; i++) {
+        listaDeVertices.add(new WE_Vertice(pointMatrix[0][0], pointMatrix[1][0], pointMatrix[2][0]));
+        min_x = max_x = pointMatrix[0][0];
+        min_y = max_y = pointMatrix[1][0];
+        min_z = max_z = pointMatrix[2][0];
+        
+        for (int i = 1; i < pointMatrix[0].length; i++) {
             listaDeVertices.add(new WE_Vertice(pointMatrix[0][i], pointMatrix[1][i], pointMatrix[2][i]));
+            
+            min_x = Math.min(pointMatrix[0][i], min_x);
+            max_x = Math.max(pointMatrix[0][i], max_x);
+            min_y = Math.min(pointMatrix[0][i], min_y);
+            max_y = Math.max(pointMatrix[0][i], max_y);
+            min_z = Math.min(pointMatrix[0][i], min_z);
+            max_z = Math.max(pointMatrix[0][i], max_z);
         }
 
         faces.forEach((_item) -> {
@@ -191,20 +209,63 @@ public class WE_Poliedro extends CGObject {
         visibilidade_faces = new boolean[p.visibilidade_faces.length];
         System.arraycopy(p.visibilidade_faces, 0, visibilidade_faces, 0, p.visibilidade_faces.length);
         
-        listaDeFaces = new ArrayList(listaDeFaces.size());
-        p.listaDeFaces.forEach((face) -> {
-            listaDeFaces.add(new WE_Face(face));
-        });
-        
-        listaDeArestas = new ArrayList(listaDeArestas.size());
-        p.listaDeArestas.forEach((aresta) -> {
-            listaDeArestas.add(new WE_Aresta(aresta));
-        });
-        
-        listaDeVertices = new ArrayList(listaDeVertices.size()); 
-        for (WE_Vertice v : p.listaDeVertices){
+        listaDeVertices = new ArrayList(p.listaDeVertices.size()); 
+        p.listaDeVertices.forEach((v) -> {
             listaDeVertices.add(new WE_Vertice(v));
+        });
+        
+        min_x = p.min_x;
+        max_x = p.max_x;
+        min_y = p.min_y;
+        max_y = p.max_y;
+        min_z = p.min_z;
+        max_z = p.max_z;
+        
+        listaDeFaces = new ArrayList(p.listaDeFaces.size()+3);
+        HashMap<Long,WE_Face> ref_fac = new HashMap(p.listaDeFaces.size()+3);
+        p.listaDeFaces.forEach((face) -> {
+            WE_Face fac = new WE_Face(face);
+            listaDeFaces.add(face);
+            ref_fac.put(face.ID, fac);
+        });
+        
+        listaDeArestas = new ArrayList(p.listaDeArestas.size()+3);
+        HashMap<Long,WE_Aresta> ref_set = new HashMap(p.listaDeArestas.size()+3);
+        p.listaDeArestas.forEach((aresta) -> {
+            WE_Aresta ar = new WE_Aresta(aresta);
+            listaDeArestas.add(ar);
+            ref_set.put(aresta.getID(), ar);
+        });
+            
+        int i;
+        for(i=0; i<p.listaDeArestas.size(); i++){
+            WE_Aresta toCopy = p.listaDeArestas.get(i);
+            
+            WE_Aresta toSet = listaDeArestas.get(i);
+            toSet.setEsquerdaPredecessora(ref_set.get(toCopy.getEsquerdaPredecessora().getID()));
+            toSet.setEsquerdaSucessora   (ref_set.get(toCopy.getEsquerdaSucessora()   .getID()));
+            toSet.setDireitaPredecessora (ref_set.get(toCopy.getDireitaPredecessora() .getID()));
+            toSet.setDireitaSucessora    (ref_set.get(toCopy.getDireitaSucessora()    .getID()));
+            
+            toSet.setFaceEsquerda(ref_fac.get(toCopy.getFaceEsquerda().ID));
+            toSet.setFaceDireita (ref_fac.get(toCopy.getFaceDireita().ID));
         }
+        
+        for(i=0; i<p.listaDeVertices.size(); i++){
+            WE_Vertice toCopy = p.listaDeVertices.get(i);
+            
+            WE_Vertice toSet = listaDeVertices.get(i);
+            toSet.setArestaIncidente(ref_set.get(toCopy.getArestaIncidente().getID()));
+        }
+        
+        for(i=0; i<p.listaDeFaces.size(); i++){
+            WE_Face toCopy = p.listaDeFaces.get(i);
+            
+            WE_Face toSet = listaDeFaces.get(i);
+            toSet.setArestaDaFace(ref_set.get(toCopy.getArestaDaFace().getID()));
+        }
+        
+        //throw new IllegalArgumentException("Terminar de arrumar as referências aqui.");
     }
     
     @Override
@@ -240,6 +301,7 @@ public class WE_Poliedro extends CGObject {
 
         return lista;
     }*/
+    
     @Override
     public List<WE_Vertice> getPoints() {
         return listaDeVertices;
@@ -259,6 +321,13 @@ public class WE_Poliedro extends CGObject {
     public void set(int i, Vertice point) {
         WE_Vertice vert = listaDeVertices.get(i);
         vert.copyAttributes(point);
+        
+        min_x = Math.min(point.getX(), min_x);
+        max_x = Math.max(point.getX(), max_x);
+        min_y = Math.min(point.getY(), min_y);
+        max_y = Math.max(point.getY(), max_y);
+        min_z = Math.min(point.getZ(), min_z);
+        max_z = Math.max(point.getZ(), max_z);
     }
 
     public static void main(String... args) {
@@ -320,9 +389,66 @@ public class WE_Poliedro extends CGObject {
 
         WE_Poliedro updated = (WE_Poliedro) updatedObj;
         
-        for (int i=0; i<listaDeVertices.size(); i++)
-           listaDeVertices.get(i).copyAttributes(updated.get(i));
+        for (int i=0; i<listaDeVertices.size(); i++){
+            listaDeVertices.get(i).copyAttributes(updated.get(i));
+            
+            Vertice point = updated.get(i);
+            min_x = Math.min(point.getX(), min_x);
+            max_x = Math.max(point.getX(), max_x);
+            min_y = Math.min(point.getY(), min_y);
+            max_y = Math.max(point.getY(), max_y);
+            min_z = Math.min(point.getZ(), min_z);
+            max_z = Math.max(point.getZ(), max_z);
+        }
     }
-    
+
+    @Override
+    public boolean contains(float x, float y, Eixo axis) {
+        //https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
+        
+        if (!insideBoundingBox(min_x, min_y, axis)) return false;
+        
+        // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+        boolean inside = false;
+        for (int i=0, j=getNumberOfPoints()-1 ; i<getNumberOfPoints() ; j=i++){
+            Vertice ith = get(i);
+            Vertice jth = get(j);
+            
+            if ( (ith.getY()>y) != (jth.getY()>y) && x < (jth.getX()-ith.getX()) * (y-ith.getY()) / (jth.getY()-ith.getY()) + ith.getX() ) {
+                inside = !inside;
+            }
+        }
+
+        return inside;
+    }
+
+    @Override
+    public boolean insideBoundingBox(float x, float y, Eixo axis) {
+        float minX, maxX, minY, maxY;
+        switch (axis){
+            case Eixo_XY:
+                minX = min_x;
+                maxX = max_x;
+                minY = min_y;
+                maxY = max_y;
+                break;
+            case Eixo_XZ:
+                minX = min_x;
+                maxX = max_x;
+                minY = min_z;
+                maxY = max_z;
+                break;
+            case Eixo_YZ:
+                minX = min_y;
+                maxX = max_y;
+                minY = min_z;
+                maxY = max_z;
+                break;
+            default :
+                throw new IllegalArgumentException("Eixo " + axis + " não é 2D.");
+        }
+        
+        return !(x < minX || x > maxX || y < minY || y > maxY); //Se menor que min ou maior que max, false
+    }
     
 }

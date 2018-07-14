@@ -3,6 +3,7 @@ package m.poligonos;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import m.Eixo;
 import utils.math.VMath;
 
 
@@ -20,11 +21,13 @@ public class Aresta extends CGObject{
     protected Vertice vInicial;
     protected Vertice vFinal;
     
-    private float maxY;
-    private float minY;
-    private float maxX;
-    private float minX;
-    
+    private float max_y;
+    private float min_y;
+    private float max_x;
+    private float min_x;
+    private float max_z;
+    private float min_z;
+        
     private boolean changed;
     private double slope;
     private double b;    //this ->   y= slope*x + b;
@@ -41,10 +44,12 @@ public class Aresta extends CGObject{
         this.vInicial = new Vertice(A.vInicial);
         this.vFinal   = new Vertice(A.vFinal);
         
-        this.maxX = A.maxX;
-        this.minX = A.minX;
-        this.maxY = A.maxY;
-        this.minY = A.minY;
+        this.max_x = A.max_x;
+        this.min_x = A.min_x;
+        this.max_y = A.max_y;
+        this.min_y = A.min_y;
+        this.max_z = A.max_z;
+        this.min_z = A.min_z;
         
         this.changed = A.changed;
         this.slope = A.slope;
@@ -64,22 +69,30 @@ public class Aresta extends CGObject{
         this.vFinal = F;
         
         if (I.getX() > F.getX()){
-            maxX = I.getX();
-            minX = F.getX();
+            max_x = I.getX();
+            min_x = F.getX();
         } else {
-            maxX = F.getX();
-            minX = I.getX();
+            max_x = F.getX();
+            min_x = I.getX();
         }
         
         if (I.getY() > F.getY()){
-            maxY = I.getY();
-            minY = F.getY();
+            max_y = I.getY();
+            min_y = F.getY();
         } else {
-            maxY = F.getY();
-            minY = I.getY();
+            max_y = F.getY();
+            min_y = I.getY();
+        }
+
+        if (I.getZ() > F.getZ()){
+            max_z = I.getZ();
+            min_z = F.getZ();
+        } else {
+            max_z = F.getZ();
+            min_z = I.getZ();
         }
         
-        interceptX = minX;
+        interceptX = min_x;
         changed = true;
     }
 //</editor-fold>
@@ -92,15 +105,15 @@ public class Aresta extends CGObject{
     /*public void setvInicial(Vertice vInicial) {
         this.vInicial = vInicial;
         
-        if (vInicial.getX() > maxX)
-            maxX = vInicial.getX();
-        if (vInicial.getX() < minX)
-            minX = vInicial.getX();
+        if (vInicial.getX() > max_x)
+            max_x = vInicial.getX();
+        if (vInicial.getX() < min_x)
+            min_x = vInicial.getX();
         
-        if (vInicial.getY() > maxY)
-            maxY = vInicial.getY();
-        if (vInicial.getY() < minY)
-            minY = vInicial.getY();
+        if (vInicial.getY() > max_y)
+            max_y = vInicial.getY();
+        if (vInicial.getY() < min_y)
+            min_y = vInicial.getY();
         
         changed = true;
     }*/
@@ -112,33 +125,33 @@ public class Aresta extends CGObject{
     /*public void setvFinal(Vertice vFinal) {
         this.vFinal = vFinal;
         
-        if (vFinal.getX() > maxX)
-            maxX = vFinal.getX();
-        if (vFinal.getX() < minX)
-            minX = vFinal.getX();
+        if (vFinal.getX() > max_x)
+            max_x = vFinal.getX();
+        if (vFinal.getX() < min_x)
+            min_x = vFinal.getX();
         
-        if (vFinal.getY() > maxY)
-            maxY = vFinal.getY();
-        if (vFinal.getY() < minY)
-            minY = vFinal.getY();
+        if (vFinal.getY() > max_y)
+            max_y = vFinal.getY();
+        if (vFinal.getY() < min_y)
+            min_y = vFinal.getY();
         
         changed = true;
     }*/
 
     public float getMaxY() {
-        return maxY;
+        return max_y;
     }
 
     public float getMinY() {
-        return minY;
+        return min_y;
     }
 
     public float getMaxX() {
-        return maxX;
+        return max_x;
     }
 
     public float getMinX() {
-        return minX;
+        return min_x;
     }
 
     public double getSlope() {
@@ -225,6 +238,30 @@ public class Aresta extends CGObject{
         } else if (i == 1){
             vFinal.copyAttributes(point);
         }
+        
+        if (this.vInicial.getX() > this.vFinal.getX()){
+            max_x = this.vInicial.getX();
+            min_x = this.vFinal.getX();
+        } else {
+            max_x = this.vFinal.getX();
+            min_x = this.vInicial.getX();
+        }
+        
+        if (this.vInicial.getY() > this.vFinal.getY()){
+            max_y = this.vInicial.getY();
+            min_y = this.vFinal.getY();
+        } else {
+            max_y = this.vFinal.getY();
+            min_y = this.vInicial.getY();
+        }
+        
+        if (this.vInicial.getZ() > this.vFinal.getZ()){
+            max_z = this.vInicial.getZ();
+            min_z = this.vFinal.getZ();
+        } else {
+            max_z = this.vFinal.getZ();
+            min_z = this.vInicial.getZ();
+        }
     }
 
     @Override
@@ -235,16 +272,6 @@ public class Aresta extends CGObject{
         return newL;
     }
     
-    public static void main(String...args){
-        Vertice I = new Vertice(0, 0, 0);
-        Vertice F = new Vertice(10, 10, 10);
-        
-        Aresta a = new Aresta(I, F);
-        System.out.println(a.getPoints());
-        I.setX(666);
-        System.out.println(a.getPoints());
-    }
-
     @Override
     public void updateInternals(CGObject updatedObj) {
         if (!(updatedObj instanceof Aresta)) throw new IllegalArgumentException("Não é uma instância de Aresta."); //Is this Right?
@@ -255,22 +282,64 @@ public class Aresta extends CGObject{
         vFinal.  copyAttributes(updated.vFinal);
 
         if (this.vInicial.getX() > this.vFinal.getX()){
-            maxX = this.vInicial.getX();
-            minX = this.vFinal.getX();
+            max_x = this.vInicial.getX();
+            min_x = this.vFinal.getX();
         } else {
-            maxX = this.vFinal.getX();
-            minX = this.vInicial.getX();
+            max_x = this.vFinal.getX();
+            min_x = this.vInicial.getX();
         }
         
         if (this.vInicial.getY() > this.vFinal.getY()){
-            maxY = this.vInicial.getY();
-            minY = this.vFinal.getY();
+            max_y = this.vInicial.getY();
+            min_y = this.vFinal.getY();
         } else {
-            maxY = this.vFinal.getY();
-            minY = this.vInicial.getY();
+            max_y = this.vFinal.getY();
+            min_y = this.vInicial.getY();
         }
         
-        interceptX = minX;
+        if (this.vInicial.getZ() > this.vFinal.getZ()){
+            max_z = this.vInicial.getZ();
+            min_z = this.vFinal.getZ();
+        } else {
+            max_z = this.vFinal.getZ();
+            min_z = this.vInicial.getZ();
+        }
+        
+        interceptX = min_x;
         changed = true;
+    }
+
+    @Override
+    public boolean contains(float x, float y, Eixo axis) {
+        return insideBoundingBox(x, y, axis);
+    }
+
+    @Override
+    public boolean insideBoundingBox(float x, float y, Eixo axis) {
+        float minX, maxX, minY, maxY;
+        switch (axis){
+            case Eixo_XY:
+                minX = min_x;
+                maxX = max_x;
+                minY = min_y;
+                maxY = max_y;
+                break;
+            case Eixo_XZ:
+                minX = min_x;
+                maxX = max_x;
+                minY = min_z;
+                maxY = max_z;
+                break;
+            case Eixo_YZ:
+                minX = min_y;
+                maxX = max_y;
+                minY = min_z;
+                maxY = max_z;
+                break;
+            default :
+                throw new IllegalArgumentException("Eixo " + axis + " não é 2D.");
+        }
+        
+        return !(x < minX || x > maxX || y < minY || y > maxY); //Se menor que min ou maior que max, false
     }
 }

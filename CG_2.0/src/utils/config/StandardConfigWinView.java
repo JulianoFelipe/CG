@@ -14,7 +14,7 @@ import m.poligonos.Vertice;
  * @author JFPS
  */
 public class StandardConfigWinView {
-    //public static final CGWindow   STD_WINDOW   = new CGWindow(544, 374); //STD
+    public static final CGWindow   STD_WINDOW_1 = new CGWindow(544, 374); //STD
     //public static final CGWindow   STD_WINDOW   = new CGWindow(272, 187); //x2 zoom?
     public static final CGWindow   STD_WINDOW   = new CGWindow(181, 125); //x3 zoom?
     public static final CGViewport STD_VIEWPORT = new CGViewport(new Vertice(0, 0), new Vertice(544, 374));

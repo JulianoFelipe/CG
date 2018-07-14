@@ -5,6 +5,7 @@
  */
 package View;
 
+import java.util.ArrayList;
 import java.util.List;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -16,11 +17,10 @@ import m.Vista;
 import m.World;
 import m.pipeline.OrtPipeline;
 import m.pipeline.PersPipeline;
-import m.poligonos.Face;
-import m.poligonos.PointObject;
+import m.poligonos.we_edge.IndexList;
+import m.poligonos.we_edge.WE_Poliedro;
 import utils.config.StandardConfigCam;
 import utils.config.StandardConfigWinView;
-import utils.math.PMath;
 
 /**
  *
@@ -49,33 +49,32 @@ public class CG_20 extends Application {
             {   1,   1,   1,   1,   1}
             //  A    B    C    D    E
         };
+                
+        int[] face0 = {0, 3, 2, 1};
+        int[] face1 = {0, 1, 4};
+        int[] face2 = {1, 2, 4};
+        int[] face3 = {2, 3, 4};
+        int[] face4 = {3, 0, 4};
+        List<IndexList> faces = new ArrayList();
+        faces.add(new IndexList(face0));
+        faces.add(new IndexList(face1));
+        faces.add(new IndexList(face2));
+        faces.add(new IndexList(face3));
+        faces.add(new IndexList(face4));
         
-        /*Aresta x_axis = new Aresta(new Vertice(-5000,0,0), new Vertice(5000,0,0));
-        Aresta y_axis = new Aresta(new Vertice(0,-5000,0), new Vertice(0,5000,0));
-        Aresta z_axis = new Aresta(new Vertice(0,0,-5000), new Vertice(0,0,5000));*/
+        WE_Poliedro poli = new WE_Poliedro(pol_mat, faces);
         
-        /*Aresta mx_axis = new Aresta(new Vertice(0,0,0), new Vertice(-5000,0,0));
-        Aresta my_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,-5000,0));
-        Aresta mz_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,-5000));*/
-        
-        PointObject pol = new PointObject(pol_mat);
-        List<Face> lista = PMath.attemptBuildingFromPlanes(pol);
+        //PointObject pol = new PointObject(pol_mat);
+        //List<Face> lista = PMath.attemptBuildingFromPlanes(pol);
 
-        mundo.addObject(lista);
+        //mundo.addObject(lista);
         //mundo.addObject(new Aresta(new Vertice(0,0,0), new Vertice(10,10,10)));
-        
-        //mundo.addObject(x_axis, y_axis, z_axis);//, mx_axis, my_axis, mz_axis);
-        
-        //PaintController paint = new PaintController();
-        //RegularPolygonController regular = new RegularPolygonController();
+        mundo.addObject(poli);
         
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("Main.fxml"));
         mainLoader.setController(main);
-        
         Parent root = mainLoader.load();
-        
         Scene scene = new Scene(root);
-        
         stage.setTitle("Modelador JSA (CG)");
         stage.setScene(scene);
         stage.show();

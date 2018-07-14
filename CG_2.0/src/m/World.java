@@ -76,20 +76,20 @@ public final class World {
                         }
                     }
                 } else {
-                    /*if ( !(tempPoints.isEmpty() && c.getRemovedSize()>0) ){ //if (!(clearEvent)), proceed
+                    if ( !(tempPoints.isEmpty() && c.getRemovedSize()>0) ){ //if (!(clearEvent)), proceed
                         c.getRemoved().forEach((removedItem) -> {
                             System.out.println("Removed: " + removedItem);
                             vistas.forEach((v) -> {
                                 v.remove(removedItem);
                             });
                         });
-                        c.getAddedSubList().forEach((addedItem) -> {
+                        /*c.getAddedSubList().forEach((addedItem) -> {
                             System.out.println("Added: " + addedItem + " Points: " + addedItem.getPoints());
                             vistas.forEach((v) -> {
                                 v.addObject(deepCopy( addedItem ));
                             });
-                        });
-                    }*/
+                        });*/
+                    }
                 }
             }
         });
@@ -273,13 +273,13 @@ public final class World {
     public void updateAll(){
         for (int i=0; i<objetos.size(); i++){
             for (Vista v : vistas){
-                v.setObject(i, deepCopy(objetos.get(i)));
+                v.setObject(i, objetos.get(i));
             }
         }
         
         for (int i=0; i<tempPoints.size(); i++){
             for (Vista v : vistas){
-                v.setTempPoint(i, new Vertice(tempPoints.get(i)));
+                v.setTempPoint(i, tempPoints.get(i));
             }
         }
     }

@@ -10,15 +10,17 @@ package m.poligonos.we_edge;
  * @author JFPS
  */
 public class WE_Face {
-    private static int INSTANCES=0;
-    public final int ID=INSTANCES++;
+    private static long INSTANCES=0;
+    public final long ID;
     private WE_Aresta arestaDaFace;
 
     public WE_Face() {
+        ID=INSTANCES++;
     }
 
     public WE_Face(WE_Face copy) {
-        arestaDaFace = new WE_Aresta(arestaDaFace);
+        //arestaDaFace = new WE_Aresta(arestaDaFace);
+        this.ID = copy.ID;
     }
 
     public WE_Aresta getArestaDaFace() {
