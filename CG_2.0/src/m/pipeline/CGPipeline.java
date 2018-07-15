@@ -11,6 +11,7 @@ import m.CGViewport;
 import m.Visao;
 import m.CGWindow;
 import m.poligonos.Vertice;
+import utils.config.StandardConfigWinView;
 import utils.math.MMath;
 import utils.math.VMath;
 
@@ -57,7 +58,7 @@ public abstract class CGPipeline extends Observable implements Pipeline{
             clearChanged();
         } else if (o instanceof CGWindow){
             updateMatrixJP();
-            
+
             setChanged();
             notifyObservers();
             clearChanged();
@@ -136,4 +137,19 @@ public abstract class CGPipeline extends Observable implements Pipeline{
         return jpProportions[0];
     }
 
+    public void setWindowDimensions(int largura, int altura){
+        window.setDimensions(largura, altura);
+    }
+    
+    public void zoom(double zoom){
+        double factor = jpProportions[0] + zoom;
+        
+        CGWindow STD_WINDOW_1 = StandardConfigWinView.STD_WINDOW_1;
+        int largura = (int) (STD_WINDOW_1.getDeltaX() / factor);
+        int altura  = (int) (STD_WINDOW_1.getDeltaY() / factor);
+        
+        window.setDimensions(largura, altura);
+        
+        //updateMatrixJP();
+    }
 }

@@ -283,4 +283,23 @@ public final class World {
             }
         }
     }
+    
+    public void updateThis(Vista vista){
+        Vista localV = null;
+        for (Vista v : vistas){
+            if (v == vista){
+                localV = v;
+                break;
+            }
+        }
+        if (localV == null) throw new IllegalArgumentException("Vista não contida no mundo.");
+        
+        for (int i=0; i<objetos.size(); i++){
+            localV.setObject(i, objetos.get(i));
+        }
+        
+        for (int i=0; i<tempPoints.size(); i++){
+            localV.setTempPoint(i, tempPoints.get(i));
+        }
+    }
 }

@@ -113,7 +113,8 @@ public class Vista implements Observer{
     @Override
     public void update(Observable o, Object arg) {
         if (o instanceof CGPipeline){
-            mundo.updateAll();
+            //mundo.updateAll();
+            mundo.updateThis(this);
         }
     }
     

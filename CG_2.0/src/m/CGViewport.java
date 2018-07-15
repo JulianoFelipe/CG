@@ -26,20 +26,31 @@ public class CGViewport extends Observable {
         this.min = new Vertice(0, 0);
     }
 
+    public CGViewport(CGViewport toCopy) {
+        this.min = toCopy.min;
+        this.max = toCopy.max;
+    }
+
     public void setMin(Vertice min) {
         this.min = min;
+        setChanged();
         notifyObservers();
+        clearChanged();
     }
 
     public void setMax(Vertice max) {
         this.max = max;
+        setChanged();
         notifyObservers();
+        clearChanged();
     }
     
     public void setDimensions(Vertice min, Vertice max){
         this.min = min;
         this.max = max;
+        setChanged();
         notifyObservers();
+        clearChanged();
     }
     
     public float getUmin() {

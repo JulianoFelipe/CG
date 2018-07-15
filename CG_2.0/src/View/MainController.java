@@ -55,6 +55,7 @@ import m.Eixo;
 import m.Visao;
 import m.Vista;
 import m.World;
+import m.pipeline.CGPipeline;
 import m.poligonos.Aresta;
 import m.poligonos.CGObject;
 import m.poligonos.Movimento;
@@ -357,41 +358,47 @@ public class MainController implements Initializable {
             frente.setOnKeyPressed((KeyEvent event1) -> {
 
                 KeyCode pressed = event1.getCode();
-                Vista frenteVista = getVistaFromVisao(Visao.Frontal);
-                Vertice vrp    = frenteVista.getPipelineCamera().getVRP();
-                Vertice p      = frenteVista.getPipelineCamera().getP();
-                Vertice viewUp = frenteVista.getPipelineCamera().getViewUp();
+                CGPipeline pipe = getVistaFromVisao(Visao.Frontal).getPipe();
+                Vertice vrp    = pipe.getCamera().getVRP();
+                Vertice p      = pipe.getCamera().getP();
+                Vertice viewUp = pipe.getCamera().getViewUp();
+                boolean changeCam = false;
                 switch (pressed){
                     case Z:
-                        //vrp.setZ(vrp.getZ() - (float) 1);
-                        //  p.setZ(  p.getZ() - (float) 1);
+                        pipe.zoom(+0.07);
+                        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", pipe.getProportions()));
                         break;
                     case C:
-                        //vrp.setZ(vrp.getZ() + (float) 1);
-                        //  p.setZ(  p.getZ() + (float) 1);
+                        pipe.zoom(-0.07);
+                        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", pipe.getProportions()));
                         break;
                     case W:
                         vrp.setY(vrp.getY() + (float) 1);
                           p.setY(  p.getY() + (float) 1);
+                        changeCam = true;
                         break;
                     case A:
                         vrp.setX(vrp.getX() + (float) 1);
                           p.setX(  p.getX() + (float) 1);
+                        changeCam = true;
                         break;
                     case S:
                         vrp.setY(vrp.getY() - (float) 1);
                           p.setY(  p.getY() - (float) 1);
+                        changeCam = true;
                         break;
                     case D:
                         vrp.setX(vrp.getX() - (float) 1);
                           p.setX(  p.getX() - (float) 1);
+                        changeCam = true;
                         break;
                     case ESCAPE:
                         frente.setOnKeyPressed(null);
                         frente.getParent().getParent().setStyle("-fx-border-color: black");
                         return;
                 }
-                frenteVista.getPipe().getCamera().set(new Camera(viewUp, vrp, p));
+                if(changeCam)
+                    pipe.getCamera().set(new Camera(viewUp, vrp, p));
                 paintStuff();
             });
         });
@@ -421,41 +428,47 @@ public class MainController implements Initializable {
             lateral.setOnKeyPressed((KeyEvent event1) -> {
 
                 KeyCode pressed = event1.getCode();
-                Vista lateralVista = getVistaFromVisao(Visao.Lateral);
-                Vertice vrp    = lateralVista.getPipelineCamera().getVRP();
-                Vertice p      = lateralVista.getPipelineCamera().getP();
-                Vertice viewUp = lateralVista.getPipelineCamera().getViewUp();
+                CGPipeline lateralPipe = getVistaFromVisao(Visao.Lateral).getPipe();
+                Vertice vrp    = lateralPipe.getCamera().getVRP();
+                Vertice p      = lateralPipe.getCamera().getP();
+                Vertice viewUp = lateralPipe.getCamera().getViewUp();
+                boolean changeCam = false;
                 switch (pressed){
                     case Z:
-                        //vrp.setX(vrp.getX() - (float) 1);
-                        //  p.setX(  p.getX() - (float) 1);
+                        lateralPipe.zoom(+0.07);
+                        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", lateralPipe.getProportions()));
                         break;
                     case C:
-                        //vrp.setX(vrp.getX() + (float) 1);
-                        //  p.setX(  p.getX() + (float) 1);
+                        lateralPipe.zoom(-0.07);
+                        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", lateralPipe.getProportions()));
                         break;
                     case W:
                         vrp.setZ(vrp.getZ() + (float) 1);
                           p.setZ(  p.getZ() + (float) 1);
+                        changeCam = true;
                         break;
                     case A:
                         vrp.setY(vrp.getY() + (float) 1);
                           p.setY(  p.getY() + (float) 1);
+                        changeCam = true;
                         break;
                     case S:
                         vrp.setZ(vrp.getZ() - (float) 1);
                           p.setZ(  p.getZ() - (float) 1);
+                        changeCam = true;
                         break;
                     case D:
                         vrp.setY(vrp.getY() - (float) 1);
                           p.setY(  p.getY() - (float) 1);
+                        changeCam = true;
                         break;
                     case ESCAPE:
                         lateral.setOnKeyPressed(null);
                         lateral.getParent().getParent().setStyle("-fx-border-color: black");
                         return;
                 }
-                lateralVista.getPipe().getCamera().set(new Camera(viewUp, vrp, p));
+                if(changeCam)
+                    lateralPipe.getCamera().set(new Camera(viewUp, vrp, p));
                 paintStuff();
             });
         });
@@ -485,41 +498,47 @@ public class MainController implements Initializable {
             topo.setOnKeyPressed((KeyEvent event1) -> {
 
                 KeyCode pressed = event1.getCode();
-                Vista topVista = getVistaFromVisao(Visao.Topo);
-                Vertice vrp    = topVista.getPipelineCamera().getVRP();
-                Vertice p      = topVista.getPipelineCamera().getP();
-                Vertice viewUp = topVista.getPipelineCamera().getViewUp();
+                CGPipeline topPipe = getVistaFromVisao(Visao.Topo).getPipe();
+                Vertice vrp    = topPipe.getCamera().getVRP();
+                Vertice p      = topPipe.getCamera().getP();
+                Vertice viewUp = topPipe.getCamera().getViewUp();
+                boolean changeCam = false;
                 switch (pressed){
                     case Z:
-                        //vrp.setY(vrp.getY() - (float) 1);
-                        //  p.setY(  p.getY() - (float) 1);
+                        topPipe.zoom(+0.07);
+                        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", topPipe.getProportions()));
                         break;
                     case C:
-                        //vrp.setY(vrp.getY() + (float) 1);
-                        //  p.setY(  p.getY() + (float) 1);
+                        topPipe.zoom(-0.07);
+                        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", topPipe.getProportions()));
                         break;
                     case W:
                         vrp.setZ(vrp.getZ() + (float) 1);
                           p.setZ(  p.getZ() + (float) 1);
+                        changeCam = true;
                         break;
                     case A:
                         vrp.setX(vrp.getX() + (float) 1);
                           p.setX(  p.getX() + (float) 1);
+                        changeCam = true;
                         break;
                     case S:
                         vrp.setZ(vrp.getZ() - (float) 1);
                           p.setZ(  p.getZ() - (float) 1);
+                        changeCam = true;
                         break;
                     case D:
                         vrp.setX(vrp.getX() - (float) 1);
                           p.setX(  p.getX() - (float) 1);
+                        changeCam = true;
                         break;
                     case ESCAPE:
                         topo.setOnKeyPressed(null);
                         topo.getParent().getParent().setStyle("-fx-border-color: black");
                         return;
                 }
-                topVista.getPipe().getCamera().set(new Camera(viewUp, vrp, p));
+                if(changeCam)
+                    topPipe.getCamera().set(new Camera(viewUp, vrp, p));
                 paintStuff();
             });
         });
@@ -550,26 +569,41 @@ public class MainController implements Initializable {
             perspectiva.setOnKeyPressed((KeyEvent event1) -> {
 
                 KeyCode pressed = event1.getCode();
-                Vista pers = getVistaFromVisao(Visao.Perspectiva);
-                Vertice vrp = pers.getPipelineCamera().getVRP();
+                CGPipeline persPipe = getVistaFromVisao(Visao.Perspectiva).getPipe();
+                Vertice vrp = persPipe.getCamera().getVRP();
+                boolean changeCam = false;
                 switch (pressed){
+                    case Z:
+                        persPipe.zoom(+0.07);
+                        persZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", persPipe.getProportions()));
+                        break;
+                    case C:
+                        persPipe.zoom(-0.07);
+                        persZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", persPipe.getProportions()));
+                        break;
                     case Q:
                         vrp.setX(vrp.getX() - (float) 0.1);
+                        changeCam = true;
                         break;
                     case E:
                         vrp.setX(vrp.getX() + (float) 0.1);
+                        changeCam = true;
                         break;
                     case W:
                         vrp.setY(vrp.getY() - (float) 0.1);
+                        changeCam = true;
                         break;
                     case A:
                         vrp.setZ(vrp.getZ() - (float) 0.1);
+                        changeCam = true;
                         break;
                     case S:
                         vrp.setY(vrp.getY() + (float) 0.1);
+                        changeCam = true;
                         break;
                     case D:
                         vrp.setZ(vrp.getZ() + (float) 0.1);
+                        changeCam = true;
                         break;
                     case ESCAPE:
                         perspectiva.setOnKeyPressed(null);
@@ -578,7 +612,8 @@ public class MainController implements Initializable {
                         perspectiva.getParent().getParent().setStyle("-fx-border-color: black");
                         return;
                 }
-                pers.getPipe().getCamera().setVRP(vrp);
+                if(changeCam)
+                    persPipe.getCamera().setVRP(vrp);
                 paintStuff();
             });
             perspectiva.setOnMouseDragged((MouseEvent event1) -> {

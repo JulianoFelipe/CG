@@ -20,20 +20,31 @@ public class CGWindow extends Observable{
         this.largura = largura;
     }
    
+    public CGWindow(CGWindow toCopy){
+        this.altura = toCopy.altura;
+        this.largura = toCopy.largura;
+    }
+    
     public void setLargura(int largura) {
         this.largura = largura;
+        setChanged();
         notifyObservers();
+        clearChanged();
     }
 
     public void setAltura(int altura) {
         this.altura = altura;
+        setChanged();
         notifyObservers();
+        clearChanged();
     }
     
     public void setDimensions(int largura, int altura){
         this.largura = largura;
         this.altura = altura;
+        setChanged();
         notifyObservers();
+        clearChanged();
     }
     
     public int getXmin() {

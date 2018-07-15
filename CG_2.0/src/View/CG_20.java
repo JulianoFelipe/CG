@@ -12,6 +12,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import m.CGWindow;
 import m.Visao;
 import m.Vista;
 import m.World;
@@ -36,10 +37,10 @@ public class CG_20 extends Application {
     public void start(Stage stage) throws Exception {
         World mundo = World.getInstance();
         mundo.setPlanes(
-            new Vista(new OrtPipeline(Visao.Frontal, StandardConfigCam.getStandardCamera(Visao.Frontal),     StandardConfigWinView.STD_WINDOW, StandardConfigWinView.STD_VIEWPORT)),
-            new Vista(new OrtPipeline(Visao.Lateral, StandardConfigCam.getStandardCamera(Visao.Lateral),     StandardConfigWinView.STD_WINDOW, StandardConfigWinView.STD_VIEWPORT)),
-            new Vista(new OrtPipeline(Visao.Topo,    StandardConfigCam.getStandardCamera(Visao.Topo),        StandardConfigWinView.STD_WINDOW, StandardConfigWinView.STD_VIEWPORT)),
-            new Vista(new PersPipeline(DP,           StandardConfigCam.getStandardCamera(Visao.Perspectiva), StandardConfigWinView.STD_WINDOW, StandardConfigWinView.STD_VIEWPORT))
+            new Vista(new OrtPipeline(Visao.Frontal, StandardConfigCam.getStandardCamera(Visao.Frontal),     new CGWindow(StandardConfigWinView.STD_WINDOW), StandardConfigWinView.STD_VIEWPORT)),
+            new Vista(new OrtPipeline(Visao.Lateral, StandardConfigCam.getStandardCamera(Visao.Lateral),     new CGWindow(StandardConfigWinView.STD_WINDOW), StandardConfigWinView.STD_VIEWPORT)),
+            new Vista(new OrtPipeline(Visao.Topo,    StandardConfigCam.getStandardCamera(Visao.Topo),        new CGWindow(StandardConfigWinView.STD_WINDOW), StandardConfigWinView.STD_VIEWPORT)),
+            new Vista(new PersPipeline(DP,           StandardConfigCam.getStandardCamera(Visao.Perspectiva), new CGWindow(StandardConfigWinView.STD_WINDOW), StandardConfigWinView.STD_VIEWPORT))
         );
 
         float[][] pol_mat = {

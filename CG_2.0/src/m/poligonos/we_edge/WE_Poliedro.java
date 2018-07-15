@@ -233,7 +233,9 @@ class WE_Poliedro extends CGObject {
         listaDeArestas = new ArrayList(p.listaDeArestas.size()+3);
         HashMap<Long,WE_Aresta> ref_set = new HashMap(p.listaDeArestas.size()+3);
         p.listaDeArestas.forEach((aresta) -> {
-            WE_Aresta ar = new WE_Aresta(aresta);
+            WE_Aresta ar = new WE_Aresta(aresta, listaDeVertices.get(0), listaDeVertices.get(0));
+            if (ar != null)
+                throw new UnsupportedOperationException("HERE. Arrumar cópia de aresta com referência a vertices copiados");
             listaDeArestas.add(ar);
             ref_set.put(aresta.getID(), ar);
         });
