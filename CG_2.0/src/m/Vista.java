@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import m.pipeline.CGPipeline;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
+import m.poligonos.we_edge.HE_Poliedro;
 
 /**
  *
@@ -38,6 +39,11 @@ public class Vista implements Observer{
     public void addObject(CGObject p){
         pipe.convert2D(p);
         objetos.add(p);
+        
+        Camera cam = pipe.getCamera();
+        if (p instanceof HE_Poliedro){
+            ((HE_Poliedro) p).updateVisibility(cam);
+        }
     }
     
     public void addObject(CGObject...p){
@@ -73,6 +79,11 @@ public class Vista implements Observer{
     public void setObject(int index, CGObject obj){
         objetos.get(index).updateInternals(obj);
         pipe.convert2D(objetos.get(index));
+        
+        Camera cam = pipe.getCamera();
+        if (obj instanceof HE_Poliedro){
+            ((HE_Poliedro) objetos.get(index)).updateVisibility(cam);
+        }
     }
     
     public void remove(CGObject obj){
@@ -115,6 +126,13 @@ public class Vista implements Observer{
         if (o instanceof CGPipeline){
             //mundo.updateAll();
             mundo.updateThis(this);
+            
+            /*Camera cam = ((CGPipeline) o).getCamera();
+            for (CGObject obj : objetos){
+                if (obj instanceof HE_Poliedro){
+                    ((HE_Poliedro) obj).updateVisibility(cam);
+                }
+            }*/
         }
     }
     

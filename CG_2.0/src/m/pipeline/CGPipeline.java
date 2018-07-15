@@ -5,6 +5,7 @@
  */
 package m.pipeline;
 
+import java.util.Arrays;
 import java.util.Observable;
 import m.Camera;
 import m.CGViewport;
@@ -28,6 +29,8 @@ public abstract class CGPipeline extends Observable implements Pipeline{
     protected float[] jpProportions;
     protected boolean sruSRCchanged=true;
     
+    protected double zoom;
+    
     protected CGPipeline(Camera cam, CGWindow window, CGViewport viewport) {
         this.cam = cam;
         this.cam.addObserver(this); //:c
@@ -40,6 +43,8 @@ public abstract class CGPipeline extends Observable implements Pipeline{
         
         jpProportions = new float[2];
         updateMatrixJP();
+        
+        zoom = jpProportions[0];
     }
     
     public Camera getCamera() {
@@ -58,7 +63,7 @@ public abstract class CGPipeline extends Observable implements Pipeline{
             clearChanged();
         } else if (o instanceof CGWindow){
             updateMatrixJP();
-
+            
             setChanged();
             notifyObservers();
             clearChanged();
@@ -121,6 +126,9 @@ public abstract class CGPipeline extends Observable implements Pipeline{
            
         jpProportions[0] = del_UX;
         jpProportions[1] = deltaV / deltaY;
+        //zoom = jpProportions[0];
+        
+        //System.out.println("PROPORTIONS: " + Arrays.toString(jpProportions));
         
         matrixJP = new float[][] {
            {del_UX,      0, ((-xmin*del_UX)+umin)},
@@ -142,12 +150,13 @@ public abstract class CGPipeline extends Observable implements Pipeline{
     }
     
     public void zoom(double zoom){
-        double factor = jpProportions[0] + zoom;
-        
+        this.zoom += zoom;
+        //System.out.println("Zoom: " + zoom +  " Prop: " + jpProportions[0] + " FACTOR: " + this.zoom);
         CGWindow STD_WINDOW_1 = StandardConfigWinView.STD_WINDOW_1;
-        int largura = (int) (STD_WINDOW_1.getDeltaX() / factor);
-        int altura  = (int) (STD_WINDOW_1.getDeltaY() / factor);
-        
+        //System.out.println("WIN Larg: " + STD_WINDOW_1.getDeltaX() + " Altu: " + STD_WINDOW_1.getDeltaY());
+        int largura = (int) (STD_WINDOW_1.getDeltaX() / this.zoom);
+        int altura  = (int) (STD_WINDOW_1.getDeltaY() / this.zoom);
+        //System.out.println("LARGURA: " + largura + " Altura: " + altura);
         window.setDimensions(largura, altura);
         
         //updateMatrixJP();

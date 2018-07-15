@@ -5,6 +5,7 @@
  */
 package View;
 
+import View.Config.ChangeFactorsController;
 import View.Config.ManualCamController;
 import View.Options.PaintController;
 import View.Options.PolySelectController;
@@ -57,6 +58,7 @@ import m.Vista;
 import m.World;
 import m.pipeline.CGPipeline;
 import m.poligonos.Aresta;
+import m.poligonos.ArestaEixo;
 import m.poligonos.CGObject;
 import m.poligonos.Movimento;
 import m.poligonos.Vertice;
@@ -200,21 +202,21 @@ public class MainController implements Initializable {
         TreeItem<String> transformacoes = new TreeItem<>(Transformacoes.C_NAME);
         
         ferramentas.getChildren().addAll(
-                new TreeItem<>(Ferramentas.Select.NAME, new ImageView(Ferramentas.Select.ICON)),
-                new TreeItem<>(Ferramentas.Delete.NAME, new ImageView(Ferramentas.Delete.ICON)),
-                new TreeItem<>(Ferramentas.Paint.NAME,  new ImageView(Ferramentas.Paint.ICON))
+            new TreeItem<>(Ferramentas.Select.NAME, new ImageView(Ferramentas.Select.ICON)),
+            new TreeItem<>(Ferramentas.Delete.NAME, new ImageView(Ferramentas.Delete.ICON)),
+            new TreeItem<>(Ferramentas.Paint.NAME,  new ImageView(Ferramentas.Paint.ICON))
         );
         
         criacao.getChildren().addAll(
-                new TreeItem<>(CriacaoPrevolucao.free.NAME,   new ImageView(CriacaoPrevolucao.free.ICON))//,
-                //new TreeItem<>(CriacaoPrevolucao.gridSnap.NAME, new ImageView(CriacaoPrevolucao.gridSnap.ICON))
+            new TreeItem<>(CriacaoPrevolucao.free.NAME,   new ImageView(CriacaoPrevolucao.free.ICON))//,
+            //new TreeItem<>(CriacaoPrevolucao.gridSnap.NAME, new ImageView(CriacaoPrevolucao.gridSnap.ICON))
         );
         
         transformacoes.getChildren().addAll(
-                new TreeItem<>(Transformacoes.Rotacao.NAME,      new ImageView(Transformacoes.Rotacao.ICON)),
-                new TreeItem<>(Transformacoes.Escala.NAME,       new ImageView(Transformacoes.Escala.ICON)),
-                new TreeItem<>(Transformacoes.Translacao.NAME,   new ImageView(Transformacoes.Translacao.ICON)),
-                new TreeItem<>(Transformacoes.Cisalhamento.NAME, new ImageView(Transformacoes.Cisalhamento.ICON))
+            new TreeItem<>(Transformacoes.Rotacao.NAME,      new ImageView(Transformacoes.Rotacao.ICON)),
+            new TreeItem<>(Transformacoes.Escala.NAME,       new ImageView(Transformacoes.Escala.ICON)),
+            new TreeItem<>(Transformacoes.Translacao.NAME,   new ImageView(Transformacoes.Translacao.ICON)),
+            new TreeItem<>(Transformacoes.Cisalhamento.NAME, new ImageView(Transformacoes.Cisalhamento.ICON))
         );
         
         root.getChildren().addAll(ferramentas, criacao, transformacoes);
@@ -251,7 +253,24 @@ public class MainController implements Initializable {
         });
         
         factors.setOnAction((ActionEvent event) -> {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            Pane pane = null;
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Config/ChangeFactors.fxml"));
+            loader.setController(new ChangeFactorsController());
+            try {
+                pane = loader.load();
+            } catch (IOException ex) {
+                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            final Stage dialog = new Stage();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initOwner(menu.getScene().getWindow());
+            Scene dialogScene = new Scene(pane);
+            dialog.setResizable(false);
+            dialog.setScene(dialogScene);
+            dialog.setTitle("Fatores de alteração");
+            dialog.show();
         });
         
         /*gridThickness.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -334,11 +353,11 @@ public class MainController implements Initializable {
     private void initializeViewToolbars(){
         //<editor-fold defaultstate="collapsed" desc="Frente">
         float zoom = getVistaFromVisao(Visao.Frontal).getPipe().getProportions();
-        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", zoom));
+        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", zoom));
         frenteCamParams.setOnAction((ActionEvent event) -> {
             System.out.println(getVistaFromVisao(Visao.Frontal).getPipelineCamera());
             ManualCamController controller = new ManualCamController(
-                    getVistaFromVisao(Visao.Frontal).getPipelineCamera(), Visao.Frontal
+                getVistaFromVisao(Visao.Frontal).getPipelineCamera(), Visao.Frontal
             );
 
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
@@ -365,31 +384,31 @@ public class MainController implements Initializable {
                 boolean changeCam = false;
                 switch (pressed){
                     case Z:
-                        pipe.zoom(+0.07);
-                        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", pipe.getProportions()));
+                        pipe.zoom(+Fatores.fator_zoom);
+                        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", pipe.getProportions()));
                         break;
                     case C:
-                        pipe.zoom(-0.07);
-                        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", pipe.getProportions()));
+                        pipe.zoom(-Fatores.fator_zoom);
+                        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", pipe.getProportions()));
                         break;
                     case W:
-                        vrp.setY(vrp.getY() + (float) 1);
-                          p.setY(  p.getY() + (float) 1);
+                        vrp.setY(vrp.getY() + Fatores.fator_movimento_ort);
+                          p.setY(  p.getY() + Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case A:
-                        vrp.setX(vrp.getX() + (float) 1);
-                          p.setX(  p.getX() + (float) 1);
+                        vrp.setX(vrp.getX() + Fatores.fator_movimento_ort);
+                          p.setX(  p.getX() + Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case S:
-                        vrp.setY(vrp.getY() - (float) 1);
-                          p.setY(  p.getY() - (float) 1);
+                        vrp.setY(vrp.getY() - Fatores.fator_movimento_ort);
+                          p.setY(  p.getY() - Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case D:
-                        vrp.setX(vrp.getX() - (float) 1);
-                          p.setX(  p.getX() - (float) 1);
+                        vrp.setX(vrp.getX() - Fatores.fator_movimento_ort);
+                          p.setX(  p.getX() - Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case ESCAPE:
@@ -406,7 +425,7 @@ public class MainController implements Initializable {
         
         //<editor-fold defaultstate="collapsed" desc="Lateral">
         zoom = getVistaFromVisao(Visao.Lateral).getPipe().getProportions();
-        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", zoom));
+        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", zoom));
         lateralCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                     getVistaFromVisao(Visao.Lateral).getPipelineCamera(), Visao.Lateral
@@ -435,31 +454,31 @@ public class MainController implements Initializable {
                 boolean changeCam = false;
                 switch (pressed){
                     case Z:
-                        lateralPipe.zoom(+0.07);
-                        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", lateralPipe.getProportions()));
+                        lateralPipe.zoom(+Fatores.fator_zoom);
+                        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", lateralPipe.getProportions()));
                         break;
                     case C:
-                        lateralPipe.zoom(-0.07);
-                        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", lateralPipe.getProportions()));
+                        lateralPipe.zoom(-Fatores.fator_zoom);
+                        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", lateralPipe.getProportions()));
                         break;
                     case W:
-                        vrp.setZ(vrp.getZ() + (float) 1);
-                          p.setZ(  p.getZ() + (float) 1);
+                        vrp.setZ(vrp.getZ() + Fatores.fator_movimento_ort);
+                          p.setZ(  p.getZ() + Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case A:
-                        vrp.setY(vrp.getY() + (float) 1);
-                          p.setY(  p.getY() + (float) 1);
+                        vrp.setY(vrp.getY() + Fatores.fator_movimento_ort);
+                          p.setY(  p.getY() + Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case S:
-                        vrp.setZ(vrp.getZ() - (float) 1);
-                          p.setZ(  p.getZ() - (float) 1);
+                        vrp.setZ(vrp.getZ() - Fatores.fator_movimento_ort);
+                          p.setZ(  p.getZ() - Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case D:
-                        vrp.setY(vrp.getY() - (float) 1);
-                          p.setY(  p.getY() - (float) 1);
+                        vrp.setY(vrp.getY() - Fatores.fator_movimento_ort);
+                          p.setY(  p.getY() - Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case ESCAPE:
@@ -476,7 +495,7 @@ public class MainController implements Initializable {
         
         //<editor-fold defaultstate="collapsed" desc="Topo">
         zoom = getVistaFromVisao(Visao.Topo).getPipe().getProportions();
-        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", zoom));
+        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", zoom));
         topoCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                     getVistaFromVisao(Visao.Topo).getPipelineCamera(), Visao.Topo
@@ -505,31 +524,31 @@ public class MainController implements Initializable {
                 boolean changeCam = false;
                 switch (pressed){
                     case Z:
-                        topPipe.zoom(+0.07);
-                        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", topPipe.getProportions()));
+                        topPipe.zoom(+Fatores.fator_zoom);
+                        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", topPipe.getProportions()));
                         break;
                     case C:
-                        topPipe.zoom(-0.07);
-                        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", topPipe.getProportions()));
+                        topPipe.zoom(-Fatores.fator_zoom);
+                        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", topPipe.getProportions()));
                         break;
                     case W:
-                        vrp.setZ(vrp.getZ() + (float) 1);
-                          p.setZ(  p.getZ() + (float) 1);
+                        vrp.setZ(vrp.getZ() + Fatores.fator_movimento_ort);
+                          p.setZ(  p.getZ() + Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case A:
-                        vrp.setX(vrp.getX() + (float) 1);
-                          p.setX(  p.getX() + (float) 1);
+                        vrp.setX(vrp.getX() + Fatores.fator_movimento_ort);
+                          p.setX(  p.getX() + Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case S:
-                        vrp.setZ(vrp.getZ() - (float) 1);
-                          p.setZ(  p.getZ() - (float) 1);
+                        vrp.setZ(vrp.getZ() - Fatores.fator_movimento_ort);
+                          p.setZ(  p.getZ() - Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case D:
-                        vrp.setX(vrp.getX() - (float) 1);
-                          p.setX(  p.getX() - (float) 1);
+                        vrp.setX(vrp.getX() - Fatores.fator_movimento_ort);
+                          p.setX(  p.getX() - Fatores.fator_movimento_ort);
                         changeCam = true;
                         break;
                     case ESCAPE:
@@ -546,7 +565,7 @@ public class MainController implements Initializable {
         
         //<editor-fold defaultstate="collapsed" desc="Perspectiva">
         zoom = getVistaFromVisao(Visao.Perspectiva).getPipe().getProportions();
-        persZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", zoom));
+        persZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", zoom));
         persCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                 getVistaFromVisao(Visao.Perspectiva).getPipelineCamera(), Visao.Perspectiva
@@ -574,35 +593,35 @@ public class MainController implements Initializable {
                 boolean changeCam = false;
                 switch (pressed){
                     case Z:
-                        persPipe.zoom(+0.07);
-                        persZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", persPipe.getProportions()));
+                        persPipe.zoom(+Fatores.fator_zoom);
+                        persZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", persPipe.getProportions()));
                         break;
                     case C:
-                        persPipe.zoom(-0.07);
-                        persZoom.setText("x "+String.format(java.util.Locale.US,"%.1f", persPipe.getProportions()));
+                        persPipe.zoom(-Fatores.fator_zoom);
+                        persZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", persPipe.getProportions()));
                         break;
                     case Q:
-                        vrp.setX(vrp.getX() - (float) 0.1);
+                        vrp.setX(vrp.getX() - Fatores.fator_movimento_pers);
                         changeCam = true;
                         break;
                     case E:
-                        vrp.setX(vrp.getX() + (float) 0.1);
+                        vrp.setX(vrp.getX() + Fatores.fator_movimento_pers);
                         changeCam = true;
                         break;
                     case W:
-                        vrp.setY(vrp.getY() - (float) 0.1);
+                        vrp.setY(vrp.getY() - Fatores.fator_movimento_pers);
                         changeCam = true;
                         break;
                     case A:
-                        vrp.setZ(vrp.getZ() - (float) 0.1);
+                        vrp.setZ(vrp.getZ() - Fatores.fator_movimento_pers);
                         changeCam = true;
                         break;
                     case S:
-                        vrp.setY(vrp.getY() + (float) 0.1);
+                        vrp.setY(vrp.getY() + Fatores.fator_movimento_pers);
                         changeCam = true;
                         break;
                     case D:
-                        vrp.setZ(vrp.getZ() + (float) 0.1);
+                        vrp.setZ(vrp.getZ() + Fatores.fator_movimento_pers);
                         changeCam = true;
                         break;
                     case ESCAPE:
@@ -862,6 +881,10 @@ public class MainController implements Initializable {
             faces.forEach((face) -> {
                 paintArestasConectadas(graphs, face);
             });
+        } else if (obj instanceof ArestaEixo){
+            ArestaEixo objA = (ArestaEixo) obj;
+            graphs.setStroke(objA.getAxisColor());
+            paintConectedPointList(graphs, obj.getPoints(), 0);
         } else {
             paintConectedPointList(graphs, obj.getPoints(), 0);
         }

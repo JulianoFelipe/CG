@@ -248,11 +248,11 @@ public class HE_Poliedro extends CGObject {
     public String toString() {
         return "WE_Poliedro: ID=" + ID + "; Points=" + listaDeVertices.size() + "; Faces=" + listaDeFaces.size() + ".";
     }
-
+    
     public void updateVisibility(Camera cam) {
         //Precisa de 3 pontos para normal.
         int i = 0;
-        
+
         for(WE_Face face : listaDeFaces){
             WE_Aresta arestaFace = face.getArestaDaFace();
             //System.out.println("Face ID: " + face.ID + " Aresta ID: " + arestaFace.getID());

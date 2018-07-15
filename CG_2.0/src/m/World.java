@@ -14,7 +14,9 @@ import javafx.beans.Observable;
 import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
+import javafx.scene.paint.Color;
 import m.poligonos.Aresta;
+import m.poligonos.ArestaEixo;
 import m.poligonos.CGObject;
 import m.poligonos.Face;
 import m.poligonos.Nregular;
@@ -46,14 +48,14 @@ public final class World {
         });*/
         tempPoints = new ArrayList();
         
-        Aresta x_axis = new Aresta(new Vertice(0,0,0), new Vertice(5000,0,0));
-        Aresta y_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,5000,0));
-        Aresta z_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,5000));
+        ArestaEixo x_axis = new ArestaEixo(new Vertice(0,0,0), new Vertice(5000,0,0), Color.GREEN);
+        ArestaEixo y_axis = new ArestaEixo(new Vertice(0,0,0), new Vertice(0,5000,0), Color.BLUE);
+        ArestaEixo z_axis = new ArestaEixo(new Vertice(0,0,0), new Vertice(0,0,5000), Color.RED);
         
-        Aresta mx_axis = new Aresta(new Vertice(0,0,0), new Vertice(-5000,0,0));
-        Aresta my_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,-5000,0));
-        Aresta mz_axis = new Aresta(new Vertice(0,0,0), new Vertice(0,0,-5000));
-        
+        ArestaEixo mx_axis = new ArestaEixo(new Vertice(0,0,0), new Vertice(-5000,0,0), Color.GREEN);
+        ArestaEixo my_axis = new ArestaEixo(new Vertice(0,0,0), new Vertice(0,-5000,0), Color.BLUE);
+        ArestaEixo mz_axis = new ArestaEixo(new Vertice(0,0,0), new Vertice(0,0,-5000), Color.RED);
+
         axis.add( x_axis);
         axis.add( y_axis);
         axis.add( z_axis);
@@ -210,9 +212,9 @@ public final class World {
     private CGObject deepCopy(CGObject obj){
         CGObject deepCopied = null;
         
-        /*if        (obj instanceof Vertice){
-            deepCopied = new Vertice( (Vertice) obj);
-        } else */if (obj instanceof Aresta){
+        if        (obj instanceof ArestaEixo){
+            deepCopied = new ArestaEixo( (ArestaEixo) obj);
+        } else if (obj instanceof Aresta){
             deepCopied = new Aresta( (Aresta) obj);
         } else if (obj instanceof Face){
             deepCopied = new Face( (Face) obj);
