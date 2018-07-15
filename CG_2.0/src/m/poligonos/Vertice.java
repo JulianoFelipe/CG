@@ -43,6 +43,10 @@ public class Vertice{
 
     //<editor-fold defaultstate="collapsed" desc="Getters & Setters">
 
+    public long getID() {
+        return ID;
+    }
+
     public float getX() {
         return x;
     }

@@ -19,7 +19,7 @@ import m.poligonos.CGObject;
 import m.poligonos.Face;
 import m.poligonos.Nregular;
 import m.poligonos.PointObject;
-import m.poligonos.we_edge.WE_Poliedro;
+import m.poligonos.we_edge.HE_Poliedro;
 import m.poligonos.Vertice;
 
 /**
@@ -216,8 +216,8 @@ public final class World {
             deepCopied = new Aresta( (Aresta) obj);
         } else if (obj instanceof Face){
             deepCopied = new Face( (Face) obj);
-        } else if (obj instanceof WE_Poliedro){
-            deepCopied = new WE_Poliedro( (WE_Poliedro) obj);
+        } else if (obj instanceof HE_Poliedro){
+            deepCopied = new HE_Poliedro( (HE_Poliedro) obj);
         } else if (obj instanceof Nregular){
             deepCopied = new Nregular( (Nregular) obj);
         } else if (obj instanceof PointObject){

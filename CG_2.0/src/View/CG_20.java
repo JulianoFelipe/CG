@@ -18,7 +18,7 @@ import m.World;
 import m.pipeline.OrtPipeline;
 import m.pipeline.PersPipeline;
 import m.poligonos.we_edge.IndexList;
-import m.poligonos.we_edge.WE_Poliedro;
+import m.poligonos.we_edge.HE_Poliedro;
 import utils.config.StandardConfigCam;
 import utils.config.StandardConfigWinView;
 
@@ -62,7 +62,7 @@ public class CG_20 extends Application {
         faces.add(new IndexList(face3));
         faces.add(new IndexList(face4));
         
-        WE_Poliedro poli = new WE_Poliedro(pol_mat, faces);
+        HE_Poliedro poli = new HE_Poliedro(pol_mat, faces);
         
         //PointObject pol = new PointObject(pol_mat);
         //List<Face> lista = PMath.attemptBuildingFromPlanes(pol);

@@ -55,10 +55,12 @@ import m.Eixo;
 import m.Visao;
 import m.Vista;
 import m.World;
+import m.poligonos.Aresta;
 import m.poligonos.CGObject;
 import m.poligonos.Movimento;
-import m.poligonos.Nregular;
 import m.poligonos.Vertice;
+import m.poligonos.we_edge.HE_Poliedro;
+import m.poligonos.we_edge.WE_Aresta;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
@@ -749,81 +751,7 @@ public class MainController implements Initializable {
             paintStuff();
         });
     }
-    
-    private void paintStuff(){
-        clearCanvases();
         
-        for (Vista vista : mundo.getVistas()){
-            GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
-            graphs.setFill(Color.BLACK);
-            graphs.setStroke(Color.BLACK);
-            graphs.setLineWidth(1);
-            
-            List<CGObject> objs = vista.get2Dobjects();
-            for (CGObject obj : objs){
-                graphs.beginPath();
-
-                if (selected_obj!=null && obj.getID()==(selected_obj.getID())){
-                    graphs.setStroke(Color.RED);
-                } else {
-                    graphs.setStroke(Color.BLACK);
-                }
-                
-                Vertice point1 = obj.get(0);
-                //System.out.println("Vista: " + vista.getVisao() + ". Point: " + point1);
-                Vertice point2 = null;
-                for (int i=1; i<obj.getNumberOfPoints(); i++){
-                    point2 = obj.get(i);
-                    graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
-                    //graphs.moveTo(point1.getX(), point.getY());
-                    point1 = point2;
-                }
-                graphs.strokeLine(point1.getX(), point1.getY(), obj.get(0).getX(),obj.get(0).getY());
-                //graphs.fill();
-                graphs.closePath();
-            }
-        }
-        
-        for (Vista vista : mundo.getVistas()){
-            GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
-            graphs.setFill(Color.BLACK);
-            graphs.setStroke(Color.BLACK);
-            graphs.setLineWidth(1);
-            
-            List<Vertice> vertices = vista.getTempPoints();
-            if (vertices.isEmpty())
-                continue;
-                
-            graphs.beginPath();           
-            Vertice point1 = vertices.get(0);
-            graphs.fillOval(point1.getX(), point1.getY(), 5, 5);
-
-            Vertice point2 = null;
-            for (int i=1; i<vertices.size(); i++){
-                point2 = vertices.get(i);
-                graphs.fillOval(point2.getX(), point2.getY(), 5, 5);
-                graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
-                point1 = point2;
-            }
-            //graphs.strokeLine(point1.getX(), point1.getY(), vertices.get(0).getX(), vertices.get(0).getY());
-            graphs.closePath();
-        }
-    }
-    
-    private void clearCanvases(){
-        GraphicsContext cl = frente.getGraphicsContext2D();
-        cl.clearRect(0, 0, frente.getWidth(), frente.getHeight());
-        
-        cl = topo.getGraphicsContext2D();
-        cl.clearRect(0, 0, topo.getWidth(), topo.getHeight());
-        
-        cl = lateral.getGraphicsContext2D();
-        cl.clearRect(0, 0, lateral.getWidth(), lateral.getHeight());
-        
-        cl = perspectiva.getGraphicsContext2D();
-        cl.clearRect(0, 0, perspectiva.getWidth(), perspectiva.getHeight());
-    }
-    
     private Canvas getCanvasFromView(Vista vista){
         switch (vista.getVisao()){
             case Frontal:
@@ -838,6 +766,124 @@ public class MainController implements Initializable {
                 throw new IllegalArgumentException("Visão não prevista.");
                     
         }
+    }
+//</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="Funções de pintura">
+    private void paintStuff(){
+        clearCanvases();
+        
+        mundo.getVistas().forEach((vista) -> {
+            GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
+            graphs.setFill(Color.BLACK);
+            graphs.setStroke(Color.BLACK);
+            graphs.setLineWidth(1);
+            
+            List<CGObject> objs = vista.get2Dobjects();
+            objs.forEach((obj) -> {
+                paintObject(graphs, obj);
+            });
+        });
+        
+        mundo.getVistas().forEach((vista) -> {
+            GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
+            graphs.setFill(Color.BLACK);
+            graphs.setStroke(Color.BLACK);
+            graphs.setLineWidth(1);
+            List<Vertice> vertices = vista.getTempPoints();
+            if (!(vertices.isEmpty())) {
+                int radius=5;
+                graphs.beginPath();
+                Vertice point1 = vertices.get(0);
+                graphs.fillOval(point1.getX(), point1.getY(), 5, 5);
+                
+                Vertice point2 = null;
+                for (int i=1; i<vertices.size(); i++){
+                    point2 = vertices.get(i);
+                    graphs.fillOval(point2.getX()-(radius/2), point2.getY()-(radius/2), radius, radius);
+                    graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+                    point1 = point2;
+                }
+                //graphs.strokeLine(point1.getX(), point1.getY(), vertices.get(0).getX(), vertices.get(0).getY());
+                graphs.closePath();
+            }
+        });
+    }
+    
+    /**
+     * Seleciona qual função de pintura específica chamar
+     * @param graphics
+     * @param obj 
+     */
+    private void paintObject(GraphicsContext graphs, CGObject obj){
+        if (selected_obj!=null && obj.getID()==(selected_obj.getID())){
+            graphs.setStroke(Color.RED);
+        } else {
+            graphs.setStroke(Color.BLACK);
+        }
+        
+        if (obj instanceof HE_Poliedro){
+            List<List<WE_Aresta>> faces = ((HE_Poliedro) obj).getVisibleFaces();
+            faces.forEach((face) -> {
+                paintArestasConectadas(graphs, face);
+            });
+        } else {
+            paintConectedPointList(graphs, obj.getPoints(), 0);
+        }
+    }
+    
+    private void paintArestasConectadas(GraphicsContext graphs, List<? extends Aresta> lista){
+        graphs.beginPath();
+             
+        lista.forEach((aresta) -> {
+            Vertice ini = aresta.getvInicial();
+            Vertice fin = aresta.getvFinal();
+            graphs.strokeLine(ini.getX(), ini.getY(), fin.getX(), fin.getY());
+        });
+        
+        graphs.closePath();
+    }
+    
+    /**
+     * Pinta os pontos como contínuos
+     * @param graphs
+     * @param lista 
+     */
+    private void paintConectedPointList(GraphicsContext graphs, List<? extends Vertice> lista, int pointRadius){
+        graphs.beginPath();
+                
+        Vertice point1 = lista.get(0);
+        //System.out.println("Vista: " + vista.getVisao() + ". Point: " + point1);
+        Vertice point2 = null;
+        for (int i=1; i<lista.size(); i++){
+            point2 = lista.get(i);
+            graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+            
+            if (pointRadius > 0){
+                graphs.fillOval(point1.getX()-(pointRadius/2), point1.getY()-(pointRadius/2), pointRadius, pointRadius);
+            }
+            
+            point1 = point2;
+        }
+        graphs.strokeLine(point1.getX(), point1.getY(), lista.get(0).getX(),lista.get(0).getY());
+        
+        
+        
+        graphs.closePath();
+    }
+    
+    private void clearCanvases(){
+        GraphicsContext cl = frente.getGraphicsContext2D();
+        cl.clearRect(0, 0, frente.getWidth(), frente.getHeight());
+        
+        cl = topo.getGraphicsContext2D();
+        cl.clearRect(0, 0, topo.getWidth(), topo.getHeight());
+        
+        cl = lateral.getGraphicsContext2D();
+        cl.clearRect(0, 0, lateral.getWidth(), lateral.getHeight());
+        
+        cl = perspectiva.getGraphicsContext2D();
+        cl.clearRect(0, 0, perspectiva.getWidth(), perspectiva.getHeight());
     }
 //</editor-fold>
     

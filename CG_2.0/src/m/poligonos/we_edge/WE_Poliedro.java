@@ -1,24 +1,25 @@
 package m.poligonos.we_edge;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
+import m.Camera;
 import m.Eixo;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
+import utils.math.VMath;
 
 /**
  *
  * @author
  */
-public class WE_Poliedro extends CGObject {
+class WE_Poliedro extends CGObject {
 
-    private List<WE_Aresta>  listaDeArestas;
-    private List<WE_Vertice> listaDeVertices;
-    private List<WE_Face>    listaDeFaces;
+    private final List<WE_Aresta>  listaDeArestas;
+    private final List<WE_Vertice> listaDeVertices;
+    private final List<WE_Face>    listaDeFaces;
     private final boolean[] visibilidade_faces;
 
     private float min_x, max_x,
@@ -273,34 +274,113 @@ public class WE_Poliedro extends CGObject {
         return "WE_Poliedro: ID=" + ID + "; Points=" + listaDeVertices.size() + "; Faces=" + listaDeFaces.size() + ".";
     }
 
-    /*public void updateVisibility(Camera cam) {
+    public void updateVisibility(Camera cam) {
         //Precisa de 3 pontos para normal.
         int i = 0;
-        for (IndexList face : vertices_das_faces) {
-            if (face.size() >= 3) {
-                System.out.println("FACE: " + face);
-                Vertice normal = VMath.obterNormal(getPoint(face.get(1)), getPoint(face.get(0)), getPoint(face.get(2)));
-                VMath.normalizar(normal);
-                System.out.println("Normal: " + normal);
-                double mult = VMath.produtoEscalar(cam.getVetorN(), normal);
-                System.out.println("Mult: " + mult);
-                visibilidade_faces[i] = mult <= 0; //Se mult>0, face[i] é visível
+        
+        for(WE_Face face : listaDeFaces){
+            WE_Aresta arestaFace = face.getArestaDaFace();
+            
+            Vertice third = null;
+            searchForAnyArestaParaEsquerda:
+            for (WE_Aresta aresta : listaDeArestas){
+                if (!aresta.equals(arestaFace)){
+                    if (face.ID == aresta.getFaceEsquerda().ID){
+                        third = aresta.getvFinal();
+                        break searchForAnyArestaParaEsquerda;
+                    } else if (face.ID == aresta.getFaceDireita().ID){
+                        third = aresta.getvInicial();
+                        break searchForAnyArestaParaEsquerda;
+                    }
+                }
             }
+            
+            Vertice normal = VMath.obterNormal(arestaFace.getvFinal(), arestaFace.getvInicial(), third);
+            VMath.normalizar(normal);
+            double mult = VMath.produtoEscalar(cam.getVetorN(), normal);
+            System.out.println("Normal: " + normal + " Mult: " + mult);
+            visibilidade_faces[i] = mult > 0; //Se mult>0, face[i] é visível
             i++;
         }
+        throw new UnsupportedOperationException("This doesn't work and programmer should feel bad. :(");
+        //<editor-fold defaultstate="collapsed" desc="Testes que não funcionaram">
+        /*System.out.println("Lista vertices: " + listaDeVertices);
+        System.out.println("Lista arestas: " + listaDeArestas);
+        System.out.println("Lista faces: " + listaDeFaces);
+
+        for (WE_Face face : listaDeFaces){
+        WE_Aresta arestaFace = face.getArestaDaFace();
+        System.out.println("ARESTA FACE: " + arestaFace);
+        WE_Aresta next;
+        Vertice third;
+        if (arestaFace.getFaceEsquerda().ID == face.ID){
+        next = arestaFace.getEsquerdaPredecessora();
+        } else {
+        next = arestaFace.getDireitaSucessora();
+        }
+
+        if (next.getvInicial().equals(arestaFace.getvInicial())
+        ||next.getvInicial().equals(arestaFace.getvFinal  ()))
+        third = next.getvFinal();
+        else
+        third = next.getvInicial();
+
+        System.out.println("POINTS (" + face.ID + "): ");
+        System.out.println("One: " + arestaFace.getvFinal());
+        System.out.println("Two: " + arestaFace.getvInicial());
+        System.out.println("Thr: " + third);
+
+        Vertice normal = VMath.obterNormal(arestaFace.getvFinal(), arestaFace.getvInicial(), third);
+        VMath.normalizar(normal);
+        double mult = VMath.produtoEscalar(cam.getVetorN(), normal);
+        System.out.println("Normal: " + normal + " Mult: " + mult);
+        visibilidade_faces[i] = mult > 0; //Se mult>0, face[i] é visível
+
+        i++;
+        }*/
+
+        /*for (WE_Face face : listaDeFaces){
+        WE_Aresta arestaFace = null;
+
+        searchForAnyArestaParaEsquerda:
+        for (WE_Aresta aresta : listaDeArestas){
+        if (face.ID == aresta.getFaceEsquerda().ID){
+        arestaFace = aresta;
+        break searchForAnyArestaParaEsquerda;
+        }
+        }
+
+        Vertice one = arestaFace.getvInicial();
+        Vertice two = arestaFace.getvFinal();
+        Vertice three;
+
+        arestaFace = arestaFace.getEsquerdaSucessora();
+        if (arestaFace.getvInicial().equals(two)){
+        three = arestaFace.getvFinal();
+        } else {
+        three = arestaFace.getvInicial();
+        }
+
+        Vertice normal = VMath.obterNormal(two, one, three);
+        VMath.normalizar(normal);
+        double mult = VMath.produtoEscalar(cam.getVetorN(), normal);
+        System.out.println("Normal: " + normal + " Mult: " + mult);
+        visibilidade_faces[i] = mult > 0; //Se mult>0, face[i] é visível
+        }*/
+        //</editor-fold>
     }
 
     public List<Integer> getVisibleFaces() {
         List<Integer> lista = new ArrayList();
 
-        for (int i = 0; i < vertices_das_faces.size(); i++) {
+        for (int i = 0; i < listaDeFaces.size(); i++) {
             if (visibilidade_faces[i] == true) {
                 lista.add(i);
             }
         }
 
         return lista;
-    }*/
+    }
     
     @Override
     public List<WE_Vertice> getPoints() {
@@ -338,7 +418,7 @@ public class WE_Poliedro extends CGObject {
         //System.out.println(a.equals(b));
         //System.out.println(a.equalsRev(b));
 
-        float[][] pol_mat = {
+        /*float[][] pol_mat = {
             {  0,  10, 10,  5}, //X
             {  0,   0,  0, 10}, //Y
             {  0,  10,  0,  5}, //Z
@@ -349,8 +429,8 @@ public class WE_Poliedro extends CGObject {
         int[] face0 = {0,1,3};
         int[] face1 = {1,2,3};
         int[] face2 = {2,0,3};
-        int[] face3 = {0,2,1};
-        /*float[][] pol_mat = {
+        int[] face3 = {0,2,1};*/
+        float[][] pol_mat = {
             {30, 35, 25, 20, 30},
             {2, 4, 3, 1, 10},
             {25, 20, 18, 23, (float) 22.5},
@@ -359,28 +439,28 @@ public class WE_Poliedro extends CGObject {
         };
 
         int[] face0 = {0, 3, 2, 1};
-        int[] face1 = {0, 1, 4};
+        int[] face1 = {0, 1, 4}; //This
         int[] face2 = {1, 2, 4};
         int[] face3 = {2, 3, 4};
-        int[] face4 = {3, 0, 4};*/
+        int[] face4 = {3, 0, 4}; //THis
 
         List<IndexList> faces = new ArrayList();
         faces.add(new IndexList(face0));
         faces.add(new IndexList(face1));
         faces.add(new IndexList(face2));
         faces.add(new IndexList(face3));
-        /*faces.add(new IndexList(face4));*/
+        faces.add(new IndexList(face4));
 
-        /*Vertice ViewUp = new Vertice(0, 1, 0);
+        Vertice ViewUp = new Vertice(0, 1, 0);
         Vertice VRP = new Vertice(50, 15, 30);
         Vertice P = new Vertice(20, 6, 15);
-        Camera cam = new Camera(ViewUp, VRP, P);*/
+        Camera cam = new Camera(ViewUp, VRP, P);
         WE_Poliedro p = new WE_Poliedro(pol_mat, faces);
 
-        /*p.updateVisibility(cam);
-        System.out.println(p.getVisibleFaces());
+        p.updateVisibility(cam);
+        //System.out.println(p.getVisibleFaces());
 
-        System.out.println(p.vertices_das_faces.get(2));*/
+        System.out.println(Arrays.toString(p.visibilidade_faces));
     }
 
     @Override

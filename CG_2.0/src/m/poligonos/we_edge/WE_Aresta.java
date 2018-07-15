@@ -27,9 +27,38 @@ public class WE_Aresta extends Aresta{
         super(I, F);
     }
 
-    public WE_Aresta(WE_Aresta a) {
-        super(a);
+    public WE_Aresta(WE_Aresta a, Vertice ini, Vertice fin) {
+        super(a.ID);
+        super.vInicial = ini;
+        super.vFinal   = fin;
         //Copia só as coords e ID para não criar cópias desnecessárias das esq_... e dir_...
+        
+        if (ini.getX() > fin.getX()){
+            max_x = ini.getX();
+            min_x = fin.getX();
+        } else {
+            max_x = fin.getX();
+            min_x = ini.getX();
+        }
+        
+        if (ini.getY() > fin.getY()){
+            max_y = ini.getY();
+            min_y = fin.getY();
+        } else {
+            max_y = fin.getY();
+            min_y = ini.getY();
+        }
+
+        if (ini.getZ() > fin.getZ()){
+            max_z = ini.getZ();
+            min_z = fin.getZ();
+        } else {
+            max_z = fin.getZ();
+            min_z = ini.getZ();
+        }
+        
+        interceptX = min_x;
+        changed = true;
     }
     
     //<editor-fold defaultstate="collapsed" desc="Getters e Setters">
@@ -88,7 +117,7 @@ public class WE_Aresta extends Aresta{
 
     @Override
     public String toString() {
-        if (esquerda==null) return super.toString();
+        if (esquerda!=null) return super.toString();
         
         StringBuilder string = new StringBuilder("WE_Aresta ");
         string.append(ID).append(" {esquerda=");
@@ -124,4 +153,12 @@ public class WE_Aresta extends Aresta{
                 ", dir_predecessora=" + dir_predecessora.ID + ", dir_sucessora=" + dir_sucessora.ID + '}';*/
     }
     
+    public boolean oppositeEdges(WE_Aresta that){
+        return this.vInicial.equalPoints(that.vFinal)
+            && this.vFinal.equalPoints(that.vInicial);
+    }
+    
+    public String idString(){
+        return "WE_Aresta " + ID;
+    }
 }

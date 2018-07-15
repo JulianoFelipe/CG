@@ -21,17 +21,17 @@ public class Aresta extends CGObject{
     protected Vertice vInicial;
     protected Vertice vFinal;
     
-    private float max_y;
-    private float min_y;
-    private float max_x;
-    private float min_x;
-    private float max_z;
-    private float min_z;
+    protected float max_y;
+    protected float min_y;
+    protected float max_x;
+    protected float min_x;
+    protected float max_z;
+    protected float min_z;
         
-    private boolean changed;
-    private double slope;
-    private double b;    //this ->   y= slope*x + b;
-    private double interceptX; //"Double" so it can be null
+    protected boolean changed;
+    protected double slope;
+    protected double b;    //this ->   y= slope*x + b;
+    protected double interceptX; //"Double" so it can be null
      
     //<editor-fold defaultstate="collapsed" desc="Construtores">    
     /**
@@ -94,6 +94,10 @@ public class Aresta extends CGObject{
         
         interceptX = min_x;
         changed = true;
+    }
+    
+    protected Aresta(long id){
+        super(id);
     }
 //</editor-fold>
 
@@ -182,7 +186,7 @@ public class Aresta extends CGObject{
         this.interceptX = interceptX;
     }
 //</editor-fold>
-    
+       
     @Override
     public String toString() {
         return "Aresta: ID=" + ID + "; Points={" + vInicial.toString() + "," + vFinal.toString() + "}";

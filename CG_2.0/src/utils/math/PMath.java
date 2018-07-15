@@ -13,8 +13,8 @@ import java.util.List;
 import m.poligonos.CGObject;
 import m.poligonos.Face;
 import m.poligonos.PointObject;
-import m.poligonos.we_edge.WE_Poliedro;
 import m.poligonos.Vertice;
+import m.poligonos.we_edge.HE_Poliedro;
 
 //import Model.Vertice;
 
@@ -61,7 +61,7 @@ public class PMath {
      * @return Vértice próximo de v, ou null, caso não exista.
      */
     @Deprecated
-    public static Vertice verticeProximoDeQualquerVerticeDoPoligono(WE_Poliedro p, Vertice v){
+    public static Vertice verticeProximoDeQualquerVerticeDoPoligono(HE_Poliedro p, Vertice v){
         for (Vertice ver : p.getPoints()){
             if (VMath.distancia(ver, v) < CLOSE_THRESHOLD){
                 return ver;

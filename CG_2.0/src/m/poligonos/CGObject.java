@@ -33,6 +33,10 @@ public abstract class CGObject implements Serializable{
         this.ID = obj.ID;
     }
     
+    protected CGObject(long id){
+        this.ID = id;
+    }
+    
     public abstract List<? extends Vertice> getPoints();
        
     public abstract int getNumberOfPoints(); 
