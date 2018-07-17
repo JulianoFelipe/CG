@@ -15,6 +15,7 @@ import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
@@ -214,8 +215,11 @@ public final class CGCanvas extends Canvas{
         cl.clearRect(0, 0, this.getWidth(), this.getHeight());
     }
 //</editor-fold>   
-        
-    public void setAutoCam(){
+      
+    private ChangeListener change;
+    
+    public void setAutoCam(ChangeListener listener){
+        this.change = listener;
         autoChangeActiveProperty.set(true);
         if (visao == Visao.Perspectiva){
             setAutoCamPerspectiva();
@@ -289,6 +293,7 @@ public final class CGCanvas extends Canvas{
                     this.setOnKeyPressed(null);
                     this.getParent().getParent().setStyle("-fx-border-color: black");
                     autoChangeActiveProperty.set(false);
+                    autoChangeActiveProperty.removeListener(change);
                     return;
             }
             

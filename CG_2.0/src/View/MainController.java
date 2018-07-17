@@ -24,7 +24,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -397,17 +396,18 @@ public class MainController implements Initializable {
             dialog.show();
         });
         frenteCamAuto.setOnAction((ActionEvent event) -> {
-            frente.autoChangeActiveProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            ChangeListener<Boolean> listener = (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
                 frenteGrid.showHotkeys(newValue);
-            }); 
-            frente.setAutoCam();
+            };
+            frente.autoChangeActiveProperty().addListener(listener);
+            frente.setAutoCam(listener);
         });
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Lateral">
         lateralCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
-                    lateral.getVista().getPipelineCamera(), Visao.Lateral
+                lateral.getVista().getPipelineCamera(), Visao.Lateral
             );
 
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
@@ -420,14 +420,18 @@ public class MainController implements Initializable {
             dialog.show();
         });
         lateralCamAuto.setOnAction((ActionEvent event) -> {
-            //asdf
+            ChangeListener<Boolean> listener = (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+                lateralGrid.showHotkeys(newValue);
+            };
+            lateral.autoChangeActiveProperty().addListener(listener);
+            lateral.setAutoCam(listener);
         });
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Topo">
         topoCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
-                    topo.getVista().getPipelineCamera(), Visao.Topo
+                topo.getVista().getPipelineCamera(), Visao.Topo
             );
 
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
@@ -440,7 +444,11 @@ public class MainController implements Initializable {
             dialog.show();
         });
         topoCamAuto.setOnAction((ActionEvent event) -> {
-            
+            ChangeListener<Boolean> listener = (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+                topoGrid.showHotkeys(newValue);
+            };
+            topo.autoChangeActiveProperty().addListener(listener);
+            topo.setAutoCam(listener);
         });
         //</editor-fold>
         
@@ -461,7 +469,11 @@ public class MainController implements Initializable {
         });
         
         persCamAuto.setOnAction((ActionEvent event) -> {
-            
+            ChangeListener<Boolean> listener = (ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+                persGrid.showHotkeys(newValue);
+            };
+            perspectiva.autoChangeActiveProperty().addListener(listener);
+            perspectiva.setAutoCam(listener);
         });
         //</editor-fold>
     }
