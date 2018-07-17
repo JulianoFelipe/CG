@@ -532,5 +532,10 @@ class WE_Poliedro extends CGObject {
         
         return !(x < minX || x > maxX || y < minY || y > maxY); //Se menor que min ou maior que max, false
     }
+
+    @Override
+    public Vertice getCentroide() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     
 }

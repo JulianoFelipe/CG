@@ -487,4 +487,9 @@ public class PoligonoOld_WingedEdge extends CGObject{
     public boolean insideBoundingBox(float x, float y, Eixo axis) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+    @Override
+    public Vertice getCentroide() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

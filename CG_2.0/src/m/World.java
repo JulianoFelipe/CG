@@ -10,9 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
-import javafx.beans.Observable;
-import javafx.collections.FXCollections;
-import javafx.collections.ListChangeListener.Change;
 import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import m.poligonos.Aresta;
@@ -30,7 +27,7 @@ import m.poligonos.Vertice;
  */
 public final class World {
     private static final Logger LOG = Logger.getLogger("CG_2.0");    
-    private final ObservableList<CGObject> objetos;
+    private final ArrayList<CGObject> objetos;
     private final List<Vertice> tempPoints;
     private List<Vista> vistas;
     
@@ -40,12 +37,7 @@ public final class World {
     //https://coderanch.com/t/666722/java/Notify-ObservableList-Listeners-Change-Elements
     
     private World() {       
-        objetos = FXCollections.observableArrayList((CGObject param) -> {
-            return new Observable[]{ param.changedProperty()};
-        });
-        /*tempPoints = FXCollections.observableArrayList((Vertice param) -> {
-            return new Observable[]{ param.changedProperty()};
-        });*/
+        objetos    = new ArrayList();
         tempPoints = new ArrayList();
         
         ArestaEixo x_axis = new ArestaEixo(new Vertice(0,0,0), new Vertice(5000,0,0), Color.GREEN);
@@ -63,7 +55,15 @@ public final class World {
         axis.add(my_axis);
         axis.add(mz_axis);
         
-        objetos.addListener((Change<? extends CGObject> c) -> {
+        //<editor-fold defaultstate="collapsed" desc="Observable List Test">
+        /*objetos = FXCollections.observableArrayList((CGObject param) -> {
+            return new Observable[]{ param.changedProperty()};
+        });
+        /*tempPoints = FXCollections.observableArrayList((Vertice param) -> {
+            return new Observable[]{ param.changedProperty()};
+        });*/
+        
+        /*objetos.addListener((Change<? extends CGObject> c) -> {
             while (c.next()) {
                 if (c.wasPermutated()) {
                     for (int i = c.getFrom(); i < c.getTo(); ++i) {
@@ -72,9 +72,12 @@ public final class World {
                     }
                 } else if (c.wasUpdated()) {
                     for (int i = c.getFrom(); i < c.getTo(); ++i) {
-                        System.out.println("Updated: " + i + " " + objetos.get(i));
+                        System.out.println("UP: " + objetos.get(i).changedProperty());
+                        objetos.get(i).changedProperty().set(false);
+                        //System.out.println("UP: " + objetos.get(i).changedProperty());
+                        //System.out.println("Updated: " + i + " " + objetos.get(i));
                         for (Vista v : vistas){
-                            v.setObject(i, deepCopy( objetos.get(i) ));
+                            v.setObject(i, objetos.get(i));
                         }
                     }
                 } else {
@@ -85,18 +88,18 @@ public final class World {
                                 v.remove(removedItem);
                             });
                         });
-                        /*c.getAddedSubList().forEach((addedItem) -> {
+                        c.getAddedSubList().forEach((addedItem) -> {
                             System.out.println("Added: " + addedItem + " Points: " + addedItem.getPoints());
                             vistas.forEach((v) -> {
                                 v.addObject(deepCopy( addedItem ));
                             });
-                        });*/
+                        });
                     }
                 }
             }
         });
-        
-        /*tempPoints.addListener((Change<? extends Vertice> c) -> {
+
+        tempPoints.addListener((Change<? extends Vertice> c) -> {
             while (c.next()) {
                 if (c.wasPermutated()) {
                     for (int i = c.getFrom(); i < c.getTo(); ++i) {
@@ -112,10 +115,10 @@ public final class World {
                     }
                 } else {
                     if ( !(tempPoints.isEmpty() && c.getRemovedSize()>0) ){
-                        /*c.getRemoved().forEach((removedItem) -> {
+                        c.getRemoved().forEach((removedItem) -> {
                             System.out.println("TEMP Removed: " + removedItem);
-                        });*/
-                        /*c.getAddedSubList().forEach((addedItem) -> {
+                        });
+                        c.getAddedSubList().forEach((addedItem) -> {
                             System.out.println("TEMP Added: " + addedItem);
                             vistas.forEach((v) -> {
                                 v.addTempPoint(new Vertice(addedItem));
@@ -125,6 +128,7 @@ public final class World {
                 }
             }
         });*/
+        //</editor-fold>
     }
     
     private World(List<CGObject> lista){
@@ -303,5 +307,29 @@ public final class World {
         for (int i=0; i<tempPoints.size(); i++){
             localV.setTempPoint(i, tempPoints.get(i));
         }
+    }
+    
+    public CGObject getObject(CGObject obj){
+        int index = objetos.indexOf(obj);
+        if (index != -1) return objetos.get(index);
+        else return null;
+    }
+    
+    public void update(CGObject obj, Vista sender){
+        int index = objetos.indexOf(obj);
+        objetos.get(index).updateInternals(obj);
+        //A vista que é o "sender" do update tem que ser o último
+        //Pois o objeto foi retirado/modificado dela
+        //Assim, quando ela re-converter, o ponto passado para as outras
+        //vistas será diferente
+        //Portanto, sender tem que ser último, o fazer uma cópia dos pontos
+        //Nesse método, aí as mudanças não são refletidas dessa maneira
+        vistas.forEach((v) -> {
+            if (v != sender)
+                v.setObject(index, obj);
+        });
+        sender.setObject(index, obj); //Dual conversão, mas...
+        //Se não for dual conversão, tem que ter cópia em algum lugar.
+        //Ora aqui ou no update da vista
     }
 }

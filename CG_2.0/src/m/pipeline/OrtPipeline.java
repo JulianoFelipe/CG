@@ -6,7 +6,6 @@
 package m.pipeline;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import m.Camera;
 import m.CGViewport;
@@ -49,6 +48,10 @@ public class OrtPipeline extends CGPipeline{
     //<editor-fold defaultstate="collapsed" desc="Conversão Mundo -> Tela">
     @Override
     public void convert2D(Vertice vertice) {
+        //Obsevação. Standard Conversion pode dar problemas se translações e similares ocorrerem
+        //Porque as matrizes de projeção atual "zeram" as coords z. ou equivalentes, resultando em
+        //problemas quando há propagação para as outras views.
+        
         if (!isCameraStraight()){
             //Se a câmera NÃO está "olhando reto para o ponto",
             //faça a conversão com a função abaixo
@@ -110,7 +113,7 @@ public class OrtPipeline extends CGPipeline{
         v.setAll(
             (v.getX() - cam.getVRP().getX()) * jpProportions[0],
             (v.getY() - cam.getVRP().getY()) * jpProportions[1],
-            0
+            (v.getZ() - cam.getVRP().getZ()) //Z no SRT?
         );
     }
     
@@ -118,7 +121,7 @@ public class OrtPipeline extends CGPipeline{
         v.setAll(
             ((v.getY() - cam.getVRP().getY()) * jpProportions[0]),
             ((v.getZ() - cam.getVRP().getZ()) * jpProportions[1]),
-            (0)
+            ((v.getX() - cam.getVRP().getX())) //Z no SRT?
         );
     }
     
@@ -126,7 +129,7 @@ public class OrtPipeline extends CGPipeline{
         v.setAll(
             (v.getX() - cam.getVRP().getX()) * jpProportions[0],
             (v.getZ() - cam.getVRP().getZ()) * jpProportions[1],
-            0
+            (v.getY() - cam.getVRP().getY()) //Z no SRT?
         );            
     }
 //</editor-fold>
@@ -238,16 +241,16 @@ public class OrtPipeline extends CGPipeline{
         v.setAll(
             (v.getX() / jpProportions[0]) + cam.getVRP().getX(),
             (v.getY() / jpProportions[1]) + cam.getVRP().getY(),
-            0
+            v.getZ() + cam.getVRP().getZ() //Só conversão oposta do Z no SRT
         );
     }
     
     private void reverseLateralConversion(Vertice v){
         float copyY=v.getY(), copyX=v.getX();      
         v.setAll(
-            0,
-            (copyX / jpProportions[1]) + cam.getVRP().getY(),
-            (copyY / jpProportions[0]) + cam.getVRP().getZ()
+            v.getZ() + cam.getVRP().getX(),
+            (copyX / jpProportions[0]) + cam.getVRP().getY(),
+            (copyY / jpProportions[1]) + cam.getVRP().getZ()
         );        
     }
     
@@ -255,7 +258,7 @@ public class OrtPipeline extends CGPipeline{
         float copyY = v.getY();
         v.setAll(
             (v.getX() / jpProportions[0]) + cam.getVRP().getX(),
-            0,
+            v.getZ() + cam.getVRP().getY(),
             (copyY    / jpProportions[1]) + cam.getVRP().getZ()
         );
     }

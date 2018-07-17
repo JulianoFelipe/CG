@@ -149,4 +149,23 @@ public class Face extends CGObject{ //extends CGObject{
         
         return !(x < minX || x > maxX || y < minY || y > maxY); //Se menor que min ou maior que max, false
     }
+
+    @Override
+    public Vertice getCentroide() {
+        double avgX=0, avgY=0, avgZ=0;
+        
+        for (Vertice v : list){
+            avgX += v.getX();
+            avgY += v.getY();
+            avgZ += v.getZ();
+        }
+        
+        int count = list.size();
+        
+        return new Vertice(
+            (float) (avgX/count),
+            (float) (avgY/count),
+            (float) (avgZ/count)
+        );
+    }
 }

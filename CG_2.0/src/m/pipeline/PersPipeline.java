@@ -48,6 +48,9 @@ public class PersPipeline extends CGPipeline{
 
     @Override
     public void convert2D(CGObject obj) {
+        //Obsevação: Verificar se há problemas relacionados com as conversões "STD" do OrtPipeline, como descrito
+        //no comentário do método equivalente na outra classe
+        
         //MMath.printMatrix(object.getPoints());
         //float[][] retPoints = MMath.multiplicar(get3DPipelineMatrix(), object.getPoints());
         //retPoints = persMatrixSwitcheroo(retPoints); 

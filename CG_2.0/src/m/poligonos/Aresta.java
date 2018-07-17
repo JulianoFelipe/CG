@@ -346,4 +346,13 @@ public class Aresta extends CGObject{
         
         return !(x < minX || x > maxX || y < minY || y > maxY); //Se menor que min ou maior que max, false
     }
+
+    @Override
+    public Vertice getCentroide() {
+        return new Vertice(
+            (float) ( (vInicial.getX()+vFinal.getX()) /2),
+            (float) ( (vInicial.getY()+vFinal.getY()) /2),
+            (float) ( (vInicial.getZ()+vFinal.getZ()) /2)
+        );
+    }
 }

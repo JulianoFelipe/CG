@@ -66,9 +66,7 @@ public abstract class CGObject implements Serializable{
         return changedProperty;
     }
     
-    /*public void operate(Operator op){
-        
-    }*/
+    public abstract Vertice getCentroide();
     
     public long getID(){
         return ID;

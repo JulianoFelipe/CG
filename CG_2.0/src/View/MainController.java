@@ -64,6 +64,7 @@ import m.poligonos.Movimento;
 import m.poligonos.Vertice;
 import m.poligonos.we_edge.HE_Poliedro;
 import m.poligonos.we_edge.WE_Aresta;
+import m.transformacoes.Translacao;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
@@ -708,15 +709,18 @@ public class MainController implements Initializable {
 //</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Operações em cima dos Canvas">
+    private int mouseX, mouseY, count=0;
+    
     private void initializeCanvases(){
+        //<editor-fold defaultstate="collapsed" desc="Frente">
         frente.setOnMouseClicked((MouseEvent e) -> {
             Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
             System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.free){                    
+                if (current_pol == CriacaoPrevolucao.free){
                     getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(clicked);
                     mundo.addTempPoint(clicked);
-                    
+
                     //Nregular newreg = new Nregular(6, 66, clicked);
                     //////getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newreg);
                     //mundo.addObject(newreg);
@@ -725,10 +729,10 @@ public class MainController implements Initializable {
                 if (current_ferr == Ferramentas.Select){
                     for (CGObject obj : getVistaFromVisao(Visao.Frontal).get2Dobjects()){
                         /*if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
-                            selected_obj = obj;
-                            selectController.objectProperty().set(obj);
-                            paintStuff();
-                            return;
+                        selected_obj = obj;
+                        selectController.objectProperty().set(obj);
+                        paintStuff();
+                        return;
                         }*/
                         if (obj.contains(clicked.getX(), clicked.getY(), Eixo.Eixo_XY)){
                             selected_obj = obj;
@@ -737,44 +741,103 @@ public class MainController implements Initializable {
                             return;
                         }
                     }
-                    
+
                     selected_obj = null;
                     selectController.objectProperty().set(null);
                 }
             }
             paintStuff();
         });
+        frente.setOnMousePressed((MouseEvent event) -> { count=0;});
+        frente.setOnMouseDragged((MouseEvent event) -> {
+            int newMouseX = (int) event.getX(),
+                newMouseY = (int) event.getY();
+            
+            if (count == 0){
+                mouseX = newMouseX;
+                mouseY = newMouseY;
+                ++count;
+                return;
+            }
+
+            CGObject object = getVistaFromVisao(Visao.Frontal).getObject(selected_obj);
+
+            Translacao t = new Translacao(true);
+            t.transladar(-(mouseX-newMouseX), -(mouseY-newMouseY), 0, object);
+            getVistaFromVisao(Visao.Frontal).update(object);
+            
+            //problema: pega-se objeto com coords da visão, onde z=0 e seta elas no mundo, que propaga com z=0 para as outras, resultando em problemas
+            //Fix: copiar a coordenada não alterada em cada vista ao invés de zerá-la, já que ela não influenciará no desenho e será utilizada na ocultação
+            
+            mouseX = newMouseX;
+            mouseY = newMouseY;
+            paintStuff();
+            ++count;
+        });
+        //</editor-fold>
         
+        //<editor-fold defaultstate="collapsed" desc="Lateral">
         lateral.setOnMouseClicked((MouseEvent e) -> {
             Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
             System.out.println("Lateral Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.free){                   
+                if (current_pol == CriacaoPrevolucao.free){
                     getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(clicked);
                     mundo.addTempPoint(clicked);
                     
                     //Nregular newreg = new Nregular(6, 66, newPoint);
                     //getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newreg);
                     //mundo.addObject(newreg);
-                }  else if (CURRENT_SEL == FERRAMENTA_SEL){
+                }
+            } else if (CURRENT_SEL == FERRAMENTA_SEL){
                     if (current_ferr == Ferramentas.Select){
-                        for (CGObject obj : getVistaFromVisao(Visao.Frontal).get2Dobjects()){
-                            if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
+                        for (CGObject obj : getVistaFromVisao(Visao.Lateral).get2Dobjects()){
+                            /*if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
+                                selected_obj = obj;
+                                selectController.objectProperty().set(obj);
+                                paintStuff();
+                                return;
+                            }*/
+                            if (obj.contains(clicked.getX(), clicked.getY(), Eixo.Eixo_XY)){
                                 selected_obj = obj;
                                 selectController.objectProperty().set(obj);
                                 paintStuff();
                                 return;
                             }
                         }
-
+                        
                         selected_obj = null;
                         selectController.objectProperty().set(null);
                     }
-                }
             }
             paintStuff();
         });
+        lateral.setOnMousePressed((MouseEvent event) -> { count=0;});
+        lateral.setOnMouseDragged((MouseEvent event) -> {
+            int newMouseX = (int) event.getX(),
+                newMouseY = (int) event.getY();
+            
+            if (count == 0){
+                mouseX = newMouseX;
+                mouseY = newMouseY;
+                ++count;
+                return;
+            }
+
+            CGObject object = getVistaFromVisao(Visao.Lateral).getObject(selected_obj);
+
+            Translacao t = new Translacao(true);
+            t.transladar(-(mouseX-newMouseX), -(mouseY-newMouseY), 0, object);
+            getVistaFromVisao(Visao.Lateral).update(object);
+            
+            mouseX = newMouseX;
+            mouseY = newMouseY;
+            paintStuff();
+            ++count;
+        });
+        //</editor-fold>
         
+        //<editor-fold defaultstate="collapsed" desc="Topo">
         topo.setOnMouseClicked((MouseEvent e) -> {
             Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
             System.out.println("Topo Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
@@ -786,24 +849,54 @@ public class MainController implements Initializable {
                     //Nregular newreg = new Nregular(6, 66, newPointCP);
                     //getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newreg);
                     //mundo.addObject(newreg);
-                } else if (CURRENT_SEL == FERRAMENTA_SEL){
+                }
+            } else if (CURRENT_SEL == FERRAMENTA_SEL){
                     if (current_ferr == Ferramentas.Select){
-                        for (CGObject obj : getVistaFromVisao(Visao.Frontal).get2Dobjects()){
-                            if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
+                        for (CGObject obj : getVistaFromVisao(Visao.Topo).get2Dobjects()){
+                            /*if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
+                                selected_obj = obj;
+                                selectController.objectProperty().set(obj);
+                                paintStuff();
+                                return;
+                            }*/
+                            if (obj.contains(clicked.getX(), clicked.getY(), Eixo.Eixo_XY)){
                                 selected_obj = obj;
                                 selectController.objectProperty().set(obj);
                                 paintStuff();
                                 return;
                             }
                         }
-
+                        
                         selected_obj = null;
                         selectController.objectProperty().set(null);
                     }
-                }
             }
             paintStuff();
         });
+        topo.setOnMousePressed((MouseEvent event) -> { count=0;});
+        topo.setOnMouseDragged((MouseEvent event) -> {
+            int newMouseX = (int) event.getX(),
+                newMouseY = (int) event.getY();
+            
+            if (count == 0){
+                mouseX = newMouseX;
+                mouseY = newMouseY;
+                ++count;
+                return;
+            }
+
+            CGObject object = getVistaFromVisao(Visao.Topo).getObject(selected_obj);
+
+            Translacao t = new Translacao(true);
+            t.transladar(-(mouseX-newMouseX), -(mouseY-newMouseY), 0, object);
+            getVistaFromVisao(Visao.Topo).update(object);
+            
+            mouseX = newMouseX;
+            mouseY = newMouseY;
+            paintStuff();
+            ++count;
+        });
+        //</editor-fold>
     }
         
     private Canvas getCanvasFromView(Vista vista){

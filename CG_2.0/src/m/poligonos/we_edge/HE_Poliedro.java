@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
 import m.Camera;
 import m.Eixo;
 import m.poligonos.CGObject;
@@ -246,7 +244,7 @@ public class HE_Poliedro extends CGObject {
     
     @Override
     public String toString() {
-        return "WE_Poliedro: ID=" + ID + "; Points=" + listaDeVertices.size() + "; Faces=" + listaDeFaces.size() + ".";
+        return "HE_Poliedro: ID=" + ID + "; Points=" + listaDeVertices.size() + "; Faces=" + listaDeFaces.size() + ".";
     }
     
     public void updateVisibility(Camera cam) {
@@ -291,6 +289,31 @@ public class HE_Poliedro extends CGObject {
                 }
                 
                 lista.add(arestas_face);
+                //System.out.println("\n\n");
+            }
+        }
+
+        return lista;
+    }
+    
+    private List<List<Vertice>> getVisiblePoints() {
+        List<List<Vertice>> lista = new ArrayList();
+
+        for (int i = 0; i < listaDeFaces.size(); i++) {
+            if (visibilidade_faces[i] == true) {
+                List<Vertice> vertices_face = new ArrayList();
+                WE_Face face = listaDeFaces.get(i);
+                WE_Aresta ini = face.getArestaDaFace();
+                vertices_face.add(ini.getvInicial());
+                //System.out.println("Aresta add: " + ini);
+                WE_Aresta local=ini.getEsquerdaSucessora();
+                while (local != ini){
+                    vertices_face.add(local.getvInicial());
+                    //System.out.println("Aresta add: " + local);
+                    local = local.getEsquerdaSucessora();
+                }
+                
+                lista.add(vertices_face);
                 //System.out.println("\n\n");
             }
         }
@@ -350,7 +373,37 @@ public class HE_Poliedro extends CGObject {
         //https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
         
         if (!insideBoundingBox(min_x, min_y, axis)) return false;
+
+        // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+        boolean inside = false;
         
+        List<List<Vertice>> lista = getVisiblePoints();
+        
+        for (List<Vertice> face : lista){
+            inside = false;
+            for (int i=0, j=face.size()-1 ; i<face.size() ; j=i++){
+                Vertice ith = face.get(i);
+                Vertice jth = face.get(j);
+
+                if ( (ith.getY()>y) != (jth.getY()>y) && x < (jth.getX()-ith.getX()) * (y-ith.getY()) / (jth.getY()-ith.getY()) + ith.getX() ) {
+                    inside = !inside;
+                }
+            }
+
+            if (inside) return inside;
+        }
+        
+        
+
+        return inside;
+    }
+    
+    /*@Override //NÃO CONSIDERA DIFERENÇA NENHUMA EM FACES. TODOS OS PONTOS TERIAM UMA FACE SÓ
+    public boolean contains(float x, float y, Eixo axis) {
+        //https://stackoverflow.com/questions/217578/how-can-i-determine-whether-a-2d-point-is-within-a-polygon
+        
+        if (!insideBoundingBox(min_x, min_y, axis)) return false;
+
         // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
         boolean inside = false;
         for (int i=0, j=getNumberOfPoints()-1 ; i<getNumberOfPoints() ; j=i++){
@@ -363,7 +416,7 @@ public class HE_Poliedro extends CGObject {
         }
 
         return inside;
-    }
+    }*/
 
     @Override
     public boolean insideBoundingBox(float x, float y, Eixo axis) {
@@ -437,14 +490,14 @@ public class HE_Poliedro extends CGObject {
         faces.add(new IndexList(face4));
 
         Vertice ViewUp = new Vertice(0, 1, 0);
-        Vertice VRP = new Vertice(50, 15, 30);
-        Vertice P = new Vertice(20, 6, 15);
-        Camera cam = new Camera(ViewUp, VRP, P);
-        HE_Poliedro p = new HE_Poliedro(pol_mat, faces);
+        Vertice VRP    = new Vertice(50, 15, 30);
+        Vertice P      = new Vertice(20, 6, 15);
+        Camera cam     = new Camera(ViewUp, VRP, P);
+        HE_Poliedro p  = new HE_Poliedro(pol_mat, faces);
 
         p.updateVisibility(cam);
         //System.out.println(p.getVisibleFaces());
-        //System.out.println(Arrays.toString(p.visibilidade_faces));
+        System.out.println(Arrays.toString(p.visibilidade_faces));
         
         /*System.out.println("Ponto 0: " + p.get(0));
         System.out.println("FACES: " + p.getVisibleFaces().get(0));
@@ -454,6 +507,25 @@ public class HE_Poliedro extends CGObject {
         System.out.println("New   0: " + p.listaDeArestas.get(0));
         System.out.println("FACES: " + new_p.getVisibleFaces().get(0));
         System.out.println("FACES: " + p.getVisibleFaces().get(0));*/
+    }
+
+    @Override
+    public Vertice getCentroide() {
+        double avgX=0, avgY=0, avgZ=0;
+        
+        for (Vertice v : listaDeVertices){
+            avgX += v.getX();
+            avgY += v.getY();
+            avgZ += v.getZ();
+        }
+        
+        int count = listaDeVertices.size();
+        
+        return new Vertice(
+            (float) (avgX/count),
+            (float) (avgY/count),
+            (float) (avgZ/count)
+        );
     }
     
 }

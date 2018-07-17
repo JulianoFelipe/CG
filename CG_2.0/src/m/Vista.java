@@ -76,10 +76,10 @@ public class Vista implements Observer{
         });
     }
     
-    public void setObject(int index, CGObject obj){
+    public void setObject(int index, CGObject obj){ 
         objetos.get(index).updateInternals(obj);
         pipe.convert2D(objetos.get(index));
-        
+
         Camera cam = pipe.getCamera();
         if (obj instanceof HE_Poliedro){
             ((HE_Poliedro) objetos.get(index)).updateVisibility(cam);
@@ -151,5 +151,20 @@ public class Vista implements Observer{
                 return;
             }
         }
+    }
+    
+    public CGObject getObject(CGObject obj){
+        int index = objetos.indexOf(obj);
+        if (index != -1) return objetos.get(index);
+        else return null;
+    }
+    
+    public void update(CGObject obj){
+        int index = objetos.indexOf(obj);
+        if (index == -1) return;
+        
+        pipe.reverseConversion(obj);
+
+        mundo.update(obj, this);
     }
 }
