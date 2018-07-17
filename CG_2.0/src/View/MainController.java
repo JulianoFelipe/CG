@@ -18,18 +18,19 @@ import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -40,8 +41,6 @@ import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
@@ -51,27 +50,20 @@ import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import m.CGViewport;
 import m.Camera;
-import m.Eixo;
 import m.Visao;
 import m.Vista;
 import m.World;
-import m.pipeline.CGPipeline;
-import m.poligonos.Aresta;
-import m.poligonos.ArestaEixo;
 import m.poligonos.CGObject;
-import m.poligonos.Movimento;
 import m.poligonos.Vertice;
-import m.poligonos.we_edge.HE_Poliedro;
-import m.poligonos.we_edge.WE_Aresta;
-import m.transformacoes.Translacao;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
+import utils.config.StandardConfigWinView;
 import utils.ioScene.InputScene;
 import utils.ioScene.OutputScene;
 import utils.math.PMath;
-import utils.math.VMath;
 
 /**
  *
@@ -95,10 +87,10 @@ public class MainController implements Initializable {
     @FXML private TreeView<String> tools;
     @FXML private AnchorPane options;
     
-    @FXML private Canvas frente;
-    @FXML private Canvas topo;
-    @FXML private Canvas lateral;
-    @FXML private Canvas perspectiva;
+    @FXML private StackPane frentePane;
+    @FXML private StackPane topoPane;
+    @FXML private StackPane lateralPane;
+    @FXML private StackPane perspectivaPane;
     
     @FXML private MenuItem frenteCamParams;
     @FXML private MenuItem frenteCamAuto;
@@ -115,21 +107,60 @@ public class MainController implements Initializable {
     @FXML private Label persZoom;
     
     private World mundo;
-    private CGObject selected_obj = null;
+    private CGObject selectedObject = null;
+    
+    private CGCanvas frente;
+    private CGCanvas topo;
+    private CGCanvas lateral;
+    private CGCanvas perspectiva;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mundo = World.getInstance();
-                
+           
+        CGViewport viw = StandardConfigWinView.STD_VIEWPORT;
+        int height = (int) viw.getDeltaV();
+        int width  = (int) viw.getDeltaU();
+        
+        for (Vista v : mundo.getVistas()){
+            switch (v.getVisao()) {
+                case Frontal: frente  = new CGCanvas(this, v, width, height); break;
+                case Lateral: lateral = new CGCanvas(this, v, width, height); break;
+                case Topo:    topo    = new CGCanvas(this, v, width, height); break;
+                case Perspectiva: perspectiva = new CGCanvas(this, v, width, height); break;
+                default: throw new IllegalArgumentException("Visão não possui canvas equivalente adicionado.");
+            }
+        }
+
+        frentePane     .getChildren().add(frente);
+        lateralPane    .getChildren().add(lateral);
+        topoPane       .getChildren().add(topo);
+        perspectivaPane.getChildren().add(perspectiva);
+        
+        frente .zoomProperty().bindBidirectional(frenteZoom.textProperty());
+        lateral.zoomProperty().bindBidirectional(lateralZoom.textProperty());
+        topo   .zoomProperty().bindBidirectional(topoZoom.textProperty());
+        perspectiva.zoomProperty().bindBidirectional(frenteZoom.textProperty());
+        
+        frente.selectedObjectProperty().addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
+            selectedObject = newValue;
+        });
+        lateral.selectedObjectProperty().addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
+            selectedObject = newValue;
+        });
+        topo.selectedObjectProperty().addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
+            selectedObject = newValue;
+        });
+        perspectiva.selectedObjectProperty().addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
+            selectedObject = newValue;
+        });
+        
         initializeTools(); //Listeners para a barra esquerda de ferramentas
         initializeMenuBar(); //Listeners para a barra de menu superior
         initializeViewToolbars(); //Listeners para as 4 barras de ferramentas das views
         initializeResizeAndCanvasHUD(); //Coloca Grids e listeners de resize
-        initializeCanvases(); //Listeners para clicks nos canvas (Exceto perspectiva)
         
-        //checkConfig();
-
-        paintStuff();
+        paint();
     }
     
     //<editor-fold defaultstate="collapsed" desc="Alterações nos grids">
@@ -178,7 +209,7 @@ public class MainController implements Initializable {
         
         ////Atualização de pintura
         ChangeListener<Number> canvasSizeListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            paintStuff();
+            paint();
         };
         
         frente.widthProperty() .addListener(canvasSizeListener);
@@ -250,7 +281,7 @@ public class MainController implements Initializable {
             } else {
                 mundo.removeAxis();
             }
-            paintStuff();
+            paint();
         });
         
         factors.setOnAction((ActionEvent event) -> {
@@ -333,10 +364,8 @@ public class MainController implements Initializable {
                     objectsList.forEach((obj) -> {
                         mundo.addObject(obj);
                     });
-                    paintStuff();
-                } catch (IOException ex) {
-                    Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (ClassNotFoundException ex) {
+                    paint();
+                } catch (IOException | ClassNotFoundException ex) {
                     Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
@@ -344,27 +373,23 @@ public class MainController implements Initializable {
         
         limparCena.setOnAction((ActionEvent event) -> {
             mundo.clearAll();
-            selected_obj = null;
+            selectedObject = null;
             if (selectController != null) selectController.objectProperty().set(null);
-            paintStuff();
+            paint();
             
         });
     }
     
     private void initializeViewToolbars(){
         //<editor-fold defaultstate="collapsed" desc="Frente">
-        float zoom = getVistaFromVisao(Visao.Frontal).getPipe().getProportions();
-        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", zoom));
         frenteCamParams.setOnAction((ActionEvent event) -> {
-            System.out.println(getVistaFromVisao(Visao.Frontal).getPipelineCamera());
             ManualCamController controller = new ManualCamController(
-                getVistaFromVisao(Visao.Frontal).getPipelineCamera(), Visao.Frontal
+                frente.getVista().getPipelineCamera(), Visao.Frontal
             );
 
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
-                //System.out.println("CAM MUDOU. PROPAGANDO.");
-                getVistaFromVisao(Visao.Frontal).getPipelineCamera().set(newValue);
-                paintStuff();
+                frente.getVista().getPipelineCamera().set(newValue);
+                paint();
             });
 
             final Stage dialog = getManualCamWindow(controller);
@@ -372,69 +397,22 @@ public class MainController implements Initializable {
             dialog.show();
         });
         frenteCamAuto.setOnAction((ActionEvent event) -> {
-            frente.getParent().getParent().setStyle("-fx-border-color: blue");
-            frente.setFocusTraversable(true);
-            frente.addEventFilter(MouseEvent.ANY, (e) -> frente.requestFocus());
-            frente.setOnKeyPressed((KeyEvent event1) -> {
-
-                KeyCode pressed = event1.getCode();
-                CGPipeline pipe = getVistaFromVisao(Visao.Frontal).getPipe();
-                Vertice vrp    = pipe.getCamera().getVRP();
-                Vertice p      = pipe.getCamera().getP();
-                Vertice viewUp = pipe.getCamera().getViewUp();
-                boolean changeCam = false;
-                switch (pressed){
-                    case Z:
-                        pipe.zoom(+Fatores.fator_zoom);
-                        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", pipe.getProportions()));
-                        break;
-                    case C:
-                        pipe.zoom(-Fatores.fator_zoom);
-                        frenteZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", pipe.getProportions()));
-                        break;
-                    case W:
-                        vrp.setY(vrp.getY() + Fatores.fator_movimento_ort);
-                          p.setY(  p.getY() + Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case A:
-                        vrp.setX(vrp.getX() + Fatores.fator_movimento_ort);
-                          p.setX(  p.getX() + Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case S:
-                        vrp.setY(vrp.getY() - Fatores.fator_movimento_ort);
-                          p.setY(  p.getY() - Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case D:
-                        vrp.setX(vrp.getX() - Fatores.fator_movimento_ort);
-                          p.setX(  p.getX() - Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case ESCAPE:
-                        frente.setOnKeyPressed(null);
-                        frente.getParent().getParent().setStyle("-fx-border-color: black");
-                        return;
-                }
-                if(changeCam)
-                    pipe.getCamera().set(new Camera(viewUp, vrp, p));
-                paintStuff();
-            });
+            frente.autoChangeActiveProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+                frenteGrid.showHotkeys(newValue);
+            }); 
+            frente.setAutoCam();
         });
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Lateral">
-        zoom = getVistaFromVisao(Visao.Lateral).getPipe().getProportions();
-        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", zoom));
         lateralCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
-                    getVistaFromVisao(Visao.Lateral).getPipelineCamera(), Visao.Lateral
+                    lateral.getVista().getPipelineCamera(), Visao.Lateral
             );
 
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
-                getVistaFromVisao(Visao.Lateral).getPipelineCamera().set(newValue);
-                paintStuff();
+                lateral.getVista().getPipelineCamera().set(newValue);
+                paint();
             });
 
             final Stage dialog = getManualCamWindow(controller);
@@ -442,69 +420,19 @@ public class MainController implements Initializable {
             dialog.show();
         });
         lateralCamAuto.setOnAction((ActionEvent event) -> {
-            lateral.getParent().getParent().setStyle("-fx-border-color: blue");
-            lateral.setFocusTraversable(true);
-            lateral.addEventFilter(MouseEvent.ANY, (e) -> lateral.requestFocus());
-            lateral.setOnKeyPressed((KeyEvent event1) -> {
-
-                KeyCode pressed = event1.getCode();
-                CGPipeline lateralPipe = getVistaFromVisao(Visao.Lateral).getPipe();
-                Vertice vrp    = lateralPipe.getCamera().getVRP();
-                Vertice p      = lateralPipe.getCamera().getP();
-                Vertice viewUp = lateralPipe.getCamera().getViewUp();
-                boolean changeCam = false;
-                switch (pressed){
-                    case Z:
-                        lateralPipe.zoom(+Fatores.fator_zoom);
-                        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", lateralPipe.getProportions()));
-                        break;
-                    case C:
-                        lateralPipe.zoom(-Fatores.fator_zoom);
-                        lateralZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", lateralPipe.getProportions()));
-                        break;
-                    case W:
-                        vrp.setZ(vrp.getZ() + Fatores.fator_movimento_ort);
-                          p.setZ(  p.getZ() + Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case A:
-                        vrp.setY(vrp.getY() + Fatores.fator_movimento_ort);
-                          p.setY(  p.getY() + Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case S:
-                        vrp.setZ(vrp.getZ() - Fatores.fator_movimento_ort);
-                          p.setZ(  p.getZ() - Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case D:
-                        vrp.setY(vrp.getY() - Fatores.fator_movimento_ort);
-                          p.setY(  p.getY() - Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case ESCAPE:
-                        lateral.setOnKeyPressed(null);
-                        lateral.getParent().getParent().setStyle("-fx-border-color: black");
-                        return;
-                }
-                if(changeCam)
-                    lateralPipe.getCamera().set(new Camera(viewUp, vrp, p));
-                paintStuff();
-            });
+            //asdf
         });
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Topo">
-        zoom = getVistaFromVisao(Visao.Topo).getPipe().getProportions();
-        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", zoom));
         topoCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
-                    getVistaFromVisao(Visao.Topo).getPipelineCamera(), Visao.Topo
+                    topo.getVista().getPipelineCamera(), Visao.Topo
             );
 
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
-                getVistaFromVisao(Visao.Topo).getPipelineCamera().set(newValue);
-                paintStuff();
+                topo.getVista().getPipelineCamera().set(newValue);
+                paint();
             });
 
             final Stage dialog = getManualCamWindow(controller);
@@ -512,69 +440,19 @@ public class MainController implements Initializable {
             dialog.show();
         });
         topoCamAuto.setOnAction((ActionEvent event) -> {
-            topo.getParent().getParent().setStyle("-fx-border-color: blue");
-            topo.setFocusTraversable(true);
-            topo.addEventFilter(MouseEvent.ANY, (e) -> topo.requestFocus());
-            topo.setOnKeyPressed((KeyEvent event1) -> {
-
-                KeyCode pressed = event1.getCode();
-                CGPipeline topPipe = getVistaFromVisao(Visao.Topo).getPipe();
-                Vertice vrp    = topPipe.getCamera().getVRP();
-                Vertice p      = topPipe.getCamera().getP();
-                Vertice viewUp = topPipe.getCamera().getViewUp();
-                boolean changeCam = false;
-                switch (pressed){
-                    case Z:
-                        topPipe.zoom(+Fatores.fator_zoom);
-                        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", topPipe.getProportions()));
-                        break;
-                    case C:
-                        topPipe.zoom(-Fatores.fator_zoom);
-                        topoZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", topPipe.getProportions()));
-                        break;
-                    case W:
-                        vrp.setZ(vrp.getZ() + Fatores.fator_movimento_ort);
-                          p.setZ(  p.getZ() + Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case A:
-                        vrp.setX(vrp.getX() + Fatores.fator_movimento_ort);
-                          p.setX(  p.getX() + Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case S:
-                        vrp.setZ(vrp.getZ() - Fatores.fator_movimento_ort);
-                          p.setZ(  p.getZ() - Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case D:
-                        vrp.setX(vrp.getX() - Fatores.fator_movimento_ort);
-                          p.setX(  p.getX() - Fatores.fator_movimento_ort);
-                        changeCam = true;
-                        break;
-                    case ESCAPE:
-                        topo.setOnKeyPressed(null);
-                        topo.getParent().getParent().setStyle("-fx-border-color: black");
-                        return;
-                }
-                if(changeCam)
-                    topPipe.getCamera().set(new Camera(viewUp, vrp, p));
-                paintStuff();
-            });
+            
         });
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Perspectiva">
-        zoom = getVistaFromVisao(Visao.Perspectiva).getPipe().getProportions();
-        persZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", zoom));
         persCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
-                getVistaFromVisao(Visao.Perspectiva).getPipelineCamera(), Visao.Perspectiva
+                perspectiva.getVista().getPipelineCamera(), Visao.Perspectiva
             );
             
             controller.camProperty().addListener((ObservableValue<? extends Camera> observable, Camera oldValue, Camera newValue) -> {
-                getVistaFromVisao(Visao.Perspectiva).getPipelineCamera().set(newValue);
-                paintStuff();
+                perspectiva.getVista().getPipelineCamera().set(newValue);
+                paint();
             });
                     
             final Stage dialog = getManualCamWindow(controller);
@@ -583,108 +461,10 @@ public class MainController implements Initializable {
         });
         
         persCamAuto.setOnAction((ActionEvent event) -> {
-            perspectiva.getParent().getParent().setStyle("-fx-border-color: blue");
-            perspectiva.setFocusTraversable(true);
-            perspectiva.addEventFilter(MouseEvent.ANY, (e) -> perspectiva.requestFocus());
-            perspectiva.setOnKeyPressed((KeyEvent event1) -> {
-
-                KeyCode pressed = event1.getCode();
-                CGPipeline persPipe = getVistaFromVisao(Visao.Perspectiva).getPipe();
-                Vertice vrp = persPipe.getCamera().getVRP();
-                boolean changeCam = false;
-                switch (pressed){
-                    case Z:
-                        persPipe.zoom(+Fatores.fator_zoom);
-                        persZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", persPipe.getProportions()));
-                        break;
-                    case C:
-                        persPipe.zoom(-Fatores.fator_zoom);
-                        persZoom.setText("x "+String.format(java.util.Locale.US,"%.2f", persPipe.getProportions()));
-                        break;
-                    case Q:
-                        vrp.setX(vrp.getX() - Fatores.fator_movimento_pers);
-                        changeCam = true;
-                        break;
-                    case E:
-                        vrp.setX(vrp.getX() + Fatores.fator_movimento_pers);
-                        changeCam = true;
-                        break;
-                    case W:
-                        vrp.setY(vrp.getY() - Fatores.fator_movimento_pers);
-                        changeCam = true;
-                        break;
-                    case A:
-                        vrp.setZ(vrp.getZ() - Fatores.fator_movimento_pers);
-                        changeCam = true;
-                        break;
-                    case S:
-                        vrp.setY(vrp.getY() + Fatores.fator_movimento_pers);
-                        changeCam = true;
-                        break;
-                    case D:
-                        vrp.setZ(vrp.getZ() + Fatores.fator_movimento_pers);
-                        changeCam = true;
-                        break;
-                    case ESCAPE:
-                        perspectiva.setOnKeyPressed(null);
-                        perspectiva.setOnMouseDragged(null);
-                        previousX = previousY = -1;
-                        perspectiva.getParent().getParent().setStyle("-fx-border-color: black");
-                        return;
-                }
-                if(changeCam)
-                    persPipe.getCamera().setVRP(vrp);
-                paintStuff();
-            });
-            perspectiva.setOnMouseDragged((MouseEvent event1) -> {
-                int currentX = (int) event1.getX(),
-                    currentY = (int) event1.getY();
-                
-                if (previousX == -1){
-                    previousX = currentX;
-                    previousY = currentY;
-                    return;
-                }
-
-                Vertice primeiro = new Vertice(previousX, previousY),
-                        segundo  = new Vertice (currentX, currentY);
-                
-                Movimento vert = VMath.movimentoVertical(primeiro, segundo);
-                Movimento hori = VMath.movimentoHorizontal(primeiro, segundo);
-                
-                Vista pers = getVistaFromVisao(Visao.Perspectiva);
-                Vertice p = pers.getPipelineCamera().getP();
-                float dp = pers.getPipe().getDP();
-                
-                if (vert == Movimento.Cima){
-                    p.setY(p.getY() + (float)0.01);
-                    //p.setZ(p.getZ() + (float)0.1);
-                } else if (vert == Movimento.Baixo){
-                    p.setY(p.getY() - (float)0.01);
-                    //p.setZ(p.getZ() - (float)0.1);
-                }
-                
-                if (hori == Movimento.Esquerda){
-                    p.setX(p.getX() + (float)0.01);
-                    //p.setZ(p.getZ() + (float)0.1);
-                } else if (hori == Movimento.Direita){
-                    p.setX(p.getX() - (float)0.01);
-                    //p.setZ(p.getZ() - (float)0.1);
-                }
-                
-                //double newZ = Math.sqrt((dp*dp)-(p.getY()*p.getY())-(p.getX()*p.getX()));
-                //p.setZ((float) newZ);
-                
-                pers.getPipelineCamera().setP(p);
-                paintStuff();
-                
-                previousX = currentX;
-                previousY = currentY;
-            });
+            
         });
         //</editor-fold>
     }
-    private int previousX=-1, previousY=-1;
     
     private Stage getManualCamWindow(ManualCamController controller){
         Pane pane = null;
@@ -707,340 +487,17 @@ public class MainController implements Initializable {
         return dialog;
     }
 //</editor-fold>
-    
-    //<editor-fold defaultstate="collapsed" desc="Operações em cima dos Canvas">
-    private int mouseX, mouseY, count=0;
-    
-    private void initializeCanvases(){
-        //<editor-fold defaultstate="collapsed" desc="Frente">
-        frente.setOnMouseClicked((MouseEvent e) -> {
-            Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
-            System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
-            if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.free){
-                    getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(clicked);
-                    mundo.addTempPoint(clicked);
-
-                    //Nregular newreg = new Nregular(6, 66, clicked);
-                    //////getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newreg);
-                    //mundo.addObject(newreg);
-                }
-            } else if (CURRENT_SEL == FERRAMENTA_SEL){
-                if (current_ferr == Ferramentas.Select){
-                    for (CGObject obj : getVistaFromVisao(Visao.Frontal).get2Dobjects()){
-                        /*if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
-                        selected_obj = obj;
-                        selectController.objectProperty().set(obj);
-                        paintStuff();
-                        return;
-                        }*/
-                        if (obj.contains(clicked.getX(), clicked.getY(), Eixo.Eixo_XY)){
-                            selected_obj = obj;
-                            selectController.objectProperty().set(obj);
-                            paintStuff();
-                            return;
-                        }
-                    }
-
-                    selected_obj = null;
-                    selectController.objectProperty().set(null);
-                }
-            }
-            paintStuff();
-        });
-        frente.setOnMousePressed((MouseEvent event) -> { count=0;});
-        frente.setOnMouseDragged((MouseEvent event) -> {
-            int newMouseX = (int) event.getX(),
-                newMouseY = (int) event.getY();
-            
-            if (count == 0){
-                mouseX = newMouseX;
-                mouseY = newMouseY;
-                ++count;
-                return;
-            }
-
-            CGObject object = getVistaFromVisao(Visao.Frontal).getObject(selected_obj);
-
-            Translacao t = new Translacao(true);
-            t.transladar(-(mouseX-newMouseX), -(mouseY-newMouseY), 0, object);
-            getVistaFromVisao(Visao.Frontal).update(object);
-            
-            //problema: pega-se objeto com coords da visão, onde z=0 e seta elas no mundo, que propaga com z=0 para as outras, resultando em problemas
-            //Fix: copiar a coordenada não alterada em cada vista ao invés de zerá-la, já que ela não influenciará no desenho e será utilizada na ocultação
-            
-            mouseX = newMouseX;
-            mouseY = newMouseY;
-            paintStuff();
-            ++count;
-        });
-        //</editor-fold>
-        
-        //<editor-fold defaultstate="collapsed" desc="Lateral">
-        lateral.setOnMouseClicked((MouseEvent e) -> {
-            Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
-            System.out.println("Lateral Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
-            if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.free){
-                    getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(clicked);
-                    mundo.addTempPoint(clicked);
-                    
-                    //Nregular newreg = new Nregular(6, 66, newPoint);
-                    //getVistaFromVisao(Visao.Lateral).getPipe().reverseConversion(newreg);
-                    //mundo.addObject(newreg);
-                }
-            } else if (CURRENT_SEL == FERRAMENTA_SEL){
-                    if (current_ferr == Ferramentas.Select){
-                        for (CGObject obj : getVistaFromVisao(Visao.Lateral).get2Dobjects()){
-                            /*if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
-                                selected_obj = obj;
-                                selectController.objectProperty().set(obj);
-                                paintStuff();
-                                return;
-                            }*/
-                            if (obj.contains(clicked.getX(), clicked.getY(), Eixo.Eixo_XY)){
-                                selected_obj = obj;
-                                selectController.objectProperty().set(obj);
-                                paintStuff();
-                                return;
-                            }
-                        }
-                        
-                        selected_obj = null;
-                        selectController.objectProperty().set(null);
-                    }
-            }
-            paintStuff();
-        });
-        lateral.setOnMousePressed((MouseEvent event) -> { count=0;});
-        lateral.setOnMouseDragged((MouseEvent event) -> {
-            int newMouseX = (int) event.getX(),
-                newMouseY = (int) event.getY();
-            
-            if (count == 0){
-                mouseX = newMouseX;
-                mouseY = newMouseY;
-                ++count;
-                return;
-            }
-
-            CGObject object = getVistaFromVisao(Visao.Lateral).getObject(selected_obj);
-
-            Translacao t = new Translacao(true);
-            t.transladar(-(mouseX-newMouseX), -(mouseY-newMouseY), 0, object);
-            getVistaFromVisao(Visao.Lateral).update(object);
-            
-            mouseX = newMouseX;
-            mouseY = newMouseY;
-            paintStuff();
-            ++count;
-        });
-        //</editor-fold>
-        
-        //<editor-fold defaultstate="collapsed" desc="Topo">
-        topo.setOnMouseClicked((MouseEvent e) -> {
-            Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
-            System.out.println("Topo Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
-            if (CURRENT_SEL == REVOLUCAO_SEL){
-                if (current_pol == CriacaoPrevolucao.free){
-                    getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(clicked);
-                    mundo.addTempPoint(clicked);
-                    
-                    //Nregular newreg = new Nregular(6, 66, newPointCP);
-                    //getVistaFromVisao(Visao.Topo).getPipe().reverseConversion(newreg);
-                    //mundo.addObject(newreg);
-                }
-            } else if (CURRENT_SEL == FERRAMENTA_SEL){
-                    if (current_ferr == Ferramentas.Select){
-                        for (CGObject obj : getVistaFromVisao(Visao.Topo).get2Dobjects()){
-                            /*if (PMath.proximoDeQualquerVerticeDoPoligono(obj, clicked)){
-                                selected_obj = obj;
-                                selectController.objectProperty().set(obj);
-                                paintStuff();
-                                return;
-                            }*/
-                            if (obj.contains(clicked.getX(), clicked.getY(), Eixo.Eixo_XY)){
-                                selected_obj = obj;
-                                selectController.objectProperty().set(obj);
-                                paintStuff();
-                                return;
-                            }
-                        }
-                        
-                        selected_obj = null;
-                        selectController.objectProperty().set(null);
-                    }
-            }
-            paintStuff();
-        });
-        topo.setOnMousePressed((MouseEvent event) -> { count=0;});
-        topo.setOnMouseDragged((MouseEvent event) -> {
-            int newMouseX = (int) event.getX(),
-                newMouseY = (int) event.getY();
-            
-            if (count == 0){
-                mouseX = newMouseX;
-                mouseY = newMouseY;
-                ++count;
-                return;
-            }
-
-            CGObject object = getVistaFromVisao(Visao.Topo).getObject(selected_obj);
-
-            Translacao t = new Translacao(true);
-            t.transladar(-(mouseX-newMouseX), -(mouseY-newMouseY), 0, object);
-            getVistaFromVisao(Visao.Topo).update(object);
-            
-            mouseX = newMouseX;
-            mouseY = newMouseY;
-            paintStuff();
-            ++count;
-        });
-        //</editor-fold>
-    }
-        
-    private Canvas getCanvasFromView(Vista vista){
-        switch (vista.getVisao()){
-            case Frontal:
-                return frente;
-            case Lateral:
-                return lateral;
-            case Topo:
-                return topo;
-            case Perspectiva:
-                return perspectiva;
-            default:
-                throw new IllegalArgumentException("Visão não prevista.");
-                    
-        }
-    }
-//</editor-fold>
-    
-    //<editor-fold defaultstate="collapsed" desc="Funções de pintura">
-    private void paintStuff(){
-        clearCanvases();
-        
-        mundo.getVistas().forEach((vista) -> {
-            GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
-            graphs.setFill(Color.BLACK);
-            graphs.setStroke(Color.BLACK);
-            graphs.setLineWidth(1);
-            
-            List<CGObject> objs = vista.get2Dobjects();
-            objs.forEach((obj) -> {
-                paintObject(graphs, obj);
-            });
-        });
-        
-        mundo.getVistas().forEach((vista) -> {
-            GraphicsContext graphs = getCanvasFromView(vista).getGraphicsContext2D();
-            graphs.setFill(Color.BLACK);
-            graphs.setStroke(Color.BLACK);
-            graphs.setLineWidth(1);
-            List<Vertice> vertices = vista.getTempPoints();
-            if (!(vertices.isEmpty())) {
-                int radius=5;
-                graphs.beginPath();
-                Vertice point1 = vertices.get(0);
-                graphs.fillOval(point1.getX(), point1.getY(), 5, 5);
-                
-                Vertice point2 = null;
-                for (int i=1; i<vertices.size(); i++){
-                    point2 = vertices.get(i);
-                    graphs.fillOval(point2.getX()-(radius/2), point2.getY()-(radius/2), radius, radius);
-                    graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
-                    point1 = point2;
-                }
-                //graphs.strokeLine(point1.getX(), point1.getY(), vertices.get(0).getX(), vertices.get(0).getY());
-                graphs.closePath();
-            }
-        });
-    }
-    
-    /**
-     * Seleciona qual função de pintura específica chamar
-     * @param graphics
-     * @param obj 
-     */
-    private void paintObject(GraphicsContext graphs, CGObject obj){
-        if (selected_obj!=null && obj.getID()==(selected_obj.getID())){
-            graphs.setStroke(Color.RED);
-        } else {
-            graphs.setStroke(Color.BLACK);
-        }
-        
-        if (obj instanceof HE_Poliedro){
-            List<List<WE_Aresta>> faces = ((HE_Poliedro) obj).getVisibleFaces();
-            faces.forEach((face) -> {
-                paintArestasConectadas(graphs, face);
-            });
-        } else if (obj instanceof ArestaEixo){
-            ArestaEixo objA = (ArestaEixo) obj;
-            graphs.setStroke(objA.getAxisColor());
-            paintConectedPointList(graphs, obj.getPoints(), 0);
-        } else {
-            paintConectedPointList(graphs, obj.getPoints(), 0);
-        }
-    }
-    
-    private void paintArestasConectadas(GraphicsContext graphs, List<? extends Aresta> lista){
-        graphs.beginPath();
-             
-        lista.forEach((aresta) -> {
-            Vertice ini = aresta.getvInicial();
-            Vertice fin = aresta.getvFinal();
-            graphs.strokeLine(ini.getX(), ini.getY(), fin.getX(), fin.getY());
-        });
-        
-        graphs.closePath();
-    }
-    
-    /**
-     * Pinta os pontos como contínuos
-     * @param graphs
-     * @param lista 
-     */
-    private void paintConectedPointList(GraphicsContext graphs, List<? extends Vertice> lista, int pointRadius){
-        graphs.beginPath();
-                
-        Vertice point1 = lista.get(0);
-        //System.out.println("Vista: " + vista.getVisao() + ". Point: " + point1);
-        Vertice point2 = null;
-        for (int i=1; i<lista.size(); i++){
-            point2 = lista.get(i);
-            graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
-            
-            if (pointRadius > 0){
-                graphs.fillOval(point1.getX()-(pointRadius/2), point1.getY()-(pointRadius/2), pointRadius, pointRadius);
-            }
-            
-            point1 = point2;
-        }
-        graphs.strokeLine(point1.getX(), point1.getY(), lista.get(0).getX(),lista.get(0).getY());
-        
-        
-        
-        graphs.closePath();
-    }
-    
-    private void clearCanvases(){
-        GraphicsContext cl = frente.getGraphicsContext2D();
-        cl.clearRect(0, 0, frente.getWidth(), frente.getHeight());
-        
-        cl = topo.getGraphicsContext2D();
-        cl.clearRect(0, 0, topo.getWidth(), topo.getHeight());
-        
-        cl = lateral.getGraphicsContext2D();
-        cl.clearRect(0, 0, lateral.getWidth(), lateral.getHeight());
-        
-        cl = perspectiva.getGraphicsContext2D();
-        cl.clearRect(0, 0, perspectiva.getWidth(), perspectiva.getHeight());
-    }
-//</editor-fold>
-    
+          
     public void cancelTempPoints(){
         mundo.clearTemp();
-        paintStuff();
+        paint();
+    }
+    
+    public void paint(){
+        frente     .paint();
+        lateral    .paint();
+        topo       .paint();
+        perspectiva.paint();
     }
     
     public void finalizeTempPoints(){
@@ -1048,28 +505,26 @@ public class MainController implements Initializable {
         //Poligono pol = Poligono.build(lista);
         mundo.addObject(PMath.attemptBuildingFromPlanes(lista));
         mundo.clearTemp();
-        paintStuff();
+        paint();
     }
-    
-    private Vista getVistaFromVisao(Visao vis){
-        for (Vista vista : mundo.getVistas()){
-            if (vista.getVisao().equals(vis)){
-                return vista;
-            }
-        }
-        return null;
-    }
-    
+        
     //<editor-fold defaultstate="collapsed" desc="Seleção e carregamento da barra de ferramentas lateral esquerda">
-    public static final byte NOTHING_SEL       = -1;
-    public static final byte FERRAMENTA_SEL    = 0;
-    public static final byte REVOLUCAO_SEL     = 1;
-    public static final byte TRANSFORMACAO_SEL = 2;
+    public void bindToolsProperties(ObjectProperty<Byte> current, ObjectProperty<Ferramentas> ferramenta, ObjectProperty<CriacaoPrevolucao> criacao, ObjectProperty<Transformacoes> transformacao){
+        current.bind(CURRENT_SEL);
+        ferramenta.bind(current_ferr);
+        criacao.bind(current_pol);
+        transformacao.bind(current_tra);
+    }
     
-    private byte CURRENT_SEL = NOTHING_SEL;
-    private Ferramentas current_ferr;
-    private CriacaoPrevolucao current_pol;
-    private Transformacoes current_tra;
+    static final byte NOTHING_SEL       = -1;
+    static final byte FERRAMENTA_SEL    = 0;
+    static final byte REVOLUCAO_SEL     = 1;
+    static final byte TRANSFORMACAO_SEL = 2;
+    
+    private final ObjectProperty<Byte> CURRENT_SEL = new SimpleObjectProperty(NOTHING_SEL);
+    private final ObjectProperty<Ferramentas> current_ferr = new SimpleObjectProperty();
+    private final ObjectProperty<CriacaoPrevolucao> current_pol= new SimpleObjectProperty();
+    private final ObjectProperty<Transformacoes> current_tra= new SimpleObjectProperty();
     
     private Parent paintOption;
     private PaintController paintControl;
@@ -1091,16 +546,16 @@ public class MainController implements Initializable {
             Transformacoes     tra = Transformacoes.fromString(name);
             
             if (ferr != null){
-                CURRENT_SEL = FERRAMENTA_SEL;
-                current_ferr = ferr;
+                CURRENT_SEL.set(FERRAMENTA_SEL);
+                current_ferr.set(ferr);
             } else if (pol != null){
-                CURRENT_SEL = REVOLUCAO_SEL;
-                current_pol = pol;
+                CURRENT_SEL.set(REVOLUCAO_SEL);
+                current_pol.set(pol);
             } else if (tra != null){
-                CURRENT_SEL = TRANSFORMACAO_SEL;
-                current_tra = tra;
+                CURRENT_SEL.set(TRANSFORMACAO_SEL);
+                current_tra.set(tra);
             } else {
-                CURRENT_SEL = NOTHING_SEL;
+                CURRENT_SEL.set(NOTHING_SEL);
             }
             
             handleSelectedTool();
@@ -1129,7 +584,7 @@ public class MainController implements Initializable {
     
     private void loadSelect(){
         if (selectController == null){
-            selectController = new PolySelectController(selected_obj);
+            selectController = new PolySelectController(selectedObject);
         }
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/PolySelect.fxml"));
@@ -1153,9 +608,9 @@ public class MainController implements Initializable {
     //Adiciona opções conforme ferramentas
     private void handleSelectedTool(){ //BEWARE! FORSAKEN LAND!
         options.getChildren().clear();
-        switch(CURRENT_SEL){
+        switch(CURRENT_SEL.get()){
             case FERRAMENTA_SEL:
-                if (null != current_ferr) switch (current_ferr) {
+                if (null != current_ferr.get()) switch (current_ferr.get()) {
                     case Paint:
                         if (paintOption == null) loadPaint();
                         options.getChildren().add(paintOption);
@@ -1169,7 +624,7 @@ public class MainController implements Initializable {
                 }
                 break;
             case REVOLUCAO_SEL:
-                if(null != current_pol && current_pol == CriacaoPrevolucao.free){
+                if(null != current_pol.get() && current_pol.get() == CriacaoPrevolucao.free){
                     if (revBuildOption == null) loadRevPorPontos();
                     options.getChildren().add(revBuildOption);
                 }
@@ -1187,22 +642,6 @@ public class MainController implements Initializable {
     
     public RegularPolygonController getRegularControl() {
         return regularControl;
-    }
-    
-    public byte getCurrentSelection() {
-        return CURRENT_SEL;
-    }
-    
-    public Ferramentas getCurrentFerramenta() {
-        return current_ferr;
-    }
-    
-    public CriacaoPrevolucao getCurrentTipoDePoligono() {
-        return current_pol;
-    }
-    
-    public Transformacoes getCurrentTrasformacao() {
-        return current_tra;
     }
 //</editor-fold>
 }

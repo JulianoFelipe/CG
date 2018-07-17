@@ -11,6 +11,7 @@ package View;
  */
 public class Fatores {
     /////////////////////////////////////////////////////////////
+    // DEFAULT FATORES NUMERICOS
     public static final float DEFAULT_MOVIMENTO_ORT  = (float) 1;
     public static final float DEFAULT_MOVIMENTO_PERS = (float) 0.1;
     
@@ -23,7 +24,7 @@ public class Fatores {
     public static final float DEFAULT_CISALHAMENTO = (float) 0.1;
     
     /////////////////////////////////////////////////////////////
-    
+    // FATORES NUMERICOS ALTERÁVEIS
     public static float fator_movimento_ort  = DEFAULT_MOVIMENTO_ORT;
     public static float fator_movimento_pers = DEFAULT_MOVIMENTO_PERS;
     

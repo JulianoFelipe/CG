@@ -7,12 +7,14 @@ package View;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.event.EventHandler;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import m.Visao;
 
@@ -25,6 +27,7 @@ public class Grid extends ImageView{
     private static final int Y_MARGIN = 5;
     
     private final Image AXIS;
+    private final Image AUTO;
     private Canvas drawableGrid;
     
     private int cellSizePX = 50;
@@ -33,9 +36,11 @@ public class Grid extends ImageView{
     
     private boolean showGrid = true;
     private boolean showAxisIcon = true;
+    private boolean showAutoHotkeys = false;
     
-    public Grid(Canvas canvas, Image axis, int cellSizePX) {
+    public Grid(Canvas canvas, Image axis, int cellSizePX, Image auto) {
         this.AXIS = axis;
+        this.AUTO = auto;
         this.cellSizePX = cellSizePX;
         
         //this.fitHeightProperty().bind(canvas.heightProperty());
@@ -56,7 +61,7 @@ public class Grid extends ImageView{
         redraw();
     }
     
-    public Grid(Canvas canvas, Visao axis, int cellSizePX){ this(canvas, axis.getImage(), cellSizePX); }
+    public Grid(Canvas canvas, Visao axis, int cellSizePX){ this(canvas, axis.getImage(), cellSizePX, Visao.getAutoHotkeyImage(axis)); }
 
     public Grid(Canvas canvas, Visao axis){ this(canvas, axis, 50);}
     
@@ -65,12 +70,20 @@ public class Grid extends ImageView{
         return max - pxLowerMargin - imgToDraw.getHeight();
     }
     
+    private double calcLowerX(Image imgToDraw, Canvas canvas, int pxLowerMargin){
+        double max = canvas.getWidth(); 
+        return max - pxLowerMargin - imgToDraw.getWidth();
+    }
+    
     private void redraw(){
         GraphicsContext graph = drawableGrid.getGraphicsContext2D();
         graph.clearRect(0, 0, drawableGrid.getWidth(), drawableGrid.getHeight());
         
         if (showAxisIcon)
             graph.drawImage(AXIS, X_MARGIN, calcLowerY(AXIS, drawableGrid, Y_MARGIN));
+        
+        if (showAutoHotkeys)
+            graph.drawImage(AUTO, calcLowerX(AUTO, drawableGrid, X_MARGIN), calcLowerY(AUTO, drawableGrid, Y_MARGIN));
         
         if (showGrid){
             graph.setStroke(gridColor); //Cor da linha
@@ -117,6 +130,13 @@ public class Grid extends ImageView{
     public void showAxisIcon(boolean show){
         if (showAxisIcon != show){
             this.showAxisIcon = show;
+            redraw();
+        }  
+    }
+    
+    public void showHotkeys(boolean show){
+        if (showAutoHotkeys != show){
+            this.showAutoHotkeys = show;
             redraw();
         }  
     }

@@ -30,7 +30,6 @@ import utils.config.StandardConfigWinView;
 public class CG_20 extends Application {
     public static final MainController main = new MainController();
     
-    
     private static float DP = StandardConfigCam.PERS_DP;
     
     @Override

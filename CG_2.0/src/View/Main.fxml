@@ -97,7 +97,7 @@
                <children>
                   <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.hgrow="SOMETIMES" GridPane.vgrow="SOMETIMES">
                      <children>
-                        <HBox maxHeight="35.0" minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;" VBox.vgrow="SOMETIMES">
+                        <HBox maxHeight="35.0" minHeight="-Infinity" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;" VBox.vgrow="SOMETIMES">
                            <children>
                               <Label alignment="CENTER" minWidth="-Infinity" prefHeight="35.0" prefWidth="69.0" text="Frente (X, Y)" HBox.hgrow="NEVER">
                                  <HBox.margin>
@@ -105,7 +105,7 @@
                                  </HBox.margin>
                               </Label>
                               <Pane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="93.0" HBox.hgrow="SOMETIMES" />
-                              <Label fx:id="frenteZoom" minWidth="-Infinity" prefHeight="35.0" prefWidth="48.0" text="x 1.00">
+                              <Label fx:id="frenteZoom" minWidth="-Infinity" prefHeight="35.0" prefWidth="50.0" text="x 3.01">
                                  <font>
                                     <Font name="System Bold" size="14.0" />
                                  </font>
@@ -131,16 +131,12 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES">
-                           <children>
-                              <Canvas fx:id="frente" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
-                           </children>
-                        </StackPane>
+                        <StackPane fx:id="frentePane" minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES" />
                      </children>
                   </VBox>
                   <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.hgrow="SOMETIMES" GridPane.vgrow="SOMETIMES">
                      <children>
-                        <HBox maxHeight="35.0" minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;" VBox.vgrow="SOMETIMES">
+                        <HBox maxHeight="35.0" minHeight="-Infinity" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;" VBox.vgrow="SOMETIMES">
                            <children>
                               <Label alignment="CENTER" minWidth="-Infinity" prefHeight="35.0" prefWidth="69.0" text="Lateral (Y, Z)" HBox.hgrow="NEVER">
                                  <HBox.margin>
@@ -148,10 +144,13 @@
                                  </HBox.margin>
                               </Label>
                               <Pane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="200.0" style="-: ;" HBox.hgrow="SOMETIMES" />
-                              <Label fx:id="lateralZoom" minWidth="-Infinity" prefHeight="35.0" prefWidth="48.0" text="x 1.00">
+                              <Label fx:id="lateralZoom" minWidth="-Infinity" prefHeight="35.0" prefWidth="50.0" text="x 3.01">
                                  <font>
                                     <Font name="System Bold" size="14.0" />
                                  </font>
+                                 <HBox.margin>
+                                    <Insets right="5.0" />
+                                 </HBox.margin>
                               </Label>
                               <MenuButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="48.0">
                                  <graphic>
@@ -171,16 +170,12 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES">
-                           <children>
-                              <Canvas fx:id="lateral" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
-                           </children>
-                        </StackPane>
+                        <StackPane fx:id="lateralPane" minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES" />
                      </children>
                   </VBox>
                   <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="1" GridPane.vgrow="SOMETIMES">
                      <children>
-                        <HBox maxHeight="35.0" minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
+                        <HBox maxHeight="35.0" minHeight="-Infinity" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
                            <children>
                               <Label alignment="CENTER" minWidth="-Infinity" prefHeight="35.0" prefWidth="69.0" text="Topo (X, Z)" HBox.hgrow="NEVER">
                                  <HBox.margin>
@@ -188,7 +183,7 @@
                                  </HBox.margin>
                               </Label>
                               <Pane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="200.0" HBox.hgrow="SOMETIMES" />
-                              <Label fx:id="topoZoom" minWidth="-Infinity" prefHeight="35.0" prefWidth="48.0" text="x 1.00">
+                              <Label fx:id="topoZoom" minWidth="-Infinity" prefHeight="35.0" prefWidth="50.0" text="x 3.01">
                                  <font>
                                     <Font name="System Bold" size="14.0" />
                                  </font>
@@ -214,16 +209,12 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES">
-                           <children>
-                              <Canvas fx:id="topo" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
-                           </children>
-                        </StackPane>
+                        <StackPane fx:id="topoPane" minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES" />
                      </children>
                   </VBox>
                   <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.hgrow="SOMETIMES" GridPane.rowIndex="1" GridPane.vgrow="SOMETIMES">
                      <children>
-                        <HBox maxHeight="35.0" minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
+                        <HBox maxHeight="35.0" minHeight="-Infinity" minWidth="0.0" prefHeight="35.0" prefWidth="526.0" style="-fx-background-color: gainsboro;">
                            <children>
                               <Label alignment="CENTER" minWidth="-Infinity" prefHeight="35.0" prefWidth="69.0" text="Perspectiva" HBox.hgrow="NEVER">
                                  <HBox.margin>
@@ -231,10 +222,13 @@
                                  </HBox.margin>
                               </Label>
                               <Pane minHeight="0.0" minWidth="0.0" prefHeight="35.0" prefWidth="200.0" HBox.hgrow="SOMETIMES" />
-                              <Label fx:id="persZoom" minWidth="-Infinity" prefHeight="35.0" prefWidth="48.0" text="x 1.00">
+                              <Label fx:id="persZoom" minWidth="-Infinity" prefHeight="35.0" prefWidth="50.0" text="x 3.01">
                                  <font>
                                     <Font name="System Bold" size="14.0" />
                                  </font>
+                                 <HBox.margin>
+                                    <Insets right="5.0" />
+                                 </HBox.margin>
                               </Label>
                               <MenuButton contentDisplay="GRAPHIC_ONLY" graphicTextGap="0.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="48.0">
                                  <graphic>
@@ -254,11 +248,7 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES">
-                           <children>
-                              <Canvas fx:id="perspectiva" height="374.0" width="544.0" VBox.vgrow="ALWAYS" />
-                           </children>
-                        </StackPane>
+                        <StackPane fx:id="perspectivaPane" minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES" />
                      </children>
                   </VBox>
                </children>
