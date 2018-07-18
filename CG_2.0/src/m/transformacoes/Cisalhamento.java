@@ -55,6 +55,24 @@ public class Cisalhamento {
         }
     }
     
+    public void cisalhamento(double fatorX, double fatorY, CGObject p){
+        int vertices = p.getNumberOfPoints();
+        for (int i=0; i<vertices; i++){            
+            Vertice copy = p.get(i);
+            float x = copy.getX(),
+                  y = copy.getY();
+            
+            p.get(i).setAll( 
+                (float) (copy.getX() + (fatorX*y)), 
+                (float) (copy.getY() + (fatorY*x)),
+                (float) (copy.getZ())
+            );
+        }
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
+    }
+    
     public void cisalhamentoX(double fator, CGObject p){
         int vertices = p.getNumberOfPoints();
         for (int i=0; i<vertices; i++){
@@ -95,7 +113,7 @@ public class Cisalhamento {
             p.get(i).setAll(  
                 (float) (copy.getX()), 
                 (float) (copy.getY()),
-                (float) (copy.getY() + (fator*copy.getX()))
+                (float) (copy.getZ() + (fator*copy.getX()))
             );
         }
         
@@ -160,6 +178,25 @@ public class Cisalhamento {
             p.changedProperty().set(true);
     }
 
+    public void cisalhamento(double fatorX, double fatorY, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            cisalhamento(fatorX, fatorY, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        cisalhamento(fatorX, fatorY, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
+    }
+    
     public boolean isLockChange() {
         return lockChange;
     }

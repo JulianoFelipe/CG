@@ -37,6 +37,7 @@ import m.poligonos.CGObject;
 import m.poligonos.Vertice;
 import m.poligonos.we_edge.HE_Poliedro;
 import m.poligonos.we_edge.WE_Aresta;
+import m.transformacoes.Cisalhamento;
 import m.transformacoes.Escala;
 import m.transformacoes.Translacao;
 import resource.description.CriacaoPrevolucao;
@@ -509,19 +510,34 @@ public final class CGCanvas extends Canvas{
 
                 CGObject object = vista.getObject(selectedObjProperty.get());
                               
-                float signalX;
-                if (axisOfOperationProperty.get() == Eixo.Eixo_X || axisOfOperationProperty.get() == Eixo.Eixo_XY)
-                     signalX = (previousX > newMouseX ? Fatores.getFatorEscalaMinus() : (previousX < newMouseX ? Fatores.getFatorEscalaPlus() : 1));
-                else signalX = 1;
+                float signalX=-1, signalY=-1;
                 
-                float signalY;
-                if (axisOfOperationProperty.get() == Eixo.Eixo_Y || axisOfOperationProperty.get() == Eixo.Eixo_XY)
-                     signalY = (previousY > newMouseY ? Fatores.getFatorEscalaMinus() : (previousY < newMouseY ? Fatores.getFatorEscalaPlus() : 1));
-                else signalY = 1; 
+                if (transformacoesProperty.get() == Transformacoes.Cisalhamento){
+                    
+                    if (axisOfOperationProperty.get() == Eixo.Eixo_X || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                        signalX = (previousX > newMouseX ? Fatores.getFatorCisalhamentoMinus() : (previousX < newMouseX ? Fatores.getFatorCisalhamentoPlus(): 0));
+                   else signalX = 0;
+
+                   if (axisOfOperationProperty.get() == Eixo.Eixo_Y || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                        signalY = (previousY > newMouseY ? Fatores.getFatorCisalhamentoMinus() : (previousY < newMouseY ? Fatores.getFatorCisalhamentoPlus() : 0));
+                   else signalY = 0; 
+                   
+                } else if (transformacoesProperty.get() == Transformacoes.Escala){
+                    
+                    if (axisOfOperationProperty.get() == Eixo.Eixo_X || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                         signalX = (previousX > newMouseX ? Fatores.getFatorEscalaMinus() : (previousX < newMouseX ? Fatores.getFatorEscalaPlus() : 1));
+                    else signalX = 1;
+
+                    if (axisOfOperationProperty.get() == Eixo.Eixo_Y || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                         signalY = (previousY > newMouseY ? Fatores.getFatorEscalaMinus() : (previousY < newMouseY ? Fatores.getFatorEscalaPlus() : 1));
+                    else signalY = 1; 
+                    
+                }
                 
                 switch (transformacoesProperty.get()){
                     case Cisalhamento:
-                        
+                        Cisalhamento c = new Cisalhamento(true);
+                        c.cisalhamento(signalX, signalY, object, object.getCentroide());
                         break;
                     case Rotacao:
                         

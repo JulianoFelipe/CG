@@ -106,11 +106,11 @@ public class ChangeFactorsController implements Initializable {
         });
         ///////////////////
         cisalhamento_reset.setOnAction((ActionEvent event) -> {
-            Fatores.fator_cisalhamento = Fatores.DEFAULT_CISALHAMENTO;
-            cisalhamento .setText(Float.toString(Fatores.fator_cisalhamento));
+            Fatores.setFatorCisalhamento(Fatores.DEFAULT_CISALHAMENTO);
+            cisalhamento .setText(Float.toString((Fatores.getFatorCisalhamentoPlus()*100)));
         });
         cisalhamento_ok.setOnAction((ActionEvent event) -> {
-            Fatores.fator_cisalhamento = Float.parseFloat(cisalhamento.getText());
+            Fatores.setFatorCisalhamento(Float.parseFloat(cisalhamento.getText()));
         });
         ///////////////////
     }
@@ -122,6 +122,6 @@ public class ChangeFactorsController implements Initializable {
         threshold.setText(Float.toString(Fatores.fator_threshold));
         rotacao.setText(Float.toString(Fatores.fator_rotacao));
         escala.setText(Float.toString((Fatores.getFatorEscalaPlus()*100)-100));
-        cisalhamento.setText(Float.toString(Fatores.fator_cisalhamento));
+        cisalhamento.setText(Float.toString((Fatores.getFatorCisalhamentoPlus()*100)));
     }
 }

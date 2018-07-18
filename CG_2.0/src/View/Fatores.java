@@ -33,11 +33,12 @@ public class Fatores {
     public static int   fator_threshold = DEFAULT_THRESHOLD;
     
     public static float fator_rotacao      = DEFAULT_ROTACAO;
-    public static float fator_cisalhamento = DEFAULT_CISALHAMENTO;
-    
+        
     private static float fator_escala_plus  = 1+(DEFAULT_ESCALA/100);
     private static float fator_escala_minus = (100-DEFAULT_ESCALA)/100;
-
+    private static float fator_cisalhamento_plus  = +((DEFAULT_CISALHAMENTO)/100);
+    private static float fator_cisalhamento_minus = -((DEFAULT_CISALHAMENTO)/100);
+    
     public static float getFatorEscalaPlus() {
         return fator_escala_plus;
     }
@@ -49,6 +50,19 @@ public class Fatores {
     public static void setFatorEscala(float fator_escala) {
         Fatores.fator_escala_plus  = 1+(Math.abs(fator_escala)/100);
         Fatores.fator_escala_minus = (100-Math.abs(fator_escala))/100;
-    }   
+    } 
+    
+    public static float getFatorCisalhamentoPlus() {
+        return fator_cisalhamento_plus;
+    }
+
+    public static float getFatorCisalhamentoMinus() {
+        return fator_cisalhamento_minus;
+    }
+    
+    public static void setFatorCisalhamento(float fator_cisalhamento) {
+        Fatores.fator_cisalhamento_plus  = +((Math.abs(fator_cisalhamento))/100);
+        Fatores.fator_cisalhamento_minus = -((Math.abs(fator_cisalhamento))/100);
+    } 
     
 }

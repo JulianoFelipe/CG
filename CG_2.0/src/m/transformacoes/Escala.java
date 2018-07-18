@@ -52,7 +52,7 @@ public class Escala {
     }
     
     public void escala(Eixo axis, double fator, CGObject p, final Vertice pontoFixo){
-        System.out.println("Eixo");
+
         switch (axis) {
             case Eixo_X:
                 escalaX(fator, p, pontoFixo);

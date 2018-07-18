@@ -7,7 +7,7 @@ package View;
 
 import View.Config.ChangeFactorsController;
 import View.Config.ManualCamController;
-import View.Options.EscalaController;
+import View.Options.TransformacaoController;
 import View.Options.PaintController;
 import View.Options.PolySelectController;
 import View.Options.RegularPolygonController;
@@ -668,7 +668,12 @@ public class MainController implements Initializable {
             case TRANSFORMACAO_SEL:
                 if (null != current_ferr.get()) switch (current_tra.get()) {
                     case Escala:
-                        load("/View/Options/Escala.fxml", new EscalaController(axisOfOperationProperty));
+                        load("/View/Options/Transformacao.fxml", new TransformacaoController(axisOfOperationProperty, Transformacoes.Escala));
+                        options.getChildren().clear();
+                        options.getChildren().add(option);
+                        break;
+                    case Cisalhamento:
+                        load("/View/Options/Transformacao.fxml", new TransformacaoController(axisOfOperationProperty, Transformacoes.Cisalhamento));
                         options.getChildren().clear();
                         options.getChildren().add(option);
                         break;
@@ -684,35 +689,5 @@ public class MainController implements Initializable {
         //load("/View/Options/RegularPolygonOption.fxml", new RegularPolygonController());
         //options.getChildren().add(option);
     }
-    
-    /*private void handleSelectedToolsssssssss(){ //BEWARE! FORSAKEN LAND!
-        options.getChildren().clear();
-        switch(CURRENT_SEL.get()){
-            case FERRAMENTA_SEL:
-                if (null != current_ferr.get()) switch (current_ferr.get()) {
-                    case Paint:
-                        if (paintOption == null) loadPaint();
-                        options.getChildren().add(paintOption);
-                        break;
-                    case Select:
-                        if (selectOption == null) loadSelect();
-                        options.getChildren().add(selectOption);
-                        break;
-                    case Delete:
-                        break;
-                }
-                break;
-            case REVOLUCAO_SEL:
-                if(null != current_pol.get() && current_pol.get() == CriacaoPrevolucao.free){
-                    if (revBuildOption == null) loadRevPorPontos();
-                    options.getChildren().add(revBuildOption);
-                }
-                break;
-                
-            case TRANSFORMACAO_SEL:
-                
-                break;
-        }
-    }*/
 //</editor-fold>
 }
