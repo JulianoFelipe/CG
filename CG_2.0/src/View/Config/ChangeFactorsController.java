@@ -9,18 +9,11 @@ import View.Fatores;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import m.Camera;
-import m.Visao;
-import m.poligonos.Vertice;
-import utils.config.StandardConfigCam;
 
 /**
  *
@@ -105,11 +98,11 @@ public class ChangeFactorsController implements Initializable {
         });
         ///////////////////
         escala_reset.setOnAction((ActionEvent event) -> {
-            Fatores.fator_escala = Fatores.DEFAULT_ESCALA;
-            escala .setText(Float.toString(Fatores.fator_escala));
+            Fatores.setFatorEscala(Fatores.DEFAULT_ESCALA);
+            escala .setText(Float.toString((Fatores.getFatorEscalaPlus()*100)-100));
         });
         escala_ok.setOnAction((ActionEvent event) -> {
-            Fatores.fator_escala = Float.parseFloat(escala.getText());
+            Fatores.setFatorEscala(Float.parseFloat(escala.getText()));
         });
         ///////////////////
         cisalhamento_reset.setOnAction((ActionEvent event) -> {
@@ -128,7 +121,7 @@ public class ChangeFactorsController implements Initializable {
         zoom.setText(Float.toString(Fatores.fator_zoom));
         threshold.setText(Float.toString(Fatores.fator_threshold));
         rotacao.setText(Float.toString(Fatores.fator_rotacao));
-        escala.setText(Float.toString(Fatores.fator_escala));
+        escala.setText(Float.toString((Fatores.getFatorEscalaPlus()*100)-100));
         cisalhamento.setText(Float.toString(Fatores.fator_cisalhamento));
     }
 }

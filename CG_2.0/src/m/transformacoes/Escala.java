@@ -35,7 +35,16 @@ public class Escala {
                 escalaZ(fator, p);
                 break;
             case Eixo_XYZ:
-                escalaZ(fator, p);
+                escalaUniforme(fator, p);
+                break;
+            case Eixo_XY:
+                escala(fator, fator, 1, p);
+                break;
+            case Eixo_YZ:
+                escala(1, fator, fator, p);
+                break;
+            case Eixo_XZ:
+                escala(fator, 1, fator, p);
                 break;
             default:
                 throw new UnsupportedOperationException("NÃ£o implementado");
@@ -43,6 +52,7 @@ public class Escala {
     }
     
     public void escala(Eixo axis, double fator, CGObject p, final Vertice pontoFixo){
+        System.out.println("Eixo");
         switch (axis) {
             case Eixo_X:
                 escalaX(fator, p, pontoFixo);
@@ -54,7 +64,16 @@ public class Escala {
                 escalaZ(fator, p, pontoFixo);
                 break;
             case Eixo_XYZ:
-                escalaZ(fator, p, pontoFixo);
+                escalaUniforme(fator, p, pontoFixo);
+                break;
+            case Eixo_XY:
+                escala(fator, fator, 1, p, pontoFixo);
+                break;
+            case Eixo_YZ:
+                escala(1, fator, fator, p, pontoFixo);
+                break;
+            case Eixo_XZ:
+                escala(fator, 1, fator, p, pontoFixo);
                 break;
             default:
                 throw new UnsupportedOperationException("NÃ£o implementado");
@@ -102,6 +121,22 @@ public class Escala {
                 (float) (copy.getX()), 
                 (float) (copy.getY()),
                 (float) (copy.getZ() * fator)
+            );
+        }
+        
+        if (!lockChange)
+            p.changedProperty().set(true);
+    }
+    
+    public void escala(double fatorX, double fatorY, double fatorZ, CGObject p){
+        int vertices = p.getNumberOfPoints();
+        for (int i=0; i<vertices; i++){
+            Vertice copy = p.get(i);
+            
+            p.get(i).setAll(  
+                (float) (copy.getX() * fatorX), 
+                (float) (copy.getY() * fatorY),
+                (float) (copy.getZ() * fatorZ)
             );
         }
         
@@ -194,6 +229,25 @@ public class Escala {
         
         t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
         escalaUniforme(fator, p);
+        t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
+        
+        lockChange = previousLock;
+        if (!lockChange)
+            p.changedProperty().set(true);
+    }
+    
+    public void escala(double fatorX, double fatorY, double fatorZ, CGObject p, final Vertice pontoFixo){
+        if (pontoFixo == null){
+            escala(fatorX, fatorY, fatorZ, p);
+            return;
+        }
+        
+        boolean previousLock = lockChange;
+        Translacao t = new Translacao(true); //Lock change
+        lockChange = true;
+        
+        t.transladar(-(int)pontoFixo.getX(), -(int)pontoFixo.getY(), -(int)pontoFixo.getZ(), p);
+        escala(fatorX, fatorY, fatorZ, p);
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;

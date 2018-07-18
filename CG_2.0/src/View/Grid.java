@@ -7,14 +7,12 @@ package View;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.event.EventHandler;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import m.Visao;
 
@@ -79,12 +77,7 @@ public class Grid extends ImageView{
         GraphicsContext graph = drawableGrid.getGraphicsContext2D();
         graph.clearRect(0, 0, drawableGrid.getWidth(), drawableGrid.getHeight());
         
-        if (showAxisIcon)
-            graph.drawImage(AXIS, X_MARGIN, calcLowerY(AXIS, drawableGrid, Y_MARGIN));
-        
-        if (showAutoHotkeys)
-            graph.drawImage(AUTO, calcLowerX(AUTO, drawableGrid, X_MARGIN), calcLowerY(AUTO, drawableGrid, Y_MARGIN));
-        
+        //Grid por baixo de tudo
         if (showGrid){
             graph.setStroke(gridColor); //Cor da linha
             graph.setLineWidth(gridThickness); //Espessura da linha
@@ -95,6 +88,12 @@ public class Grid extends ImageView{
 
             //END
         }
+        
+        if (showAxisIcon)
+            graph.drawImage(AXIS, X_MARGIN, calcLowerY(AXIS, drawableGrid, Y_MARGIN));
+        
+        if (showAutoHotkeys)
+            graph.drawImage(AUTO, calcLowerX(AUTO, drawableGrid, X_MARGIN), calcLowerY(AUTO, drawableGrid, Y_MARGIN));
         
         SnapshotParameters parameters = new SnapshotParameters();
         parameters.setFill(Color.TRANSPARENT);

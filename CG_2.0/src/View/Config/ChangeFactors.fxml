@@ -28,11 +28,17 @@
             <Label prefHeight="40.0" prefWidth="193.0" text="Movimento (Ortográficas)">
                <GridPane.margin>
                   <Insets left="5.0" />
-               </GridPane.margin></Label>
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="A cada alteração nas vistas ortográficas, esse fator é utilizado" />
+               </tooltip></Label>
             <Label prefHeight="44.0" prefWidth="156.0" text="Movimento (Perspectiva)" GridPane.rowIndex="1">
                <GridPane.margin>
                   <Insets left="5.0" />
-               </GridPane.margin></Label>
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="A cada alteração na vista perspectiva, esse fator é utilizado" />
+               </tooltip></Label>
             <TextField fx:id="mov_ort" prefHeight="28.0" prefWidth="42.0" text="0,001" GridPane.columnIndex="1">
                <GridPane.margin>
                   <Insets left="5.0" right="5.0" />
@@ -51,7 +57,10 @@
             <Label prefHeight="37.0" prefWidth="176.0" text="Zoom (Janela)" GridPane.rowIndex="2">
                <GridPane.margin>
                   <Insets left="5.0" />
-               </GridPane.margin></Label>
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="Fator de alteração da Window a cada pressionada de botão" />
+               </tooltip></Label>
             <Button fx:id="mov_ort_reset" contentDisplay="GRAPHIC_ONLY" graphicTextGap="1.0" maxWidth="40.0" mnemonicParsing="false" prefHeight="9.0" prefWidth="40.0" GridPane.columnIndex="2">
                <graphic>
                   <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
@@ -106,7 +115,10 @@
             <Label prefHeight="35.0" prefWidth="189.0" text="Limiar (Snap de grade) (px)" GridPane.rowIndex="3">
                <GridPane.margin>
                   <Insets left="5.0" />
-               </GridPane.margin></Label>
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="Considera clique em um ponto da grade se estiver entro do círculo com esse raio" />
+               </tooltip></Label>
             <TextField fx:id="threshold" prefHeight="28.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
                <GridPane.margin>
                   <Insets left="5.0" right="5.0" />
@@ -129,18 +141,27 @@
                   <Insets left="5.0" right="5.0" />
                </GridPane.margin>
             </Button>
-            <Label prefHeight="37.0" prefWidth="176.0" text="Rotação" GridPane.rowIndex="4">
+            <Label prefHeight="37.0" prefWidth="176.0" text="Rotação (%)" GridPane.rowIndex="4">
                <GridPane.margin>
                   <Insets left="5.0" />
-               </GridPane.margin></Label>
-            <Label prefHeight="37.0" prefWidth="176.0" text="Escala" GridPane.rowIndex="5">
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="Empty Tooltip" />
+               </tooltip></Label>
+            <Label prefHeight="37.0" prefWidth="176.0" text="Escala (%)" GridPane.rowIndex="5">
                <GridPane.margin>
                   <Insets left="5.0" />
-               </GridPane.margin></Label>
-            <Label prefHeight="37.0" prefWidth="176.0" text="Cisalhamento" GridPane.rowIndex="6">
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="Para cada alteração, objeto tem sua escala modificada em X%" />
+               </tooltip></Label>
+            <Label prefHeight="37.0" prefWidth="176.0" text="Cisalhamento (%)" GridPane.rowIndex="6">
                <GridPane.margin>
                   <Insets left="5.0" />
-               </GridPane.margin></Label>
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="Para cada alteração, objeto é cisalhado com um fator X%" />
+               </tooltip></Label>
             <TextField fx:id="rotacao" prefHeight="28.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                <GridPane.margin>
                   <Insets left="5.0" right="5.0" />

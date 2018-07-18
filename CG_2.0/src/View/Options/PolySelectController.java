@@ -55,8 +55,9 @@ public class PolySelectController implements Initializable {
         return objProperty;
     }
 
-    public PolySelectController(CGObject obj) {
-        objProperty = new SimpleObjectProperty<>(obj);
+    public PolySelectController(ObjectProperty<CGObject> objProperty) {
+        //objProperty = new SimpleObjectProperty<>(obj);
+        this.objProperty = objProperty;
         objProperty.addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
             if (newValue != null)
                 setFields(newValue);

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="238.0" prefWidth="193.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox prefHeight="290.0" prefWidth="193.0">
+         <children>
+            <HBox prefHeight="29.0" prefWidth="193.0">
+               <children>
+                  <Label prefHeight="28.0" prefWidth="50.0" text="Fator (%)">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Label>
+                  <TextField fx:id="factorField" prefHeight="32.0" prefWidth="48.0">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" top="5.0" />
+                     </HBox.margin>
+                  </TextField>
+                  <Button fx:id="factorReset" contentDisplay="GRAPHIC_ONLY" graphicTextGap="1.0" maxWidth="40.0" mnemonicParsing="false" prefHeight="9.0" prefWidth="40.0">
+                     <graphic>
+                        <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../../resource/images/reset_50.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+                  <Button fx:id="factorOk" alignment="CENTER" contentDisplay="TEXT_ONLY" graphicTextGap="1.0" maxWidth="40.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="37.0" text="Ok">
+                     <HBox.margin>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </HBox.margin>
+                  </Button>
+               </children>
+            </HBox>
+            <Separator prefHeight="15.0" prefWidth="193.0" visible="false" />
+            <RadioButton fx:id="justX" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" text="Somente largura">
+               <toggleGroup>
+                  <ToggleGroup fx:id="group1" />
+               </toggleGroup>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </RadioButton>
+            <RadioButton fx:id="justY" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" text="Somente altura" toggleGroup="$group1">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </RadioButton>
+            <RadioButton fx:id="both" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" selected="true" text="Ambos" toggleGroup="$group1">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </RadioButton>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

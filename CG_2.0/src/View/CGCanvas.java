@@ -8,6 +8,7 @@ package View;
 import static View.MainController.FERRAMENTA_SEL;
 import static View.MainController.NOTHING_SEL;
 import static View.MainController.REVOLUCAO_SEL;
+import static View.MainController.TRANSFORMACAO_SEL;
 import java.util.List;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
@@ -16,6 +17,8 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.event.Event;
+import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
@@ -34,6 +37,7 @@ import m.poligonos.CGObject;
 import m.poligonos.Vertice;
 import m.poligonos.we_edge.HE_Poliedro;
 import m.poligonos.we_edge.WE_Aresta;
+import m.transformacoes.Escala;
 import m.transformacoes.Translacao;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Ferramentas;
@@ -56,13 +60,15 @@ public final class CGCanvas extends Canvas{
     private final ObjectProperty<CGObject> selectedObjProperty;
     private final StringProperty zoomProperty;
     private final BooleanProperty autoChangeActiveProperty;
+    //private final BooleanProperty updatePaintProperty;
     
     //Tools property
     private final ObjectProperty<Byte> selProperty;  
     private final ObjectProperty<Ferramentas> ferramentasProperty;  
     private final ObjectProperty<CriacaoPrevolucao> criacaoProperty;  
     private final ObjectProperty<Transformacoes> transformacoesProperty;  
-        
+    private final ObjectProperty<Eixo> axisOfOperationProperty;
+    
     public CGCanvas(MainController controller, Vista vista, int width, int height) {
         super(width, height);
         
@@ -84,14 +90,18 @@ public final class CGCanvas extends Canvas{
         
         ///////////////////////////////// SET MOUSE FUNCTIONS
         if (visao != Visao.Perspectiva){
-            mouseOnClicked(); mouseOnMoved(); mouseOnPressed(); mouseOnDragged();
+            mouseOnClicked(); mouseOnMoved(); mouseOnPressed(); mouseOnDragged(); mouseOnReleased();
         }
+        
+        //updatePaintProperty = new SimpleBooleanProperty(false);
+        axisOfOperationProperty = new SimpleObjectProperty<>(Eixo.Eixo_XY);
     }
 
+    //<editor-fold defaultstate="collapsed" desc="Getters & Properties">
     public Vista getVista() {
         return vista;
     }
-
+    
     public StringProperty zoomProperty() {
         return zoomProperty;
     }
@@ -103,6 +113,11 @@ public final class CGCanvas extends Canvas{
     public BooleanProperty autoChangeActiveProperty(){
         return autoChangeActiveProperty;
     }
+    
+    public ObjectProperty<Eixo> axisOfOperationProperty(){
+        return axisOfOperationProperty;
+    }
+//</editor-fold>
     
     //<editor-fold defaultstate="collapsed" desc="Pintura">
     public void paint(){
@@ -299,7 +314,7 @@ public final class CGCanvas extends Canvas{
             
             if(changeCam)
                 pipe.getCamera().set(new Camera(viewUp, vrp, p));
-            paint();
+            controller.paint();
         });
     }
     
@@ -356,7 +371,7 @@ public final class CGCanvas extends Canvas{
             }
             if(changeCam)
                 persPipe.getCamera().setVRP(vrp);
-            paint();
+            controller.paint();
         });
         /*perspectiva.setOnMouseDragged((MouseEvent event1) -> {
             int currentX = (int) event1.getX(),
@@ -411,7 +426,7 @@ public final class CGCanvas extends Canvas{
     private void mouseOnClicked(){
         this.setOnMouseClicked((MouseEvent e) -> {
             Vertice clicked = new Vertice((float) e.getX(), (float) e.getY());
-            System.out.println("Frente Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
+            //System.out.println(visao + " Clicked: " + e.getX() + ", " + e.getY() + ", " + e.getZ());
             if (selProperty.get() == REVOLUCAO_SEL){
                 if (criacaoProperty.get() == CriacaoPrevolucao.free){
                     vista.getPipe().reverseConversion(clicked);
@@ -433,7 +448,7 @@ public final class CGCanvas extends Canvas{
                         if (obj.contains(clicked.getX(), clicked.getY(), Eixo.Eixo_XY)){
                             selectedObjProperty.set(obj);
                             //selectController.objectProperty().set(obj);
-                            paint();
+                            controller.paint();
                             return;
                         }
                     }
@@ -442,45 +457,96 @@ public final class CGCanvas extends Canvas{
                     //selectController.objectProperty().set(null); //Not needed? MainController listens?
                 }
             }
-            paint();
+            controller.paint();
         });
     }
     
     private void mouseOnMoved(){
-        
+        this.setOnMouseMoved((Event event) -> {
+            if (selProperty.get() == TRANSFORMACAO_SEL){
+                if (draggedCount == 0)
+                    this.setCursor(Cursor.OPEN_HAND);
+            } else {
+                this.setCursor(Cursor.DEFAULT);
+            }
+        });
+    }
+    
+    private void mouseOnReleased(){
+        this.setOnMouseReleased((MouseEvent event) -> {
+            draggedCount = 0;
+            if (selProperty.get() == TRANSFORMACAO_SEL)
+                this.setCursor(Cursor.OPEN_HAND);
+            else
+                this.setCursor(Cursor.DEFAULT);
+        });
     }
     
     private void mouseOnPressed(){
         this.setOnMousePressed((MouseEvent event) -> {
             draggedCount=0;
+            if (selProperty.get() == TRANSFORMACAO_SEL)
+                this.setCursor(Cursor.CLOSED_HAND);
+            else
+                this.setCursor(Cursor.DEFAULT);
         });
     }
     
     private void mouseOnDragged(){
         this.setOnMouseDragged((MouseEvent event) -> {
-            int newMouseX = (int) event.getX(),
-                newMouseY = (int) event.getY();
+            if (selectedObjProperty.get() == null) return;
             
-            if (draggedCount == 0){
+            if (selProperty.get() == TRANSFORMACAO_SEL){
+                int newMouseX = (int) event.getX(),
+                    newMouseY = (int) event.getY();
+            
+                if (draggedCount == 0){
+                    previousX = newMouseX;
+                    previousY = newMouseY;
+                    ++draggedCount;
+                    return;
+                }
+
+                CGObject object = vista.getObject(selectedObjProperty.get());
+                              
+                float signalX;
+                if (axisOfOperationProperty.get() == Eixo.Eixo_X || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                     signalX = (previousX > newMouseX ? Fatores.getFatorEscalaMinus() : (previousX < newMouseX ? Fatores.getFatorEscalaPlus() : 1));
+                else signalX = 1;
+                
+                float signalY;
+                if (axisOfOperationProperty.get() == Eixo.Eixo_Y || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                     signalY = (previousY > newMouseY ? Fatores.getFatorEscalaMinus() : (previousY < newMouseY ? Fatores.getFatorEscalaPlus() : 1));
+                else signalY = 1; 
+                
+                switch (transformacoesProperty.get()){
+                    case Cisalhamento:
+                        
+                        break;
+                    case Rotacao:
+                        
+                        break;
+                    case Escala:
+                        Escala e = new Escala(true);
+                        e.escala(signalX, signalY, 1, object, object.getCentroide());
+                        break;
+                    case Translacao:
+                        Translacao t = new Translacao(true);
+                        t.transladar(-(previousX-newMouseX), -(previousY-newMouseY), 0, object);
+                        break;
+                    default: throw new IllegalArgumentException("Transformação não prevista para evento Drag.");
+                }
+                
+                vista.update(object);
+
+                //problema: pega-se objeto com coords da visão, onde z=0 e seta elas no mundo, que propaga com z=0 para as outras, resultando em problemas
+                //Fix: copiar a coordenada não alterada em cada vista ao invés de zerá-la, já que ela não influenciará no desenho e será utilizada na ocultação
+
                 previousX = newMouseX;
                 previousY = newMouseY;
+                controller.paint();
                 ++draggedCount;
-                return;
             }
-
-            CGObject object = vista.getObject(selectedObjProperty.get());
-
-            Translacao t = new Translacao(true);
-            t.transladar(-(previousX-newMouseX), -(previousY-newMouseY), 0, object);
-            vista.update(object);
-            
-            //problema: pega-se objeto com coords da visão, onde z=0 e seta elas no mundo, que propaga com z=0 para as outras, resultando em problemas
-            //Fix: copiar a coordenada não alterada em cada vista ao invés de zerá-la, já que ela não influenciará no desenho e será utilizada na ocultação
-            
-            previousX = newMouseX;
-            previousY = newMouseY;
-            paint();
-            ++draggedCount;
         });
     }
 }

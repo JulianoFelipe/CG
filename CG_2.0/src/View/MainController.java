@@ -7,6 +7,7 @@ package View;
 
 import View.Config.ChangeFactorsController;
 import View.Config.ManualCamController;
+import View.Options.EscalaController;
 import View.Options.PaintController;
 import View.Options.PolySelectController;
 import View.Options.RegularPolygonController;
@@ -51,6 +52,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import m.CGViewport;
 import m.Camera;
+import m.Eixo;
 import m.Visao;
 import m.Vista;
 import m.World;
@@ -106,7 +108,8 @@ public class MainController implements Initializable {
     @FXML private Label persZoom;
     
     private World mundo;
-    private CGObject selectedObject = null;
+    private ObjectProperty<CGObject> selectedObjectProperty;
+    private ObjectProperty<Eixo> axisOfOperationProperty;
     
     private CGCanvas frente;
     private CGCanvas topo;
@@ -136,24 +139,44 @@ public class MainController implements Initializable {
         topoPane       .getChildren().add(topo);
         perspectivaPane.getChildren().add(perspectiva);
         
+        //<editor-fold defaultstate="collapsed" desc="Property Binding">
+        ///Zoom
         frente .zoomProperty().bindBidirectional(frenteZoom.textProperty());
         lateral.zoomProperty().bindBidirectional(lateralZoom.textProperty());
         topo   .zoomProperty().bindBidirectional(topoZoom.textProperty());
         perspectiva.zoomProperty().bindBidirectional(frenteZoom.textProperty());
+
+        ///Selected Object
+        selectedObjectProperty = new SimpleObjectProperty();
+        selectedObjectProperty.bindBidirectional(
+            frente.selectedObjectProperty()
+        );
+        selectedObjectProperty.bindBidirectional(
+            lateral.selectedObjectProperty()
+        );
+        selectedObjectProperty.bindBidirectional(
+            topo.selectedObjectProperty()
+        );
+        selectedObjectProperty.bindBidirectional(
+            perspectiva.selectedObjectProperty()
+        );
         
-        frente.selectedObjectProperty().addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
-            selectedObject = newValue;
-        });
-        lateral.selectedObjectProperty().addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
-            selectedObject = newValue;
-        });
-        topo.selectedObjectProperty().addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
-            selectedObject = newValue;
-        });
-        perspectiva.selectedObjectProperty().addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
-            selectedObject = newValue;
-        });
-        
+        ///Axis of Operation
+        axisOfOperationProperty = new SimpleObjectProperty<>(Eixo.Eixo_XY);
+        axisOfOperationProperty.bindBidirectional(
+            frente.axisOfOperationProperty()
+        );
+        axisOfOperationProperty.bindBidirectional(
+            lateral.axisOfOperationProperty()
+        );
+        axisOfOperationProperty.bindBidirectional(
+            topo.axisOfOperationProperty()
+        );
+        axisOfOperationProperty.bindBidirectional(
+            perspectiva.axisOfOperationProperty()
+        );
+        //</editor-fold>
+                
         initializeTools(); //Listeners para a barra esquerda de ferramentas
         initializeMenuBar(); //Listeners para a barra de menu superior
         initializeViewToolbars(); //Listeners para as 4 barras de ferramentas das views
@@ -372,8 +395,9 @@ public class MainController implements Initializable {
         
         limparCena.setOnAction((ActionEvent event) -> {
             mundo.clearAll();
-            selectedObject = null;
-            if (selectController != null) selectController.objectProperty().set(null);
+            //selectedObject = null;
+            selectedObjectProperty.set(null);
+            //if (selectController != null) selectController.objectProperty().set(null);
             paint();
             
         });
@@ -538,20 +562,25 @@ public class MainController implements Initializable {
     private final ObjectProperty<CriacaoPrevolucao> current_pol= new SimpleObjectProperty();
     private final ObjectProperty<Transformacoes> current_tra= new SimpleObjectProperty();
     
-    private Parent paintOption;
-    private PaintController paintControl;
-    private Parent regularOption;
-    private RegularPolygonController regularControl;
-    private Parent revBuildOption;
-    private RevBuildController revBuildController;
-    private Parent selectOption;
-    private PolySelectController selectController;
+    private Object controller;
+    private Parent option;
+    
+    private byte previous_sel;
+    private Ferramentas previous_ferr;
+    private CriacaoPrevolucao previous_pol;
+    private Transformacoes previous_tra;
+    private boolean loadPrevious = true;
     
     @FXML //Clicar na árvore de ferramentas
     private void onMouseClickedToolsListener(MouseEvent e){
         Node node = e.getPickResult().getIntersectedNode();
         if (node instanceof Text || (node instanceof TreeCell && ((TreeCell) node).getText() != null)){
             String name = (String) ((TreeItem)tools.getSelectionModel().getSelectedItem()).getValue();
+            
+            previous_sel  = CURRENT_SEL .get();
+            previous_ferr = current_ferr.get();
+            previous_pol  = current_pol .get();
+            previous_tra  = current_tra .get();
             
             Ferramentas       ferr = Ferramentas.fromString(name);
             CriacaoPrevolucao  pol = CriacaoPrevolucao.fromString(name);
@@ -560,58 +589,31 @@ public class MainController implements Initializable {
             if (ferr != null){
                 CURRENT_SEL.set(FERRAMENTA_SEL);
                 current_ferr.set(ferr);
+                loadPrevious = previous_sel == FERRAMENTA_SEL;
             } else if (pol != null){
                 CURRENT_SEL.set(REVOLUCAO_SEL);
                 current_pol.set(pol);
+                loadPrevious = false;
             } else if (tra != null){
                 CURRENT_SEL.set(TRANSFORMACAO_SEL);
                 current_tra.set(tra);
+                loadPrevious = false;
             } else {
                 CURRENT_SEL.set(NOTHING_SEL);
+                loadPrevious = previous_sel == FERRAMENTA_SEL;
             }
             
             handleSelectedTool();
         }
     }
-    
-    private void loadPaint(){
+       
+    private void load(String fxml, Object controller){
+        this.controller = controller;
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/PaintOption.fxml"));
-            loader.setController(paintControl);
-            paintOption = loader.load();
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    private void loadRegular(){
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/RegularPolygonOption.fxml"));
-            loader.setController(regularControl);
-            regularOption = loader.load();
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    private void loadSelect(){
-        if (selectController == null){
-            selectController = new PolySelectController(selectedObject);
-        }
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/PolySelect.fxml"));
-            loader.setController(selectController);
-            selectOption = loader.load();
-        } catch (IOException ex) {
-            LOG.log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    private void loadRevPorPontos(){
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Options/RevBuildOption.fxml"));
-            loader.setController(revBuildController);
-            revBuildOption = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxml));
+            if (controller != null)
+                loader.setController(controller);
+            option = loader.load();
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
@@ -619,6 +621,71 @@ public class MainController implements Initializable {
     
     //Adiciona opções conforme ferramentas
     private void handleSelectedTool(){ //BEWARE! FORSAKEN LAND!
+        //System.out.println("PREVIOUS: " + previous_sel);
+        //System.out.println("PREVIOUS: " + previous_ferr);
+        //System.out.println("PREVIOUS: " + previous_pol);
+        //System.out.println("PREVIOUS: " + previous_tra);
+        
+        //System.out.println("CURRENT: " + CURRENT_SEL.get());
+        //System.out.println("CURRENT: " + current_ferr.get());
+        //System.out.println("CURRENT: " + current_pol.get());
+        //System.out.println("CURRENT: " + current_tra.get());
+        
+        if (loadPrevious && options.getChildren().size()>0){
+            //if (options!=null)
+            //options.getChildren().clear();
+            //options.getChildren().add(option);
+            //System.out.println("Load: " + loadPrevious);
+            return;
+        }
+        
+        switch(CURRENT_SEL.get()){
+            case FERRAMENTA_SEL:
+                if (null != current_ferr.get()) switch (current_ferr.get()) {
+                    case Paint:
+                        //load("/View/Options/Paint.fxml", new PaintController());
+                        options.getChildren().clear();
+                        //options.getChildren().add(option);
+                        break;
+                    case Select:
+                        load("/View/Options/PolySelect.fxml", new PolySelectController(selectedObjectProperty));
+                        options.getChildren().clear();
+                        options.getChildren().add(option);
+                        break;
+                    case Delete:
+                        options.getChildren().clear();
+                        break;
+                }
+                break;
+            case REVOLUCAO_SEL:
+                if(null != current_pol.get() && current_pol.get() == CriacaoPrevolucao.free){                    
+                    load("/View/Options/RevBuildOption.fxml", null);
+                    options.getChildren().clear();
+                    options.getChildren().add(option);
+                }
+                break;
+                
+            case TRANSFORMACAO_SEL:
+                if (null != current_ferr.get()) switch (current_tra.get()) {
+                    case Escala:
+                        load("/View/Options/Escala.fxml", new EscalaController(axisOfOperationProperty));
+                        options.getChildren().clear();
+                        options.getChildren().add(option);
+                        break;
+                }
+                break;
+                
+            case NOTHING_SEL:
+                options.getChildren().clear();
+                break;
+        }
+        
+        // NOT USED
+        //load("/View/Options/RegularPolygonOption.fxml", new RegularPolygonController());
+        //options.getChildren().add(option);
+    }
+    
+    /*private void handleSelectedToolsssssssss(){ //BEWARE! FORSAKEN LAND!
         options.getChildren().clear();
         switch(CURRENT_SEL.get()){
             case FERRAMENTA_SEL:
@@ -646,14 +713,6 @@ public class MainController implements Initializable {
                 
                 break;
         }
-    }
-    
-    public PaintController getPaintControl() {
-        return paintControl;
-    }
-    
-    public RegularPolygonController getRegularControl() {
-        return regularControl;
-    }
+    }*/
 //</editor-fold>
 }

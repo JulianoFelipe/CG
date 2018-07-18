@@ -5,7 +5,7 @@
  */
 package utils.math;
 
-import java.util.Arrays;
+import m.Eixo;
 import m.poligonos.Aresta;
 import m.poligonos.Movimento;
 import m.poligonos.Vertice;
@@ -204,6 +204,20 @@ public class VMath {
              if (segundo.getX() < primeiro.getX()) return Movimento.Esquerda;
         else if (segundo.getX() > primeiro.getX()) return Movimento.Direita;
         else return Movimento.Estatico;
+    }
+    
+    public static Movimento movimento(float primeiro, float segundo, Eixo eixo){
+        if (eixo == Eixo.Eixo_X){
+                 if (segundo < primeiro) return Movimento.Esquerda;
+            else if (segundo > primeiro) return Movimento.Direita;
+            else return Movimento.Estatico;
+        } else if (eixo == Eixo.Eixo_Y){
+                 if (segundo < primeiro) return Movimento.Baixo;
+            else if (segundo > primeiro) return Movimento.Cima;
+            else return Movimento.Estatico;
+        } else {
+            throw new IllegalArgumentException("Movimento não implementado para: " + eixo);
+        }
     }
     
     public static Movimento movimentoVertical(Vertice primeiro, Vertice segundo){
