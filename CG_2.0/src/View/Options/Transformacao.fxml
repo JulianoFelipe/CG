@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.text.*?>
 <?import javafx.scene.image.*?>
 <?import javafx.geometry.*?>
 <?import java.lang.*?>
@@ -14,7 +15,7 @@
          <children>
             <HBox prefHeight="29.0" prefWidth="193.0">
                <children>
-                  <Label prefHeight="28.0" prefWidth="50.0" text="Fator (%)">
+                  <Label fx:id="factorLabel" prefHeight="28.0" prefWidth="50.0" text="Fator (%)">
                      <HBox.margin>
                         <Insets bottom="5.0" left="5.0" top="5.0" />
                      </HBox.margin>
@@ -43,7 +44,7 @@
                   </Button>
                </children>
             </HBox>
-            <Separator prefHeight="15.0" prefWidth="193.0" visible="false" />
+            <Separator prefHeight="5.0" prefWidth="193.0" visible="false" />
             <RadioButton fx:id="justX" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" text="Somente largura">
                <toggleGroup>
                   <ToggleGroup fx:id="group1" />
@@ -54,14 +55,24 @@
             </RadioButton>
             <RadioButton fx:id="justY" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" text="Somente altura" toggleGroup="$group1">
                <VBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  <Insets bottom="5.0" left="5.0" right="5.0" />
                </VBox.margin>
             </RadioButton>
             <RadioButton fx:id="both" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" selected="true" text="Ambos" toggleGroup="$group1">
                <VBox.margin>
-                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                  <Insets bottom="5.0" left="5.0" right="5.0" />
                </VBox.margin>
             </RadioButton>
+            <RadioButton fx:id="allRadio" mnemonicParsing="false" prefHeight="17.0" prefWidth="232.0" text="Altura/Largura/Profundidade" toggleGroup="$group1">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" />
+               </VBox.margin>
+            </RadioButton>
+            <Separator prefHeight="5.0" prefWidth="193.0" visible="false" />
+            <TextFlow fx:id="textFlow" prefHeight="184.0" prefWidth="183.0" textAlignment="JUSTIFY">
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" />
+               </VBox.margin></TextFlow>
          </children>
       </VBox>
    </children>

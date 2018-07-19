@@ -39,6 +39,7 @@ import m.poligonos.we_edge.HE_Poliedro;
 import m.poligonos.we_edge.WE_Aresta;
 import m.transformacoes.Cisalhamento;
 import m.transformacoes.Escala;
+import m.transformacoes.Rotacao;
 import m.transformacoes.Translacao;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Ferramentas;
@@ -57,7 +58,8 @@ public final class CGCanvas extends Canvas{
     private final World mundo;
     private final Visao visao;
     private final Vista vista;
-
+    private Grid grid;
+    
     private final ObjectProperty<CGObject> selectedObjProperty;
     private final StringProperty zoomProperty;
     private final BooleanProperty autoChangeActiveProperty;
@@ -77,7 +79,7 @@ public final class CGCanvas extends Canvas{
         this.selectedObjProperty = new SimpleObjectProperty<>();
         this.vista = vista;
         this.visao = vista.getVisao();
-        
+
         this.mundo = World.getInstance();
         
         this.zoomProperty = new SimpleStringProperty("x "+String.format(java.util.Locale.US,"%.2f", vista.getPipe().getProportions()));
@@ -98,6 +100,10 @@ public final class CGCanvas extends Canvas{
         axisOfOperationProperty = new SimpleObjectProperty<>(Eixo.Eixo_XY);
     }
 
+    public void setGrid(Grid grid){
+        this.grid = grid;
+    }
+    
     //<editor-fold defaultstate="collapsed" desc="Getters & Properties">
     public Vista getVista() {
         return vista;
@@ -144,7 +150,7 @@ public final class CGCanvas extends Canvas{
             int radius=5;
             graphs.beginPath();
             Vertice point1 = vertices.get(0);
-            graphs.fillOval(point1.getX(), point1.getY(), 5, 5);
+            graphs.fillOval(point1.getX()-(radius/2), point1.getY()-(radius/2), radius, radius);
             
             Vertice point2 = null;
             for (int i=1; i<vertices.size(); i++){
@@ -232,6 +238,7 @@ public final class CGCanvas extends Canvas{
     }
 //</editor-fold>   
       
+    //<editor-fold defaultstate="collapsed" desc="Listeners para alterações de Câmera/Window">
     private ChangeListener change;
     
     public void setAutoCam(ChangeListener listener){
@@ -249,7 +256,7 @@ public final class CGCanvas extends Canvas{
         this.setFocusTraversable(true);
         this.addEventFilter(MouseEvent.ANY, (e) -> this.requestFocus());
         this.setOnKeyPressed((KeyEvent event1) -> {
-
+            
             KeyCode pressed = event1.getCode();
             CGPipeline pipe = vista.getPipe();
             Vertice vrp    = pipe.getCamera().getVRP();
@@ -268,40 +275,40 @@ public final class CGCanvas extends Canvas{
                 case W:
                     if (visao == Visao.Frontal){
                         vrp.setY(vrp.getY() + Fatores.fator_movimento_ort);
-                          p.setY(  p.getY() + Fatores.fator_movimento_ort);
+                        p.setY(  p.getY() + Fatores.fator_movimento_ort);
                     } else {
                         vrp.setZ(vrp.getZ() + Fatores.fator_movimento_ort); //Lateral e Topo tem Z no mesmo eixo
-                          p.setZ(  p.getZ() + Fatores.fator_movimento_ort);
+                        p.setZ(  p.getZ() + Fatores.fator_movimento_ort);
                     }
                     changeCam = true;
                     break;
                 case A:
                     if (visao == Visao.Lateral){
                         vrp.setY(vrp.getY() + Fatores.fator_movimento_ort);
-                          p.setY(  p.getY() + Fatores.fator_movimento_ort);
+                        p.setY(  p.getY() + Fatores.fator_movimento_ort);
                     } else {
                         vrp.setX(vrp.getX() + Fatores.fator_movimento_ort); //Frontal e Topo tem X no mesmo eixo
-                          p.setX(  p.getX() + Fatores.fator_movimento_ort);
+                        p.setX(  p.getX() + Fatores.fator_movimento_ort);
                     }
                     changeCam = true;
                     break;
                 case S:
                     if (visao == Visao.Frontal){
                         vrp.setY(vrp.getY() - Fatores.fator_movimento_ort);
-                          p.setY(  p.getY() - Fatores.fator_movimento_ort);
+                        p.setY(  p.getY() - Fatores.fator_movimento_ort);
                     } else {
                         vrp.setZ(vrp.getZ() - Fatores.fator_movimento_ort); //Lateral e Topo tem Z no mesmo eixo
-                          p.setZ(  p.getZ() - Fatores.fator_movimento_ort);
+                        p.setZ(  p.getZ() - Fatores.fator_movimento_ort);
                     }
                     changeCam = true;
                     break;
                 case D:
-                     if (visao == Visao.Lateral){
+                    if (visao == Visao.Lateral){
                         vrp.setY(vrp.getY() - Fatores.fator_movimento_ort);
-                          p.setY(  p.getY() - Fatores.fator_movimento_ort);
+                        p.setY(  p.getY() - Fatores.fator_movimento_ort);
                     } else {
                         vrp.setX(vrp.getX() - Fatores.fator_movimento_ort); //Frontal e Topo tem X no mesmo eixo
-                          p.setX(  p.getX() - Fatores.fator_movimento_ort);
+                        p.setX(  p.getX() - Fatores.fator_movimento_ort);
                     }
                     changeCam = true;
                     break;
@@ -324,7 +331,7 @@ public final class CGCanvas extends Canvas{
         this.setFocusTraversable(true);
         this.addEventFilter(MouseEvent.ANY, (e) -> this.requestFocus());
         this.setOnKeyPressed((KeyEvent event1) -> {
-
+            
             KeyCode pressed = event1.getCode();
             CGPipeline persPipe = vista.getPipe();
             Vertice vrp = persPipe.getCamera().getVRP();
@@ -375,51 +382,52 @@ public final class CGCanvas extends Canvas{
             controller.paint();
         });
         /*perspectiva.setOnMouseDragged((MouseEvent event1) -> {
-            int currentX = (int) event1.getX(),
-                currentY = (int) event1.getY();
-
-            if (previousX == -1){
-                previousX = currentX;
-                previousY = currentY;
-                return;
-            }
-
-            Vertice primeiro = new Vertice(previousX, previousY),
-                    segundo  = new Vertice (currentX, currentY);
-
-            Movimento vert = VMath.movimentoVertical(primeiro, segundo);
-            Movimento hori = VMath.movimentoHorizontal(primeiro, segundo);
-
-            Vista pers = perspectiva.getVista();
-            Vertice p = pers.getPipelineCamera().getP();
-            float dp = pers.getPipe().getDP();
-
-            if (vert == Movimento.Cima){
-                p.setY(p.getY() + (float)0.01);
-                //p.setZ(p.getZ() + (float)0.1);
-            } else if (vert == Movimento.Baixo){
-                p.setY(p.getY() - (float)0.01);
-                //p.setZ(p.getZ() - (float)0.1);
-            }
-
-            if (hori == Movimento.Esquerda){
-                p.setX(p.getX() + (float)0.01);
-                //p.setZ(p.getZ() + (float)0.1);
-            } else if (hori == Movimento.Direita){
-                p.setX(p.getX() - (float)0.01);
-                //p.setZ(p.getZ() - (float)0.1);
-            }
-
-            //double newZ = Math.sqrt((dp*dp)-(p.getY()*p.getY())-(p.getX()*p.getX()));
-            //p.setZ((float) newZ);
-
-            pers.getPipelineCamera().setP(p);
-            paint();
-
-            previousX = currentX;
-            previousY = currentY;
+        int currentX = (int) event1.getX(),
+        currentY = (int) event1.getY();
+        
+        if (previousX == -1){
+        previousX = currentX;
+        previousY = currentY;
+        return;
+        }
+        
+        Vertice primeiro = new Vertice(previousX, previousY),
+        segundo  = new Vertice (currentX, currentY);
+        
+        Movimento vert = VMath.movimentoVertical(primeiro, segundo);
+        Movimento hori = VMath.movimentoHorizontal(primeiro, segundo);
+        
+        Vista pers = perspectiva.getVista();
+        Vertice p = pers.getPipelineCamera().getP();
+        float dp = pers.getPipe().getDP();
+        
+        if (vert == Movimento.Cima){
+        p.setY(p.getY() + (float)0.01);
+        //p.setZ(p.getZ() + (float)0.1);
+        } else if (vert == Movimento.Baixo){
+        p.setY(p.getY() - (float)0.01);
+        //p.setZ(p.getZ() - (float)0.1);
+        }
+        
+        if (hori == Movimento.Esquerda){
+        p.setX(p.getX() + (float)0.01);
+        //p.setZ(p.getZ() + (float)0.1);
+        } else if (hori == Movimento.Direita){
+        p.setX(p.getX() - (float)0.01);
+        //p.setZ(p.getZ() - (float)0.1);
+        }
+        
+        //double newZ = Math.sqrt((dp*dp)-(p.getY()*p.getY())-(p.getX()*p.getX()));
+        //p.setZ((float) newZ);
+        
+        pers.getPipelineCamera().setP(p);
+        paint();
+        
+        previousX = currentX;
+        previousY = currentY;
         });*/
     }
+//</editor-fold>
     
     private int previousX, previousY;
     private int draggedCount = 0;
@@ -436,6 +444,15 @@ public final class CGCanvas extends Canvas{
                     //Nregular newreg = new Nregular(6, 66, clicked);
                     //////getVistaFromVisao(Visao.Frontal).getPipe().reverseConversion(newreg);
                     //mundo.addObject(newreg);
+                } else if (criacaoProperty.get() == CriacaoPrevolucao.gridSnap){
+                    float[] closestIntercept = grid.closestIntercept((int) e.getX(), (int) e.getY(), Fatores.fator_threshold);
+                    if (closestIntercept == null) return;
+                    else{
+                        clicked.setX(closestIntercept[0]);
+                        clicked.setY(closestIntercept[1]);
+                        vista.getPipe().reverseConversion(clicked);
+                        mundo.addTempPoint(clicked);
+                    }
                 }
             } else if (selProperty.get() == FERRAMENTA_SEL){
                 if (ferramentasProperty.get() == Ferramentas.Select){
@@ -465,8 +482,23 @@ public final class CGCanvas extends Canvas{
     private void mouseOnMoved(){
         this.setOnMouseMoved((Event event) -> {
             if (selProperty.get() == TRANSFORMACAO_SEL){
-                if (draggedCount == 0)
+                
+                Transformacoes t = transformacoesProperty.get();
+                if (t == Transformacoes.Cisalhamento || t == Transformacoes.Escala){
+                    
+                    if (axisOfOperationProperty.get() == Eixo.Eixo_X)
+                        this.setCursor(Cursor.H_RESIZE);   
+                    else if (axisOfOperationProperty.get() == Eixo.Eixo_Y)
+                        this.setCursor(Cursor.V_RESIZE);
+                    else
+                        this.setCursor(Cursor.MOVE);
+                    
+                } else if (t == Transformacoes.Translacao){
                     this.setCursor(Cursor.OPEN_HAND);
+                } else {
+                    this.setCursor(Cursor.HAND);
+                }
+                
             } else {
                 this.setCursor(Cursor.DEFAULT);
             }
@@ -476,9 +508,25 @@ public final class CGCanvas extends Canvas{
     private void mouseOnReleased(){
         this.setOnMouseReleased((MouseEvent event) -> {
             draggedCount = 0;
-            if (selProperty.get() == TRANSFORMACAO_SEL)
-                this.setCursor(Cursor.OPEN_HAND);
-            else
+            if (selProperty.get() == TRANSFORMACAO_SEL){
+                
+                Transformacoes t = transformacoesProperty.get();
+                if (t == Transformacoes.Cisalhamento || t == Transformacoes.Escala){
+                    
+                    if (axisOfOperationProperty.get() == Eixo.Eixo_X)
+                        this.setCursor(Cursor.H_RESIZE);   
+                    else if (axisOfOperationProperty.get() == Eixo.Eixo_Y)
+                        this.setCursor(Cursor.V_RESIZE);
+                    else
+                        this.setCursor(Cursor.MOVE);
+                    
+                } else if (t == Transformacoes.Translacao){
+                    this.setCursor(Cursor.OPEN_HAND);
+                } else {
+                    this.setCursor(Cursor.DEFAULT);
+                }
+                
+            } else
                 this.setCursor(Cursor.DEFAULT);
         });
     }
@@ -486,9 +534,10 @@ public final class CGCanvas extends Canvas{
     private void mouseOnPressed(){
         this.setOnMousePressed((MouseEvent event) -> {
             draggedCount=0;
-            if (selProperty.get() == TRANSFORMACAO_SEL)
-                this.setCursor(Cursor.CLOSED_HAND);
-            else
+            if (selProperty.get() == TRANSFORMACAO_SEL){
+                if (transformacoesProperty.get() == Transformacoes.Translacao)
+                    this.setCursor(Cursor.CLOSED_HAND);
+            } else
                 this.setCursor(Cursor.DEFAULT);
         });
     }
@@ -510,7 +559,7 @@ public final class CGCanvas extends Canvas{
 
                 CGObject object = vista.getObject(selectedObjProperty.get());
                               
-                float signalX=-1, signalY=-1;
+                float signalX=-1, signalY=-1, signalZ=1;
                 
                 if (transformacoesProperty.get() == Transformacoes.Cisalhamento){
                     
@@ -522,6 +571,8 @@ public final class CGCanvas extends Canvas{
                         signalY = (previousY > newMouseY ? Fatores.getFatorCisalhamentoMinus() : (previousY < newMouseY ? Fatores.getFatorCisalhamentoPlus() : 0));
                    else signalY = 0; 
                    
+                   if (axisOfOperationProperty.get() == Eixo.Eixo_XYZ) signalZ = signalY = signalX;
+                   
                 } else if (transformacoesProperty.get() == Transformacoes.Escala){
                     
                     if (axisOfOperationProperty.get() == Eixo.Eixo_X || axisOfOperationProperty.get() == Eixo.Eixo_XY)
@@ -529,8 +580,15 @@ public final class CGCanvas extends Canvas{
                     else signalX = 1;
 
                     if (axisOfOperationProperty.get() == Eixo.Eixo_Y || axisOfOperationProperty.get() == Eixo.Eixo_XY)
-                         signalY = (previousY > newMouseY ? Fatores.getFatorEscalaMinus() : (previousY < newMouseY ? Fatores.getFatorEscalaPlus() : 1));
+                         signalY = (previousY > newMouseY ? Fatores.getFatorEscalaPlus() : (previousY < newMouseY ? Fatores.getFatorEscalaMinus() : 1));
                     else signalY = 1; 
+                    
+                    if (axisOfOperationProperty.get() == Eixo.Eixo_XYZ) signalZ = signalY = signalX;
+                    
+                } else if (transformacoesProperty.get() == Transformacoes.Rotacao){
+                    
+                    signalX = (previousX > newMouseX ? -Fatores.fator_rotacao : (previousX < newMouseX ? Fatores.fator_rotacao : 0));
+                    //signalY = (previousY > newMouseY ? -Fatores.fator_rotacao : (previousY < newMouseY ? Fatores.fator_rotacao : 0));
                     
                 }
                 
@@ -540,11 +598,14 @@ public final class CGCanvas extends Canvas{
                         c.cisalhamento(signalX, signalY, object, object.getCentroide());
                         break;
                     case Rotacao:
-                        
+                        Rotacao r = new Rotacao(true);
+                             if (visao == Visao.Frontal) r.rotacaoZ(signalX, object, object.getCentroide());
+                        else if (visao == Visao.Lateral) r.rotacaoX(signalX, object, object.getCentroide());
+                        else if (visao == Visao.Topo)    r.rotacaoY(signalX, object, object.getCentroide());
                         break;
                     case Escala:
                         Escala e = new Escala(true);
-                        e.escala(signalX, signalY, 1, object, object.getCentroide());
+                        e.escala(signalX, signalY, signalZ, object, object.getCentroide());
                         break;
                     case Translacao:
                         Translacao t = new Translacao(true);

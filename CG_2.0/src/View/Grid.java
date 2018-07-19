@@ -15,6 +15,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
 import m.Visao;
+import utils.math.VMath;
 
 /**
  *
@@ -28,8 +29,8 @@ public class Grid extends ImageView{
     private final Image AUTO;
     private Canvas drawableGrid;
     
-    private int cellSizePX = 50;
-    private Color gridColor = Color.RED;
+    private int cellSizePX;
+    private Color gridColor = Color.LIGHTGRAY;
     private int gridThickness = 2;
     
     private boolean showGrid = true;
@@ -74,17 +75,29 @@ public class Grid extends ImageView{
     }
     
     private void redraw(){
+        int gridWidth  = (int) drawableGrid.getWidth(),
+            gridHeight = (int) drawableGrid.getHeight();
+        
         GraphicsContext graph = drawableGrid.getGraphicsContext2D();
-        graph.clearRect(0, 0, drawableGrid.getWidth(), drawableGrid.getHeight());
+        graph.clearRect(0, 0, gridWidth, gridHeight);
         
         //Grid por baixo de tudo
         if (showGrid){
             graph.setStroke(gridColor); //Cor da linha
             graph.setLineWidth(gridThickness); //Espessura da linha
-
+            
             //HERE
-            graph.strokeLine(0, 0, drawableGrid.getWidth(), drawableGrid.getHeight());
-
+            int currentHeight=cellSizePX;
+            while (currentHeight < gridHeight){
+                graph.strokeLine(0, currentHeight, gridWidth, currentHeight);
+                currentHeight += cellSizePX;
+            }
+            
+            int currentWidth=cellSizePX;
+            while (currentWidth < gridWidth){
+                graph.strokeLine(currentWidth, 0, currentWidth, gridHeight);
+                currentWidth += cellSizePX;
+            }
 
             //END
         }
@@ -97,7 +110,7 @@ public class Grid extends ImageView{
         
         SnapshotParameters parameters = new SnapshotParameters();
         parameters.setFill(Color.TRANSPARENT);
-        this.setImage(drawableGrid.snapshot(parameters, new WritableImage((int) drawableGrid.getWidth(), (int) drawableGrid.getHeight())));
+        this.setImage(drawableGrid.snapshot(parameters, new WritableImage((int) gridWidth, (int) gridHeight)));
     }
 
     public void setCellSizePX(int cellSizePX) {
@@ -138,5 +151,42 @@ public class Grid extends ImageView{
             this.showAutoHotkeys = show;
             redraw();
         }  
+    }
+    
+    public float[] closestIntercept(float x, float y, int threshold){
+        int x_div = (int) (x/cellSizePX);
+        int y_div = (int) (y/cellSizePX);
+        
+        // Left Top
+        int x_cell = x_div*cellSizePX;
+        int y_cell = y_div*cellSizePX;
+        double dist = VMath.distancia(x_cell, y_cell, x, y);
+        if (dist < threshold){
+            return new float[]{ x_cell, y_cell};
+        }
+        
+        // Right Top
+        x_cell = (x_div+1)*cellSizePX;
+        dist = VMath.distancia(x_cell, y_cell, x, y);
+        if (dist < threshold){
+            return new float[]{ x_cell, y_cell};
+        }
+        
+        // Left Bottom
+        x_cell = x_div*cellSizePX;
+        y_cell = (y_div+1)*cellSizePX;
+        dist = VMath.distancia(x_cell, y_cell, x, y);
+        if (dist < threshold){
+            return new float[]{ x_cell, y_cell};
+        }
+        
+        // Right Bottom
+        x_cell = (x_div+1)*cellSizePX;
+        dist = VMath.distancia(x_cell, y_cell, x, y);
+        if (dist < threshold){
+            return new float[]{ x_cell, y_cell};
+        }
+        
+        return null;
     }
 }

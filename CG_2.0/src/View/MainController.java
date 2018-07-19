@@ -8,10 +8,7 @@ package View;
 import View.Config.ChangeFactorsController;
 import View.Config.ManualCamController;
 import View.Options.TransformacaoController;
-import View.Options.PaintController;
 import View.Options.PolySelectController;
-import View.Options.RegularPolygonController;
-import View.Options.RevBuildController;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -37,6 +34,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
@@ -83,6 +81,7 @@ public class MainController implements Initializable {
     @FXML private MenuItem factors;
     @FXML private Slider      gridThickness;
     @FXML private Slider      gridOpacity;
+    @FXML private Slider      gridSize;
     @FXML private ColorPicker gridColor;
     
     @FXML private TreeView<String> tools;
@@ -144,7 +143,7 @@ public class MainController implements Initializable {
         frente .zoomProperty().bindBidirectional(frenteZoom.textProperty());
         lateral.zoomProperty().bindBidirectional(lateralZoom.textProperty());
         topo   .zoomProperty().bindBidirectional(topoZoom.textProperty());
-        perspectiva.zoomProperty().bindBidirectional(frenteZoom.textProperty());
+        perspectiva.zoomProperty().bindBidirectional(persZoom.textProperty());
 
         ///Selected Object
         selectedObjectProperty = new SimpleObjectProperty();
@@ -198,36 +197,40 @@ public class MainController implements Initializable {
         frente.widthProperty().bind(parentPane.widthProperty());
         frente.heightProperty().bind(parentPane.heightProperty());
         frenteGrid = new Grid(frente, Visao.Frontal);
-        frenteGrid.setOpacity(0.35);
+        frenteGrid.setOpacity(Fatores.DEFAULT_OPACITY);
         /*grid.setFocusTraversable(true);*/ frenteGrid.setMouseTransparent(true);
         parentPane.getChildren().add(frenteGrid);
+        frente.setGrid(frenteGrid);
         
         parentPane = (StackPane) lateral.getParent();
         parentPane.resize(lateral.getWidth(), lateral.getHeight());
         lateral.widthProperty().bind(parentPane.widthProperty());
         lateral.heightProperty().bind(parentPane.heightProperty());
         lateralGrid = new Grid(lateral, Visao.Lateral);
-        lateralGrid.setOpacity(0.35);
+        lateralGrid.setOpacity(Fatores.DEFAULT_OPACITY);
         /*grid.setFocusTraversable(true);*/ lateralGrid.setMouseTransparent(true);
         parentPane.getChildren().add(lateralGrid);
+        lateral.setGrid(lateralGrid);
         
         parentPane = (StackPane) topo.getParent();
         parentPane.resize(topo.getWidth(), topo.getHeight());
         topo.widthProperty().bind(parentPane.widthProperty());
         topo.heightProperty().bind(parentPane.heightProperty());
         topoGrid = new Grid(topo, Visao.Topo);
-        topoGrid.setOpacity(0.35);
+        topoGrid.setOpacity(Fatores.DEFAULT_OPACITY);
         /*grid.setFocusTraversable(true);*/ topoGrid.setMouseTransparent(true);
         parentPane.getChildren().add(topoGrid);
+        topo.setGrid(topoGrid);
         
         parentPane = (StackPane) perspectiva.getParent();
         parentPane.resize(perspectiva.getWidth(), perspectiva.getHeight());
         perspectiva.widthProperty().bind(parentPane.widthProperty());
         perspectiva.heightProperty().bind(parentPane.heightProperty());
         persGrid = new Grid(perspectiva, Visao.Perspectiva);
-        persGrid.setOpacity(0.35);
+        persGrid.setOpacity(Fatores.DEFAULT_OPACITY);
         /*grid.setFocusTraversable(true); grid.setMouseTransparent(true);*/ //Sem click na perspectiva mesmo...
         parentPane.getChildren().add(persGrid);
+        perspectiva.setGrid(persGrid);
         
         ////Atualização de pintura
         ChangeListener<Number> canvasSizeListener = (ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
@@ -262,8 +265,8 @@ public class MainController implements Initializable {
         );
         
         criacao.getChildren().addAll(
-            new TreeItem<>(CriacaoPrevolucao.free.NAME,   new ImageView(CriacaoPrevolucao.free.ICON))//,
-            //new TreeItem<>(CriacaoPrevolucao.gridSnap.NAME, new ImageView(CriacaoPrevolucao.gridSnap.ICON))
+            new TreeItem<>(CriacaoPrevolucao.free.NAME,     new ImageView(CriacaoPrevolucao.free.ICON)),
+            new TreeItem<>(CriacaoPrevolucao.gridSnap.NAME, new ImageView(CriacaoPrevolucao.gridSnap.ICON))
         );
         
         transformacoes.getChildren().addAll(
@@ -327,9 +330,6 @@ public class MainController implements Initializable {
             dialog.show();
         });
         
-        /*gridThickness.valueProperty().addListener((ObservableValue<? extends Number> observable, Number oldValue, Number newValue) -> {
-            System.out.println("GRID THICK: OLD=" + oldValue + " New="+ newValue);
-        });*/ //Muitos updates se não fazer um check com "valueChangingProperty()"
         gridThickness.setOnMouseReleased((Event event) -> {
             int thickness = gridThickness.valueProperty().intValue();
             frenteGrid.setGridThickness(thickness);
@@ -338,6 +338,18 @@ public class MainController implements Initializable {
             persGrid.setGridThickness(thickness);
         });
         
+        Tooltip opac = new Tooltip("30");
+        opac.setAutoHide(true);
+        gridOpacity.setTooltip(opac);
+        gridOpacity.setOnMouseDragged((MouseEvent event) -> {
+            opac.setText(String.format("%.2f", gridOpacity.valueProperty().doubleValue()));
+            gridOpacity.getTooltip().show(menu.getScene().getWindow(), event.getScreenX()+10, event.getScreenY()+10);
+        });
+        gridOpacity.setOnMouseClicked((MouseEvent event) -> {
+            opac.setText(String.format("%.2f", gridOpacity.valueProperty().doubleValue()));
+            gridOpacity.getTooltip().show(menu.getScene().getWindow(), event.getScreenX()+10, event.getScreenY()+10);
+        });
+        gridOpacity.setOnMouseExited((MouseEvent event) -> { opac.hide(); });
         gridOpacity.setOnMouseReleased((Event event) -> {
             double opacity = gridOpacity.valueProperty().get();
             frenteGrid.setOpacity(opacity);
@@ -345,8 +357,29 @@ public class MainController implements Initializable {
             topoGrid.setOpacity(opacity);
             persGrid.setOpacity(opacity);
         });
+                
+        Tooltip tool = new Tooltip("30");
+        tool.setAutoHide(true);
+        gridSize.setTooltip(tool);
+        gridSize.setOnMouseDragged((MouseEvent event) -> {
+            tool.setText(String.valueOf(Math.round(gridSize.valueProperty().doubleValue())));
+            gridSize.getTooltip().show(menu.getScene().getWindow(), event.getScreenX()+10, event.getScreenY()+10);
+        });
+        gridSize.setOnMouseExited((MouseEvent event) -> { tool.hide(); });
+        gridSize.setOnMouseClicked((MouseEvent event) -> {
+            tool.setText(String.valueOf(Math.round(gridSize.valueProperty().doubleValue())));
+            gridSize.getTooltip().show(menu.getScene().getWindow(), event.getScreenX()+10, event.getScreenY()+10);
+        });
+        gridSize.setOnMouseReleased((MouseEvent event) -> {
+            int cellSize = gridSize.valueProperty().intValue();
+            
+            frenteGrid.setCellSizePX(cellSize);
+            lateralGrid.setCellSizePX(cellSize);
+            topoGrid.setCellSizePX(cellSize);
+            persGrid.setCellSizePX(cellSize);
+        });
         
-        gridColor.valueProperty().set(Color.RED);
+        gridColor.valueProperty().set(Color.LIGHTGRAY);
         gridColor.valueProperty().addListener((ObservableValue<? extends Color> observable, Color oldValue, Color newValue) -> {
             Color color = newValue;
             frenteGrid.setGridColor(color);
@@ -666,7 +699,7 @@ public class MainController implements Initializable {
                 break;
                 
             case TRANSFORMACAO_SEL:
-                if (null != current_ferr.get()) switch (current_tra.get()) {
+                if (null != current_tra.get()) switch (current_tra.get()) {
                     case Escala:
                         load("/View/Options/Transformacao.fxml", new TransformacaoController(axisOfOperationProperty, Transformacoes.Escala));
                         options.getChildren().clear();
@@ -674,6 +707,11 @@ public class MainController implements Initializable {
                         break;
                     case Cisalhamento:
                         load("/View/Options/Transformacao.fxml", new TransformacaoController(axisOfOperationProperty, Transformacoes.Cisalhamento));
+                        options.getChildren().clear();
+                        options.getChildren().add(option);
+                        break;
+                    case Rotacao:
+                        load("/View/Options/Transformacao.fxml", new TransformacaoController(axisOfOperationProperty, Transformacoes.Rotacao));
                         options.getChildren().clear();
                         options.getChildren().add(option);
                         break;

@@ -86,7 +86,9 @@ public class ChangeFactorsController implements Initializable {
             threshold .setText(Integer.toString(Fatores.fator_threshold));
         });
         threshold_ok.setOnAction((ActionEvent event) -> {
-            Fatores.fator_threshold = Integer.parseInt(threshold.getText());
+            float num = Float.parseFloat(threshold.getText());
+            
+            Fatores.fator_threshold = Math.round(num);
         });
         ///////////////////
         rotacao_reset.setOnAction((ActionEvent event) -> {
@@ -119,7 +121,7 @@ public class ChangeFactorsController implements Initializable {
         mov_ort .setText(Float.toString(Fatores.fator_movimento_ort));
         mov_pers.setText(Float.toString(Fatores.fator_movimento_pers));
         zoom.setText(Float.toString(Fatores.fator_zoom));
-        threshold.setText(Float.toString(Fatores.fator_threshold));
+        threshold.setText(Integer.toString(Fatores.fator_threshold));
         rotacao.setText(Float.toString(Fatores.fator_rotacao));
         escala.setText(Float.toString((Fatores.getFatorEscalaPlus()*100)-100));
         cisalhamento.setText(Float.toString((Fatores.getFatorCisalhamentoPlus()*100)));

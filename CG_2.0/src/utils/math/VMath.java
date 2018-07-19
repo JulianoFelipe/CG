@@ -83,6 +83,13 @@ public class VMath {
         return Math.sqrt(firstT + secndT + thirdT);
     }
     
+    public static double distancia(float x1, float y1, float x2, float y2){
+        double firstT = Math.pow((x1 - x2),2);
+        double secndT = Math.pow((y1 - y2),2);
+        
+        return Math.sqrt(firstT + secndT);
+    }
+    
     //https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
     public static double shortestDistance2D(Aresta a, Vertice p) {
         float px=a.getvFinal().getX() - a.getvInicial().getX();

@@ -50,6 +50,11 @@
                                     <Slider fx:id="gridOpacity" blockIncrement="0.05" majorTickUnit="0.25" max="1.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" style="-fx-background-color: GRAY;" value="0.35" />
                                  </graphic>
                               </MenuItem>
+                              <MenuItem mnemonicParsing="false" text="Tamanho">
+                                 <graphic>
+                                    <Slider fx:id="gridSize" blockIncrement="5.0" majorTickUnit="5.0" max="50.0" min="20.0" minorTickCount="4" showTickLabels="true" showTickMarks="true" snapToTicks="true" style="-fx-background-color: GRAY;" value="30.0" />
+                                 </graphic>
+                              </MenuItem>
                           </items>
                         </Menu>
                       <MenuItem fx:id="factors" mnemonicParsing="false" text="Fatores de alteração" />

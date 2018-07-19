@@ -12,14 +12,18 @@ package View;
 public class Fatores {
     /////////////////////////////////////////////////////////////
     // DEFAULT FATORES NUMERICOS
+    public static final float DEFAULT_OPACITY  = (float) 0.35;
+    
+    /////////////////////////////////////////////////////////////
+    // DEFAULT FATORES NUMERICOS
     public static final float DEFAULT_MOVIMENTO_ORT  = (float) 1;
     public static final float DEFAULT_MOVIMENTO_PERS = (float) 0.1;
     
     public static final float DEFAULT_ZOOM = (float) 0.05;
     
-    public static final int   DEFAULT_THRESHOLD = 5;
+    public static final int   DEFAULT_THRESHOLD = 20;
     
-    public static final float DEFAULT_ROTACAO      = 1;
+    public static final float DEFAULT_ROTACAO      = (float) 0.05;
     public static final float DEFAULT_ESCALA       = 1;
     public static final float DEFAULT_CISALHAMENTO = 1;
     
