@@ -64,14 +64,15 @@ public class TransformacaoController implements Initializable {
                 text = new Text("Fator de escala em porcentagem. Funciona de modo que se, por exemplo,"
                 + " o fator for 1%, a cada operação (determinada pelo movimento de arraste do mouse) o"
                 + " objeto tem sua escala ampliada/reduzida em 1%. Se a opção \"Somente largura\" estiver"
-                + " selecionada, apenas os movimentos horizontais serão considerados. O equivalente para \"Somente altura\" e \"Ambos\"."); 
+                + " selecionada, apenas os movimentos horizontais serão considerados e só a largura será afetada. Idem para os restantes."); 
                 break;
             case Cisalhamento:
                 text = new Text("Fator de cisalhamento em porcentagem. Funciona de modo que se, por exemplo,"
                 + " o fator for 1%, a cada operação (determinada pelo movimento de arraste do mouse) o objeto tem 1% do valor das"
-                + " coordenadas do eixo horizontal acrescentado nas do eixo vertical, e/ou vice versa, dependendo da opção selecionada."
-                + " Se a opção \"Somente largura\" estiver selecionada, apenas os movimentos horizontais serão considerados. O equivalente"
-                + " para \"Somente altura\" e \"Ambos\".");  
+                + " coordenadas horizontais acrescentado nas verticais, e/ou vice versa, dependendo da opção selecionada."
+                + " Se a opção \"Somente largura\" estiver selecionada, apenas os movimentos horizontais serão considerados e só a largura"
+                + " será afetada. Idem para os restantes.");  
+                allRadio.setDisable(true); 
                 break;
             case Rotacao:
                 factorLabel.textProperty().set("Fator (°)");
@@ -88,6 +89,8 @@ public class TransformacaoController implements Initializable {
         }
         
         textFlow.getChildren().add(text);
+        
+        if (axisOfOperationProperty.get()==Eixo.Eixo_XYZ && tra==Transformacoes.Cisalhamento) axisOfOperationProperty.set(Eixo.Eixo_XY);
         
         Eixo axis = axisOfOperationProperty.get();
              if (axis == Eixo.Eixo_X)   justX.selectedProperty().set(true); 

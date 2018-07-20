@@ -1,10 +1,12 @@
 package m.poligonos;
 
+import java.io.Serializable;
+
 /**
  * Classe da estrutura e manipulacao de vertices
  * @author Anderson
  */
-public class Vertice{
+public class Vertice implements Serializable{
     private static long INSTANCES=0;
     private final long ID;
     private float x,y,z,w;

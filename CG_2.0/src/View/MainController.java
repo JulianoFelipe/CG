@@ -289,6 +289,13 @@ public class MainController implements Initializable {
             lateralGrid.showGrid(show);
             topoGrid.showGrid(show);
             persGrid.showGrid(show);
+            
+            if (show){ //Hardcoding intensifies
+                tools.getRoot().getChildren().get(1).getChildren().add(new TreeItem<>(CriacaoPrevolucao.gridSnap.NAME, new ImageView(CriacaoPrevolucao.gridSnap.ICON)));
+            } else {
+                current_pol.set(CriacaoPrevolucao.free); // Tee hee hee
+                tools.getRoot().getChildren().get(1).getChildren().remove(1);
+            }
         });
         
         showAxisIcon.setOnAction((ActionEvent event) -> {
@@ -389,6 +396,8 @@ public class MainController implements Initializable {
         });
         
         salvar.setOnAction((ActionEvent event) -> {
+            if (showAxis.selectedProperty().get()) mundo.removeAxis();
+            
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Arquivos de CG (*.jas)", "*.jas");
@@ -402,6 +411,8 @@ public class MainController implements Initializable {
                     Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+            
+            if (showAxis.selectedProperty().get()) mundo.addAxis();
         });
         
         carregar.setOnAction((ActionEvent event) -> {

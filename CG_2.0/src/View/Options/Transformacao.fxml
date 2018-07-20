@@ -58,7 +58,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" />
                </VBox.margin>
             </RadioButton>
-            <RadioButton fx:id="both" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" selected="true" text="Ambos" toggleGroup="$group1">
+            <RadioButton fx:id="both" mnemonicParsing="false" prefHeight="25.0" prefWidth="183.0" selected="true" text="Altura e Largura" toggleGroup="$group1">
                <VBox.margin>
                   <Insets bottom="5.0" left="5.0" right="5.0" />
                </VBox.margin>

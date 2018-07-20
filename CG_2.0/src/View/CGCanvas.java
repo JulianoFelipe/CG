@@ -561,30 +561,33 @@ public final class CGCanvas extends Canvas{
                               
                 float signalX=-1, signalY=-1, signalZ=1;
                 
+                Eixo axisOfOp = axisOfOperationProperty.get();
+                
                 if (transformacoesProperty.get() == Transformacoes.Cisalhamento){
                     
-                    if (axisOfOperationProperty.get() == Eixo.Eixo_X || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                    if (axisOfOp == Eixo.Eixo_X || axisOfOp == Eixo.Eixo_XY)
                         signalX = (previousX > newMouseX ? Fatores.getFatorCisalhamentoMinus() : (previousX < newMouseX ? Fatores.getFatorCisalhamentoPlus(): 0));
                    else signalX = 0;
 
-                   if (axisOfOperationProperty.get() == Eixo.Eixo_Y || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                   if (axisOfOp == Eixo.Eixo_Y || axisOfOp == Eixo.Eixo_XY)
                         signalY = (previousY > newMouseY ? Fatores.getFatorCisalhamentoMinus() : (previousY < newMouseY ? Fatores.getFatorCisalhamentoPlus() : 0));
                    else signalY = 0; 
                    
-                   if (axisOfOperationProperty.get() == Eixo.Eixo_XYZ) signalZ = signalY = signalX;
-                   
                 } else if (transformacoesProperty.get() == Transformacoes.Escala){
                     
-                    if (axisOfOperationProperty.get() == Eixo.Eixo_X || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                    if (axisOfOp == Eixo.Eixo_X || axisOfOp == Eixo.Eixo_XY || axisOfOp == Eixo.Eixo_XYZ)
                          signalX = (previousX > newMouseX ? Fatores.getFatorEscalaMinus() : (previousX < newMouseX ? Fatores.getFatorEscalaPlus() : 1));
                     else signalX = 1;
 
-                    if (axisOfOperationProperty.get() == Eixo.Eixo_Y || axisOfOperationProperty.get() == Eixo.Eixo_XY)
+                    if (axisOfOp == Eixo.Eixo_Y || axisOfOp == Eixo.Eixo_XY || axisOfOp == Eixo.Eixo_XYZ)
                          signalY = (previousY > newMouseY ? Fatores.getFatorEscalaPlus() : (previousY < newMouseY ? Fatores.getFatorEscalaMinus() : 1));
                     else signalY = 1; 
                     
-                    if (axisOfOperationProperty.get() == Eixo.Eixo_XYZ) signalZ = signalY = signalX;
-                    
+                    if (axisOfOp == Eixo.Eixo_XYZ){
+                             if (signalX != 1) signalZ = signalY = signalX;
+                        else if (signalY != 1) signalZ = signalX = signalY;
+                    }
+
                 } else if (transformacoesProperty.get() == Transformacoes.Rotacao){
                     
                     signalX = (previousX > newMouseX ? -Fatores.fator_rotacao : (previousX < newMouseX ? Fatores.fator_rotacao : 0));

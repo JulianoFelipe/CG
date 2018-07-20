@@ -5,11 +5,13 @@
  */
 package m.poligonos.we_edge;
 
+import java.io.Serializable;
+
 /**
  *
  * @author JFPS
  */
-public class WE_Face {
+public class WE_Face implements Serializable{
     private static long INSTANCES=0;
     public final long ID;
     private WE_Aresta arestaDaFace;

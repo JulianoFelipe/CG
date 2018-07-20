@@ -62,7 +62,7 @@ public class Grid extends ImageView{
     
     public Grid(Canvas canvas, Visao axis, int cellSizePX){ this(canvas, axis.getImage(), cellSizePX, Visao.getAutoHotkeyImage(axis)); }
 
-    public Grid(Canvas canvas, Visao axis){ this(canvas, axis, 50);}
+    public Grid(Canvas canvas, Visao axis){ this(canvas, axis, 30);}
     
     private double calcLowerY(Image imgToDraw, Canvas canvas, int pxLowerMargin){
         double max = canvas.getHeight(); 

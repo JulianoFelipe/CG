@@ -23,7 +23,7 @@ public abstract class CGObject implements Serializable{
     protected boolean isChromatic = true;
     protected boolean setK=false;
     
-    protected BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    protected transient BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     
     protected CGObject(){ 
         this.ID = INSTANCES++;
