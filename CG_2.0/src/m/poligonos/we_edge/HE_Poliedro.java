@@ -30,6 +30,8 @@ public class HE_Poliedro extends CGObject {
     private final List<WE_Face>    listaDeFaces;
     private final boolean[] visibilidade_faces;
 
+    //private final Vertice[] normais;
+    
     private transient Camera lastCamCopy;
     
     private float min_x, max_x,

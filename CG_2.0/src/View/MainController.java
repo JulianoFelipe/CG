@@ -7,6 +7,7 @@ package View;
 
 import View.Config.ChangeFactorsController;
 import View.Config.ManualCamController;
+import View.Options.LuzesPontuaisController;
 import View.Options.TransformacaoController;
 import View.Options.PolySelectController;
 import java.io.File;
@@ -56,6 +57,7 @@ import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
+import m.shader.Wireframe;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
@@ -125,10 +127,10 @@ public class MainController implements Initializable {
         
         for (Vista v : mundo.getVistas()){
             switch (v.getVisao()) {
-                case Frontal: frente  = new CGCanvas(this, v, width, height); break;
-                case Lateral: lateral = new CGCanvas(this, v, width, height); break;
-                case Topo:    topo    = new CGCanvas(this, v, width, height); break;
-                case Perspectiva: perspectiva = new CGCanvas(this, v, width, height); break;
+                case Frontal: frente  = new CGCanvas(this, v, width, height, new Wireframe()); break;
+                case Lateral: lateral = new CGCanvas(this, v, width, height, new Wireframe()); break;
+                case Topo:    topo    = new CGCanvas(this, v, width, height, new Wireframe()); break;
+                case Perspectiva: perspectiva = new CGCanvas(this, v, width, height, new Wireframe()); break;
                 default: throw new IllegalArgumentException("Visão não possui canvas equivalente adicionado.");
             }
         }
@@ -260,8 +262,8 @@ public class MainController implements Initializable {
         
         ferramentas.getChildren().addAll(
             new TreeItem<>(Ferramentas.Select.NAME, new ImageView(Ferramentas.Select.ICON)),
-            new TreeItem<>(Ferramentas.Delete.NAME, new ImageView(Ferramentas.Delete.ICON)),
-            new TreeItem<>(Ferramentas.Paint.NAME,  new ImageView(Ferramentas.Paint.ICON))
+            new TreeItem<>(Ferramentas.LuzAmbiente.NAME, new ImageView(Ferramentas.LuzAmbiente.ICON)),
+            new TreeItem<>(Ferramentas.LuzPontual.NAME,  new ImageView(Ferramentas.LuzPontual.ICON))
         );
         
         criacao.getChildren().addAll(
@@ -633,7 +635,7 @@ public class MainController implements Initializable {
             if (ferr != null){
                 CURRENT_SEL.set(FERRAMENTA_SEL);
                 current_ferr.set(ferr);
-                loadPrevious = previous_sel == FERRAMENTA_SEL;
+                loadPrevious = (previous_sel == FERRAMENTA_SEL) && (previous_ferr==ferr);
             } else if (pol != null){
                 CURRENT_SEL.set(REVOLUCAO_SEL);
                 current_pol.set(pol);
@@ -644,7 +646,7 @@ public class MainController implements Initializable {
                 loadPrevious = false;
             } else {
                 CURRENT_SEL.set(NOTHING_SEL);
-                loadPrevious = previous_sel == FERRAMENTA_SEL;
+                loadPrevious = (previous_sel == FERRAMENTA_SEL) && (previous_ferr==Ferramentas.Select);
             }
             
             handleSelectedTool();
@@ -686,24 +688,26 @@ public class MainController implements Initializable {
         switch(CURRENT_SEL.get()){
             case FERRAMENTA_SEL:
                 if (null != current_ferr.get()) switch (current_ferr.get()) {
-                    case Paint:
-                        //load("/View/Options/Paint.fxml", new PaintController());
-                        options.getChildren().clear();
-                        //options.getChildren().add(option);
-                        break;
-                    case Select:
-                        load("/View/Options/PolySelect.fxml", new PolySelectController(selectedObjectProperty));
+                    case LuzPontual:
+                        load("/View/Options/LuzesPontuais.fxml", new LuzesPontuaisController());
                         options.getChildren().clear();
                         options.getChildren().add(option);
                         break;
-                    case Delete:
+                    case Select:
+                        load("/View/Options/PolySelect.fxml", new PolySelectController(selectedObjectProperty, this));
                         options.getChildren().clear();
+                        options.getChildren().add(option);
+                        break;
+                    case LuzAmbiente:
+                        //load("/View/Options/LuzAmbiente.fxml", new LuzAmbienteController());
+                        options.getChildren().clear();
+                        //options.getChildren().add(option);
                         break;
                 }
                 break;
             case REVOLUCAO_SEL:
                 if(null != current_pol.get() && current_pol.get() == CriacaoPrevolucao.free){                    
-                    load("/View/Options/RevBuildOption.fxml", null);
+                    load("/View/Options/RevBuild.fxml", null);
                     options.getChildren().clear();
                     options.getChildren().add(option);
                 }

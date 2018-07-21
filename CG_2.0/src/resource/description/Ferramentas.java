@@ -12,9 +12,9 @@ import javafx.scene.image.Image;
  * @author JFPS
  */
 public enum Ferramentas {
-    Select("Seleção",  new Image(Ferramentas.class.getResourceAsStream("/resource/images/select.png"))),
-    Delete("Exclusão", new Image(Ferramentas.class.getResourceAsStream("/resource/images/delete.png"))),
-    Paint ("Pintura",  new Image(Ferramentas.class.getResourceAsStream("/resource/images/paint.png")));
+    Select     ("Seleção",     new Image(Ferramentas.class.getResourceAsStream("/resource/images/select.png"))),
+    LuzAmbiente("Luz Ambiente", new Image(Ferramentas.class.getResourceAsStream("/resource/images/light_ambient.png"))),
+    LuzPontual ("Luzes Pontuais",  new Image(Ferramentas.class.getResourceAsStream("/resource/images/light_point.png")));
     
     public final String NAME;
     public final Image ICON;

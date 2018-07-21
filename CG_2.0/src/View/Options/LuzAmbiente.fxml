@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane id="AnchorPane" prefHeight="238.0" prefWidth="193.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TabPane tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Luzes">
+               <content>
+                  <VBox>
+                     <children>
+                        <TreeView prefHeight="210.0" prefWidth="193.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+               </content>
+          </Tab>
+            <Tab text="Editar Selecionada">
+               <content>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <ColorPicker />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="25.0" prefWidth="193.0">
+                           <children>
+                              <Label alignment="CENTER" prefHeight="17.0" prefWidth="60.0" text="X" HBox.hgrow="SOMETIMES">
+                                 <HBox.margin>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label alignment="CENTER" prefHeight="17.0" prefWidth="60.0" text="Y" HBox.hgrow="SOMETIMES">
+                                 <HBox.margin>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <Label alignment="CENTER" prefHeight="17.0" prefWidth="60.0" text="Z" HBox.hgrow="SOMETIMES">
+                                 <HBox.margin>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </HBox.margin>
+                              </Label>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="50.0" prefWidth="193.0">
+                           <children>
+                              <TextField prefHeight="25.0">
+                                 <HBox.margin>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </HBox.margin>
+                              </TextField>
+                              <TextField prefHeight="25.0">
+                                 <HBox.margin>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </HBox.margin>
+                              </TextField>
+                              <TextField prefHeight="25.0">
+                                 <HBox.margin>
+                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                 </HBox.margin>
+                              </TextField>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Button alignment="BOTTOM_RIGHT" mnemonicParsing="false" text="Button" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+               </content>
+            </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>

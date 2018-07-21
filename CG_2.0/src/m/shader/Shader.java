@@ -6,15 +6,16 @@
 package m.shader;
 
 import java.util.List;
-import javafx.scene.canvas.Canvas;
+import javafx.scene.canvas.GraphicsContext;
 import m.poligonos.CGObject;
+import m.poligonos.Vertice;
 
 /**
  *
  * @author JFPS
  */
 public interface Shader {
-    public void shade(float[][] matrix, List<CGObject> objetosSRT, Canvas canvas);
+    public void shade(List<CGObject> objetosSRT, GraphicsContext graphs, long selectedID);
     
-    public void operate(float[][] test, Operator op);
+    public void paintTemporaryPoints(List<? extends Vertice> temporaryPoints, GraphicsContext graphs);
 }

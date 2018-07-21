@@ -5,28 +5,64 @@
  */
 package m.shader;
 
+import View.Fatores;
+import java.util.ArrayList;
 import java.util.List;
-import javafx.scene.canvas.Canvas;
-import m.poligonos.CGObject;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
+import m.poligonos.Vertice;
 
 /**
  *
  * @author JFPS
  */
-public class CGShader implements Shader{
+public abstract class CGShader implements Shader{
 
-    @Override
-    public void shade(float[][] matrix, List<CGObject> objetosSRT, Canvas canvas) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    protected final AmbientLight luzAmbiente;
+    protected final List<PointLight> luzesPontuais;
+
+    protected CGShader(AmbientLight luzAmbiente) {
+        this.luzAmbiente = luzAmbiente;
+        this.luzesPontuais = new ArrayList();
+    }
+    
+    protected CGShader(AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
+        this.luzAmbiente = luzAmbiente;
+        this.luzesPontuais = luzesPontuais;
+    }
+
+    public void setAmbientLight(AmbientLight light){
+        luzAmbiente.update(light);
+    }
+    
+    public void updatePointLight(int index, PointLight light){
+        luzesPontuais.get(index).update(light);
     }
 
     @Override
-    public void operate(float[][] test, Operator op) {
-        op.operator(test);
+    public void paintTemporaryPoints(List<? extends Vertice> tempPoints, GraphicsContext graphs){
+        //////////////////////////////////////////// TEMPS
+        graphs.setFill(Color.BLACK);
+        graphs.setStroke(Color.BLACK);
+        graphs.setLineWidth(1);
+
+        if (!(tempPoints.isEmpty())) {
+            int radius=Fatores.POINT_RADIUS;
+            graphs.beginPath();
+            Vertice point1 = tempPoints.get(0);
+            graphs.fillOval(point1.getX()-(radius/2), point1.getY()-(radius/2), radius, radius);
+            
+            Vertice point2 = null;
+            for (int i=1; i<tempPoints.size(); i++){
+                point2 = tempPoints.get(i);
+                graphs.fillOval(point2.getX()-(radius/2), point2.getY()-(radius/2), radius, radius);
+                graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+                point1 = point2;
+            }
+            //graphs.strokeLine(point1.getX(), point1.getY(), vertices.get(0).getX(), vertices.get(0).getY());
+            graphs.closePath();
+        }
+    }
         
-        Operator aa = (float[][] points) -> {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-        };
-    }
     
 }

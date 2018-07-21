@@ -5,20 +5,24 @@
  */
 package View.Options;
 
+import View.MainController;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import m.World;
 import m.poligonos.CGObject;
-import m.poligonos.Vertice;
 
 /**
  *
@@ -43,8 +47,14 @@ public class PolySelectController implements Initializable {
     @FXML private TextField objPoints;
     
     @FXML private Button   okButton;
+    @FXML private Button   deleteThis;
     @FXML private CheckBox isChromatic;
     
+    @FXML private Label vermelhoLabel;
+    @FXML private Label verdeLabel;
+    @FXML private Label azulLabel;
+    
+    private final MainController mainController;
     private final ObjectProperty<CGObject> objProperty;
     private boolean changeKA;
     private boolean changeKD;
@@ -55,8 +65,9 @@ public class PolySelectController implements Initializable {
         return objProperty;
     }
 
-    public PolySelectController(ObjectProperty<CGObject> objProperty) {
+    public PolySelectController(ObjectProperty<CGObject> objProperty, MainController controller) {
         //objProperty = new SimpleObjectProperty<>(obj);
+        this.mainController = controller;
         this.objProperty = objProperty;
         objProperty.addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
             if (newValue != null)
@@ -106,9 +117,40 @@ public class PolySelectController implements Initializable {
             changeKS = true;
         });
 
+        isChromatic.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            if (newValue){
+                kaG.setDisable(false); kaB.setDisable(false);
+                kdG.setDisable(false); kdB.setDisable(false);
+                ksG.setDisable(false); ksB.setDisable(false); ksN.setDisable(false);
+                vermelhoLabel.setText("Vermelho");
+                verdeLabel.setText("Verde");
+                azulLabel.setText("Azul");
+            } else {
+                kaG.setDisable(true); kaB.setDisable(true);
+                kdG.setDisable(true); kdB.setDisable(true);
+                ksG.setDisable(true); ksB.setDisable(true); ksN.setDisable(true);
+                vermelhoLabel.setText("Intensidade");
+                verdeLabel.setText("");
+                azulLabel.setText("");
+            }
+        });
+        
         okButton.setOnAction((ActionEvent event) -> {
             if (objProperty.get() != null)
                 propagate();
+        });
+        
+        deleteThis.setOnAction((ActionEvent event) -> {
+            if (objProperty.get() != null){
+                Alert alert = new Alert(AlertType.CONFIRMATION, "Deseja excluir o objeto \"" + objProperty.get() + "\" ?", ButtonType.YES, ButtonType.NO);
+                alert.showAndWait();
+
+                if (alert.getResult() == ButtonType.YES) {
+                    World.getInstance().removeObject(objProperty.get().getID());
+                    objProperty.set(null);
+                    mainController.paint();
+                }
+            }
         });
         
         CGObject obj = objProperty.get();

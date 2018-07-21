@@ -37,6 +37,7 @@ import m.poligonos.CGObject;
 import m.poligonos.Vertice;
 import m.poligonos.we_edge.HE_Poliedro;
 import m.poligonos.we_edge.WE_Aresta;
+import m.shader.CGShader;
 import m.transformacoes.Cisalhamento;
 import m.transformacoes.Escala;
 import m.transformacoes.Rotacao;
@@ -58,6 +59,7 @@ public final class CGCanvas extends Canvas{
     private final World mundo;
     private final Visao visao;
     private final Vista vista;
+    private final CGShader shader;
     private Grid grid;
     
     private final ObjectProperty<CGObject> selectedObjProperty;
@@ -72,13 +74,14 @@ public final class CGCanvas extends Canvas{
     private final ObjectProperty<Transformacoes> transformacoesProperty;  
     private final ObjectProperty<Eixo> axisOfOperationProperty;
     
-    public CGCanvas(MainController controller, Vista vista, int width, int height) {
+    public CGCanvas(MainController controller, Vista vista, int width, int height, CGShader shader) {
         super(width, height);
         
         this.controller = controller;
         this.selectedObjProperty = new SimpleObjectProperty<>();
         this.vista = vista;
         this.visao = vista.getVisao();
+        this.shader = shader;
 
         this.mundo = World.getInstance();
         
@@ -86,7 +89,7 @@ public final class CGCanvas extends Canvas{
         this.autoChangeActiveProperty = new SimpleBooleanProperty(false);
         
         selProperty = new SimpleObjectProperty<>(NOTHING_SEL);  
-        ferramentasProperty = new SimpleObjectProperty<>(Ferramentas.Delete);  
+        ferramentasProperty = new SimpleObjectProperty<>(Ferramentas.LuzAmbiente);  
         criacaoProperty = new SimpleObjectProperty<>(CriacaoPrevolucao.gridSnap);  
         transformacoesProperty = new SimpleObjectProperty<>(Transformacoes.Rotacao);
         controller.bindToolsProperties(selProperty, ferramentasProperty, criacaoProperty, transformacoesProperty);
@@ -130,106 +133,12 @@ public final class CGCanvas extends Canvas{
     public void paint(){
         clear();
         
-        //////////////////////////////////////////// OBJS
-        GraphicsContext graphs = this.getGraphicsContext2D();
-        graphs.setFill(Color.BLACK);
-        graphs.setStroke(Color.BLACK);
-        graphs.setLineWidth(1);
+        CGObject selObj = selectedObjProperty.get();
+        long id = (selObj == null ? -1 : selObj.getID());
         
-        List<CGObject> objs = vista.get2Dobjects();
-        objs.forEach((obj) -> {
-            paintObject(graphs, obj);
-        });
+        shader.shade(vista.get2Dobjects(), this.getGraphicsContext2D(), id);
         
-        //////////////////////////////////////////// TEMPS
-        graphs.setFill(Color.BLACK);
-        graphs.setStroke(Color.BLACK);
-        graphs.setLineWidth(1);
-        List<Vertice> vertices = vista.getTempPoints();
-        if (!(vertices.isEmpty())) {
-            int radius=5;
-            graphs.beginPath();
-            Vertice point1 = vertices.get(0);
-            graphs.fillOval(point1.getX()-(radius/2), point1.getY()-(radius/2), radius, radius);
-            
-            Vertice point2 = null;
-            for (int i=1; i<vertices.size(); i++){
-                point2 = vertices.get(i);
-                graphs.fillOval(point2.getX()-(radius/2), point2.getY()-(radius/2), radius, radius);
-                graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
-                point1 = point2;
-            }
-            //graphs.strokeLine(point1.getX(), point1.getY(), vertices.get(0).getX(), vertices.get(0).getY());
-            graphs.closePath();
-        }
-    }
-    
-    /**
-     * Seleciona qual função de pintura específica chamar
-     * @param graphics
-     * @param obj
-     */
-    private void paintObject(GraphicsContext graphs, CGObject obj){
-        CGObject selected_obj = selectedObjProperty.get();
-        
-        if (selected_obj!=null && obj.getID()==(selected_obj.getID())){
-            graphs.setStroke(Color.RED);
-        } else {
-            graphs.setStroke(Color.BLACK);
-        }
-        
-        if (obj instanceof HE_Poliedro){
-            List<List<WE_Aresta>> faces = ((HE_Poliedro) obj).getVisibleFaces();
-            faces.forEach((face) -> {
-                paintArestasConectadas(graphs, face);
-            });
-        } else if (obj instanceof ArestaEixo){
-            ArestaEixo objA = (ArestaEixo) obj;
-            graphs.setStroke(objA.getAxisColor());
-            paintConectedPointList(graphs, obj.getPoints(), 0);
-        } else {
-            paintConectedPointList(graphs, obj.getPoints(), 0);
-        }
-    }
-    
-    private void paintArestasConectadas(GraphicsContext graphs, List<? extends Aresta> lista){
-        graphs.beginPath();
-        
-        lista.forEach((aresta) -> {
-            Vertice ini = aresta.getvInicial();
-            Vertice fin = aresta.getvFinal();
-            graphs.strokeLine(ini.getX(), ini.getY(), fin.getX(), fin.getY());
-        });
-        
-        graphs.closePath();
-    }
-    
-    /**
-     * Pinta os pontos como contínuos
-     * @param graphs
-     * @param lista
-     */
-    private void paintConectedPointList(GraphicsContext graphs, List<? extends Vertice> lista, int pointRadius){
-        graphs.beginPath();
-        
-        Vertice point1 = lista.get(0);
-        //System.out.println("Vista: " + vista.getVisao() + ". Point: " + point1);
-        Vertice point2 = null;
-        for (int i=1; i<lista.size(); i++){
-            point2 = lista.get(i);
-            graphs.strokeLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
-            
-            if (pointRadius > 0){
-                graphs.fillOval(point1.getX()-(pointRadius/2), point1.getY()-(pointRadius/2), pointRadius, pointRadius);
-            }
-            
-            point1 = point2;
-        }
-        graphs.strokeLine(point1.getX(), point1.getY(), lista.get(0).getX(),lista.get(0).getY());
-        
-        
-        
-        graphs.closePath();
+        shader.paintTemporaryPoints(vista.getTempPoints(), this.getGraphicsContext2D());
     }
     
     public void clear(){

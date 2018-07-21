@@ -271,9 +271,13 @@ public final class World {
         for (CGObject obj : objetos){
             if (obj.getID() == id){
                 objetos.remove(obj);
-                return;
+                break;
             }
         }
+        
+        vistas.forEach((vista) -> {
+            vista.remove(id);
+        });
     }
     
     public void updateAll(){

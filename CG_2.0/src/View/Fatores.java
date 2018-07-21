@@ -11,8 +11,9 @@ package View;
  */
 public class Fatores {
     /////////////////////////////////////////////////////////////
-    // DEFAULT FATORES NUMERICOS
+    // DEFAULT UNCHANGEABLE
     public static final float DEFAULT_OPACITY  = (float) 0.35;
+    public static final int POINT_RADIUS = 5;
     
     /////////////////////////////////////////////////////////////
     // DEFAULT FATORES NUMERICOS
