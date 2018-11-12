@@ -9,7 +9,6 @@ import static View.MainController.FERRAMENTA_SEL;
 import static View.MainController.NOTHING_SEL;
 import static View.MainController.REVOLUCAO_SEL;
 import static View.MainController.TRANSFORMACAO_SEL;
-import java.util.List;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -24,19 +23,14 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.paint.Color;
 import m.Camera;
 import m.Eixo;
 import m.Visao;
 import m.Vista;
 import m.World;
 import m.pipeline.CGPipeline;
-import m.poligonos.Aresta;
-import m.poligonos.ArestaEixo;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
-import m.poligonos.we_edge.HE_Poliedro;
-import m.poligonos.we_edge.WE_Aresta;
 import m.shader.CGShader;
 import m.transformacoes.Cisalhamento;
 import m.transformacoes.Escala;
@@ -144,6 +138,8 @@ public final class CGCanvas extends Canvas{
     public void clear(){
         GraphicsContext cl = this.getGraphicsContext2D();
         cl.clearRect(0, 0, this.getWidth(), this.getHeight());
+        //cl.setStroke(Color.BLACK);
+        //cl.fillRect(0, 0, this.getWidth(), this.getHeight());
     }
 //</editor-fold>   
       
@@ -387,7 +383,8 @@ public final class CGCanvas extends Canvas{
             controller.paint();
         });
     }
-    
+    //https://pt.aliexpress.com/wholesale?catId=0&initiative_id=SB_20180803061257&SearchText=ESP
+    //https://pt.aliexpress.com/item/18-21mm-Hg-Stockings-COMPRESSION-KNEE-HIGH-Open-Toe-Men-Women-Support-Stockings-New-Sale/32796310798.html?spm=a2g03.10010108.1000016.1.1bc351c3w57Vye&isOrigTitle=true
     private void mouseOnMoved(){
         this.setOnMouseMoved((Event event) -> {
             if (selProperty.get() == TRANSFORMACAO_SEL){

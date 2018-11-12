@@ -143,19 +143,39 @@ public class Aresta extends CGObject{
     }*/
 
     public float getMaxY() {
-        return max_y;
+        if (vInicial.getY() > vFinal.getY()){
+            return vInicial.getY();
+        } else {
+            return vFinal.getY();
+        }
+        //return max_y;
     }
 
     public float getMinY() {
-        return min_y;
+        if (vInicial.getY() < vFinal.getY()){
+            return vInicial.getY();
+        } else {
+            return vFinal.getY();
+        }
+        //return min_y;
     }
 
     public float getMaxX() {
-        return max_x;
+        if (vInicial.getX() > vFinal.getX()){
+            return vInicial.getX();
+        } else {
+            return vFinal.getX();
+        }
+        //return max_x;
     }
 
     public float getMinX() {
-        return min_x;
+        if (vInicial.getX() < vFinal.getX()){
+            return vInicial.getX();
+        } else {
+            return vFinal.getX();
+        }
+        //return min_x;
     }
 
     public double getSlope() {

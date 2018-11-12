@@ -57,6 +57,7 @@ import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
+import m.shader.Flat;
 import m.shader.Wireframe;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
@@ -73,6 +74,7 @@ import utils.math.PMath;
 public class MainController implements Initializable {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
     
+    //<editor-fold defaultstate="collapsed" desc="GUI FXML ELEMENTS">
     @FXML private MenuBar  menu;
     @FXML private MenuItem salvar;
     @FXML private MenuItem carregar;
@@ -107,6 +109,7 @@ public class MainController implements Initializable {
     @FXML private Label lateralZoom;
     @FXML private Label topoZoom;
     @FXML private Label persZoom;
+//</editor-fold>
     
     private World mundo;
     private ObjectProperty<CGObject> selectedObjectProperty;
@@ -127,7 +130,7 @@ public class MainController implements Initializable {
         
         for (Vista v : mundo.getVistas()){
             switch (v.getVisao()) {
-                case Frontal: frente  = new CGCanvas(this, v, width, height, new Wireframe()); break;
+                case Frontal: frente  = new CGCanvas(this, v, width, height, new Flat(null)); break;
                 case Lateral: lateral = new CGCanvas(this, v, width, height, new Wireframe()); break;
                 case Topo:    topo    = new CGCanvas(this, v, width, height, new Wireframe()); break;
                 case Perspectiva: perspectiva = new CGCanvas(this, v, width, height, new Wireframe()); break;

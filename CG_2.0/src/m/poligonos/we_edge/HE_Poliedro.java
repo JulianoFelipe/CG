@@ -29,8 +29,7 @@ public class HE_Poliedro extends CGObject {
     private final List<WE_Vertice> listaDeVertices;
     private final List<WE_Face>    listaDeFaces;
     private final boolean[] visibilidade_faces;
-
-    //private final Vertice[] normais;
+    private final Vertice[] normais;
     
     private transient Camera lastCamCopy;
     
@@ -42,6 +41,7 @@ public class HE_Poliedro extends CGObject {
         super();
 
         visibilidade_faces = new boolean[faces.size()];
+        normais = new Vertice[faces.size()];
         Arrays.fill(visibilidade_faces, true);
         
         listaDeFaces = new ArrayList(faces.size());
@@ -177,6 +177,9 @@ public class HE_Poliedro extends CGObject {
         visibilidade_faces = new boolean[p.visibilidade_faces.length];
         System.arraycopy(p.visibilidade_faces, 0, visibilidade_faces, 0, p.visibilidade_faces.length);
         
+        normais = new Vertice[p.normais.length];
+        System.arraycopy(p.normais, 0, normais, 0, p.normais.length);
+        
         listaDeVertices = new ArrayList(p.listaDeVertices.size()); 
         HashMap<Long,Vertice> ref_ver = new HashMap(p.listaDeVertices.size()+3);
         p.listaDeVertices.forEach((v) -> {
@@ -267,6 +270,7 @@ public class HE_Poliedro extends CGObject {
             double mult = VMath.produtoEscalar(cam.getVetorN(), normal);
             //System.out.println("Normal: " + normal + " Mult: " + mult);
             visibilidade_faces[i] = mult <= 0; //Se mult>0, face[i] é visível
+            normais[i] = normal;
             i++;
         }
         
@@ -298,6 +302,27 @@ public class HE_Poliedro extends CGObject {
         return lista;
     }
     
+    public List<WE_Aresta> getVisibleArestas(){
+        List<WE_Aresta> lista = new ArrayList();
+
+        for (int i = 0; i < listaDeFaces.size(); i++) {
+            if (visibilidade_faces[i] == true) {
+                WE_Face face = listaDeFaces.get(i);
+                WE_Aresta ini = face.getArestaDaFace();
+                lista.add(ini);
+                //System.out.println("Aresta add: " + ini);
+                WE_Aresta local=ini.getEsquerdaSucessora();
+                while (local != ini){
+                    lista.add(local);
+                    //System.out.println("Aresta add: " + local);
+                    local = local.getEsquerdaSucessora();
+                }
+            }
+        }
+
+        return lista;
+    }
+    
     private List<List<Vertice>> getVisiblePoints() {
         List<List<Vertice>> lista = new ArrayList();
 
@@ -321,6 +346,14 @@ public class HE_Poliedro extends CGObject {
         }
 
         return lista;
+    }
+    
+    public Vertice getNormal(int i){
+        if (i>0 && i<normais.length){
+            return normais[i];
+        } else {
+            return null;
+        }
     }
     
     @Override
@@ -449,6 +482,33 @@ public class HE_Poliedro extends CGObject {
         return !(x < minX || x > maxX || y < minY || y > maxY); //Se menor que min ou maior que max, false
     }
     
+    @Override
+    public Vertice getCentroide() {
+        double avgX=0, avgY=0, avgZ=0;
+        
+        for (Vertice v : listaDeVertices){
+            avgX += v.getX();
+            avgY += v.getY();
+            avgZ += v.getZ();
+        }
+        
+        int count = listaDeVertices.size();
+        
+        return new Vertice(
+            (float) (avgX/count),
+            (float) (avgY/count),
+            (float) (avgZ/count)
+        );
+    }
+
+    public float getMinY() {
+        return min_y;
+    }
+
+    public float getMaxY() {
+        return max_y;
+    }
+        
     public static void main(String... args) {
         //Index2 a = new Index2(0, 1);
         //Index2 b = new Index2(1, 0);
@@ -510,24 +570,5 @@ public class HE_Poliedro extends CGObject {
         System.out.println("FACES: " + new_p.getVisibleFaces().get(0));
         System.out.println("FACES: " + p.getVisibleFaces().get(0));*/
     }
-
-    @Override
-    public Vertice getCentroide() {
-        double avgX=0, avgY=0, avgZ=0;
-        
-        for (Vertice v : listaDeVertices){
-            avgX += v.getX();
-            avgY += v.getY();
-            avgZ += v.getZ();
-        }
-        
-        int count = listaDeVertices.size();
-        
-        return new Vertice(
-            (float) (avgX/count),
-            (float) (avgY/count),
-            (float) (avgZ/count)
-        );
-    }
-    
+ 
 }

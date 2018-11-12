@@ -5,6 +5,9 @@
  */
 package View;
 
+import javafx.scene.paint.Color;
+
+
 /**
  *
  * @author JFPS
@@ -13,7 +16,8 @@ public class Fatores {
     /////////////////////////////////////////////////////////////
     // DEFAULT UNCHANGEABLE
     public static final float DEFAULT_OPACITY  = (float) 0.35;
-    public static final int POINT_RADIUS = 5;
+    public static final int   POINT_RADIUS = 5;
+    public static final Color BACKGROUND_COLOR = Color.BLACK;
     
     /////////////////////////////////////////////////////////////
     // DEFAULT FATORES NUMERICOS
