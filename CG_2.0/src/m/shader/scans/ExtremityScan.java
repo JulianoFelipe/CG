@@ -14,25 +14,25 @@ public class ExtremityScan {
     //As such, color information is stored on a face level basis
     
     //Put here so no ID's are wasted
-    private float xIni, xFin,
+    private int xIni, xFin,
                 yIni, yFin;
 
-    public ExtremityScan(float xIni, float xFin, float yIni, float yFin) {
+    public ExtremityScan(int xIni, int xFin, int yIni, int yFin) {
         this.xIni = xIni;
         this.xFin = xFin;
         this.yIni = yIni;
         this.yFin = yFin;
     }
 
-    public int getxIni() { return Math.round(xIni); }
-    public int getxFin() { return Math.round(xFin); }
-    public int getyIni() { return Math.round(yIni); }
-    public int getyFin() { return Math.round(yFin); }
+    //public int getxIni() { return Math.round(xIni); }
+    //public int getxFin() { return Math.round(xFin); }
+    //public int getyIni() { return Math.round(yIni); }
+    //public int getyFin() { return Math.round(yFin); }
 
-    public float getXinicial(){ return xIni;}
-    public float getXfinal  (){ return xFin;}
-    public float getYinicial(){ return yIni;}
-    public float getYfinal  (){ return yFin;}
+    public int getxIni(){   return xIni;}
+    public int getxFin  (){ return xFin;}
+    public int getyIni(){   return yIni;}
+    public int getyFin  (){ return yFin;}
     
     @Override
     public String toString() {

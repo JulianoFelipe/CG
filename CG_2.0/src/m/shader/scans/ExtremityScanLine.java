@@ -22,11 +22,12 @@ public class ExtremityScanLine {
     private final List<Float> slope;
     private List<WE_Aresta> nonProcessedEdges;
     private final List<WE_Aresta> activeEdges;
+    private final List<Float> interceptX;
     
     public ExtremityScanLine(List<WE_Aresta> object) {
         this.object = object;
         scans = new ArrayList();
-        
+        interceptX = new ArrayList();
         slope = new ArrayList();
         activeEdges = new ArrayList();
         
@@ -51,51 +52,33 @@ public class ExtremityScanLine {
         slope.clear();
         activeEdges.clear();
         scans.clear();
+        interceptX.clear();
         nonProcessedEdges = object;
-        
-        List<Vertice> firstScn = new ArrayList<>();
         
         for(int i=0; i<nonProcessedEdges.size(); i++){
             WE_Aresta a = nonProcessedEdges.get(i);
-            System.out.println("Edge non proc: " + a + " Size: " + nonProcessedEdges.size());
+            //System.out.println("Edge non proc: " + a + " Size: " + nonProcessedEdges.size());
             if (firstScanLine >= Math.round(a.getMinY()) &&
                 firstScanLine <= Math.round(a.getMaxY())){
-                System.out.println("Inside scan y="+firstScanLine);
-                float ty = Math.round(Math.abs(a.getvInicial().getY() - a.getvFinal().getY()));
-                if (ty == Float.POSITIVE_INFINITY){ System.out.println("TY Inf"); ty = 0; }
+                //System.out.println("Inside scan y="+firstScanLine);
+                float ty = Math.round((a.getvFinal().getY() - a.getvInicial().getY()));
+                if (ty == Float.POSITIVE_INFINITY){ ty = 0;}
                 
-                if (ty > 0){ //Aresta não é horizontal, então adiciona
-                    System.out.println("TY="+ty);
-                    float tx = Math.round(Math.abs(a.getvInicial().getX() - a.getvFinal().getX()));
-                    System.out.println("TX="+tx);
-                    if (tx == Float.POSITIVE_INFINITY){ System.out.println("TX INF"); tx = 1; }
+                if (ty != 0){ //Aresta não é horizontal, então adiciona
+                    float tx = Math.round((a.getvFinal().getX() - a.getvInicial().getX()));
+                    //System.out.println("TX="+tx+" TY="+ty);
+                    if (tx == Float.POSITIVE_INFINITY){ tx = 1; }
                     if (tx == 0.) slope.add((float) 0.);
-                    else          slope.add(ty/tx);
-                    activeEdges.add(a);
-
-                    if(Math.round(a.getvInicial().getY()) == firstScanLine){
-                        System.out.println("VINI SCAN");
-                        firstScn.add(a.getvInicial()); firstScn.add(a.getvFinal());
-                    } else if (Math.round(a.getvFinal().getY()) == firstScanLine){
-                        System.out.println("VFIN SCAN");
-                        firstScn.add(a.getvInicial()); firstScn.add(a.getvFinal());
-                    }
+                    else          slope.add(tx/ty);
+                    
+                    activeEdges.add(a);     
+                    
+                    if (slope.get(slope.size()-1) > 0) interceptX.add(a.getMinX()); //Slope positivo reta é /, pega Min X
+                    else                               interceptX.add(a.getMaxX()); //Slope negativo reta é \, pega Max X
                 }
                 nonProcessedEdges.remove(i); //Removes even if horizontal
-                i--;
+                --i;
             }
-        }
-        System.out.println("FIRST ARR: " + firstScn);
-        for (int i=0; i<firstScn.size(); i+=2){
-            Vertice ini = firstScn.get(i);
-            Vertice fin = firstScn.get(i+1);
-            System.out.println("Initial scan: (" + Math.round(ini.getX()) + ", " + Math.round(ini.getY()) + "); (" + Math.round(fin.getX()) + ", " + Math.round(fin.getY()) + ")");
-            scans.add(
-                new ExtremityScan(
-                    (ini.getX()), (fin.getX()),
-                    (ini.getY()), (fin.getY())
-                )
-            );
         }
     }
     
@@ -107,14 +90,16 @@ public class ExtremityScanLine {
      * @param scanline 
      */
     private void updateFromScan(int scanline){
-        System.out.println("UPDATE : y : " + scanline);
+        //System.out.println("UPDATE : y : " + scanline);
         for(int i=0; i<activeEdges.size(); i++){
             WE_Aresta a = activeEdges.get(i);
             if (scanline <  Math.round(a.getMinY()) ||
                 scanline >  Math.round(a.getMaxY())){
-                System.out.println("Remove edge: " + a);
+                //System.out.println("Remove edge: " + a);
                 activeEdges.remove(i);
                 slope.remove(i);
+                interceptX.remove(i);
+                --i;
             }
         }
         
@@ -122,20 +107,23 @@ public class ExtremityScanLine {
             WE_Aresta a = nonProcessedEdges.get(i);
             if (scanline >  Math.round(a.getMinY()) &&
                 scanline <= Math.round(a.getMaxY())){
-                System.out.println("Add edge: " + a);
-                float ty = Math.round(Math.abs(a.getvInicial().getY() - a.getvFinal().getY()));
-                if (ty == Float.POSITIVE_INFINITY){ System.out.println("TY Inf"); ty = 0; }
+                //System.out.println("Add edge: " + a);
+                float ty = Math.round((a.getvFinal().getY() - a.getvInicial().getY()));
+                if (ty == Float.POSITIVE_INFINITY){ ty = 0; }
                 
-                if (ty > 0){
-                    float tx = Math.round(Math.abs(a.getvInicial().getX() - a.getvFinal().getX()));
-                    if (tx == Float.POSITIVE_INFINITY){ System.out.println("TX INF"); tx = 1; }
+                if (ty != 0){
+                    float tx = Math.round((a.getvFinal().getX() - a.getvInicial().getX()));
+                    if (tx == Float.POSITIVE_INFINITY){ tx = 1;}
                     if (tx == 0.) slope.add((float) 0.);
-                    else          slope.add(ty/tx);
+                    else          slope.add(tx/ty);
 
-                    System.out.println("Added slope: " + (ty/tx));
+                    //System.out.println("Added slope: " + (ty/tx));
                     activeEdges.add(a);
+                    if (slope.get(slope.size()-1) > 0) interceptX.add(a.getMinX()); //Slope positivo reta é /, pega Min X
+                    else                               interceptX.add(a.getMaxX()); //Slope negativo reta é \, pega Max X
                 }
                 nonProcessedEdges.remove(i); //Removes even if horizontal
+                --i;
             }
         }
     }
@@ -146,30 +134,39 @@ public class ExtremityScanLine {
         int max = Math.round(minMax[1]);
         //System.out.println("Min: " + min + " Max: " + max);
         initialize(min);
-        
+        //System.out.println("MAX Y: " + max);
         for (int yScan=min+1; yScan<=max; yScan++){        
-            System.out.println("SCNS LIST: " + scans);
-            //byte parity = 0;
             int size = activeEdges.size();
-            int offset = scans.size()-(int)(size/2);
-            for (int ps=0; ps <size; ps+=2, offset++) {
-                ExtremityScan active1 = scans.get(offset); //Problemas com faces com "buracos", já que pega apenas a scan ligeiramente anterior
-                System.out.println("xIni: " + (active1.getxIni()+slope.get(ps)) + "  xFin: " + (active1.getxFin()+slope.get(ps+1)));
-                System.out.println("Active: " + active1);
-                System.out.println("Slope: " + slope.get(ps));
-                System.out.println("Slope2: " + slope.get(ps+1));
-                scans.add(
-                    new ExtremityScan(                                                  //Scan "yScan"
-                        active1.getXinicial()+slope.get(ps), active1.getXfinal()+slope.get(ps+1), 
-                        yScan, yScan
-                    )
-                );
+            //System.out.println("Active Edges: " + activeEdges);
+            //System.out.println("Intercepts: " + interceptX);
+            for (int ps=0; ps<size; ps++) {  
+                //System.out.print("X: " + interceptX.get(ps));
+                interceptX.set(ps,   interceptX.get(ps)+slope.get(ps));
+                
+                //System.out.println(" New X: " + interceptX.get(ps) + " Slope: " + slope.get(ps));
+            }
+            
+            List<Float> sortedIntercept = sortInterceptX();
+            
+            byte parity=0;
+            for (int ps=0; ps<size-1; ps++){
+                if (parity==0){
+                    scans.add(
+                        new ExtremityScan(                                                  //Scan "yScan"
+                            Math.round(sortedIntercept.get(ps)), Math.round(sortedIntercept.get(ps+1)), 
+                            yScan, yScan
+                        )
+                    );
+                    
+                    parity = 1;
+                } else parity = 0;
             }
             
             
             updateFromScan(yScan+1);
         }
-        System.out.println("SCANS: " + scans.size());
+        //System.out.println("SCANS: " + scans.size());
+        //System.out.println(scans);
     }
     
     public void update(){
@@ -179,4 +176,34 @@ public class ExtremityScanLine {
     public List<ExtremityScan> getScans(){
         return scans;
     }
+        
+    private List<Float> sortInterceptX() { 
+        int n = interceptX.size(); 
+        List<Float> sorted = new ArrayList(n);
+        
+        for (int i=0; i<n; i++) sorted.add(interceptX.get(i)); //"Deep" Copy
+        
+        for (int i=1; i<n; ++i) {         
+            float key = sorted.get(i);
+            int j = i-1; 
+  
+            /* Move elements of arr[0..i-1], that are 
+               greater than key, to one position ahead 
+               of their current position */
+            while (j>=0 && sorted.get(i) > key){ 
+                //arr[j+1] = arr[j]; 
+                sorted.set(j+1, sorted .get(j));
+                
+                j = j-1; 
+            } 
+            //arr[j+1] = key; 
+            sorted.set(j+1, key);
+        } 
+        
+        return sorted;
+    } 
+    
+    //private final List<Float> slope;
+    //private final List<WE_Aresta> activeEdges;
+    //private final List<Float> interceptX;
 }
