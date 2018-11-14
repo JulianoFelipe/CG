@@ -8,6 +8,7 @@ package m.shader;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import m.poligonos.Aresta;
 import m.poligonos.ArestaEixo;
 import m.poligonos.CGObject;
@@ -26,13 +27,13 @@ public class Wireframe extends CGShader{
     }
     
     @Override
-    public void shade(List<CGObject> objetosSRT, GraphicsContext graphs, long selectedID) {
+    public void shade(List<CGObject> objetosSRT, GraphicsContext graphs, long selectedID, Color selectedColor) {
         graphs.setFill(Color.BLACK);
         graphs.setStroke(Color.BLACK);
         graphs.setLineWidth(1);
 
         objetosSRT.forEach((obj) -> {
-            paintObject(graphs, obj, selectedID);
+            paintObject(graphs, obj, selectedID, selectedColor);
         });        
     }
     
@@ -41,11 +42,11 @@ public class Wireframe extends CGShader{
      * @param graphics
      * @param obj
      */
-    private void paintObject(GraphicsContext graphs, CGObject obj, long selectedID){        
+    private void paintObject(GraphicsContext graphs, CGObject obj, long selectedID, Color selColor){        
+        Paint stroke = graphs.getStroke();
         if (selectedID!=-1 && obj.getID()==(selectedID)){
-            graphs.setStroke(Color.RED);
-        } else {
-            graphs.setStroke(Color.BLACK);
+            if (selColor != null) graphs.setStroke(selColor);
+            else graphs.setStroke(Color.RED);
         }
         
         if (obj instanceof HE_Poliedro){
@@ -60,6 +61,8 @@ public class Wireframe extends CGShader{
         } else {
             paintConectedPointList(graphs, obj.getPoints(), 0);
         }
+        
+        graphs.setStroke(stroke);
     }
     
     private void paintArestasConectadas(GraphicsContext graphs, List<? extends Aresta> lista){

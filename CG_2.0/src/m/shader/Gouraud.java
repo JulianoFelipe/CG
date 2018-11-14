@@ -7,6 +7,7 @@ package m.shader;
 
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
 
@@ -25,7 +26,7 @@ public class Gouraud extends CGShader{
     }
     
     @Override
-    public void shade(List<CGObject> objetosSRT, GraphicsContext graphs, long selectedID) {
+    public void shade(List<CGObject> objetosSRT, GraphicsContext graphs, long selectedID, Color selectedColor) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     

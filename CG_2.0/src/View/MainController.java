@@ -63,6 +63,7 @@ import m.poligonos.Vertice;
 import m.shader.AmbientLight;
 import m.shader.Flat;
 import m.shader.PointLight;
+import m.shader.Wireframe;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
@@ -142,7 +143,7 @@ public class MainController implements Initializable {
         
         for (Vista v : mundo.getVistas()){
             Vertice observer = v.getPipelineCamera().getVRP();
-            switch (v.getVisao()) {
+            switch (v.getVisao()) { 
                 case Frontal: frente  = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
                 case Lateral: lateral = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
                 case Topo:    topo    = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
