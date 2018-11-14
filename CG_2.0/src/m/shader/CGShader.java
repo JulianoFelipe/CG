@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import m.poligonos.Vertice;
 
 /**
@@ -67,5 +68,18 @@ public abstract class CGShader implements Shader{
         }
     }
         
-    
+    public void paintPoints(List<? extends Vertice> tempPoints, GraphicsContext graphs){
+        if (!(tempPoints.isEmpty())) {
+            int radius=Fatores.POINT_RADIUS;
+            graphs.beginPath();
+            Vertice point1;
+           
+            for (int i=0; i<tempPoints.size(); i++){
+                point1 = tempPoints.get(i);
+                graphs.fillOval(point1.getX()-(radius/2), point1.getY()-(radius/2), radius, radius);
+            }
+            //graphs.strokeLine(point1.getX(), point1.getY(), vertices.get(0).getX(), vertices.get(0).getY());
+            graphs.closePath();
+        }
+    }
 }

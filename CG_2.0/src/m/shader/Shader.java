@@ -7,6 +7,7 @@ package m.shader;
 
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
 
@@ -15,7 +16,7 @@ import m.poligonos.Vertice;
  * @author JFPS
  */
 public interface Shader {
-    public void shade(List<CGObject> objetosSRT, GraphicsContext graphs, long selectedID);
+    public void shade(List<CGObject> objetosSRT, GraphicsContext graphs, long selectedID, Color selectedColor);
     
     public void paintTemporaryPoints(List<? extends Vertice> temporaryPoints, GraphicsContext graphs);
 }

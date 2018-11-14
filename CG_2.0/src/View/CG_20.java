@@ -63,7 +63,7 @@ public class CG_20 extends Application {
         int[] face2 = {1, 2, 4};
         int[] face3 = {2, 3, 4};
         int[] face4 = {3, 0, 4};
-        //int[] face5 = {0, 1, 2};
+        int[] face5 = {0, 1, 2};
         //int[] face6 = {1, 0, 2};
         List<IndexList> faces = new ArrayList();
         faces.add(new IndexList(face0));

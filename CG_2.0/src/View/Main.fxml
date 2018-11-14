@@ -58,6 +58,7 @@
                           </items>
                         </Menu>
                       <MenuItem fx:id="factors" mnemonicParsing="false" text="Fatores de alteração" />
+                        <MenuItem fx:id="backgroundMenu" mnemonicParsing="false" text="Cor de fundo" />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Renderização">
@@ -136,7 +137,7 @@
                               </MenuButton>
                            </children>
                         </HBox>
-                        <StackPane fx:id="frentePane" minHeight="0.0" minWidth="0.0" VBox.vgrow="SOMETIMES" />
+                        <StackPane fx:id="frentePane" minHeight="0.0" minWidth="0.0" styleClass="BLACK" VBox.vgrow="SOMETIMES" />
                      </children>
                   </VBox>
                   <VBox minHeight="100.0" minWidth="100.0" prefHeight="200.0" prefWidth="100.0" style="-fx-border-color: black;" GridPane.columnIndex="1" GridPane.hgrow="SOMETIMES" GridPane.vgrow="SOMETIMES">

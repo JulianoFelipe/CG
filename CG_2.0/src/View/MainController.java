@@ -5,6 +5,7 @@
  */
 package View;
 
+import View.Config.BackgroundColorsController;
 import View.Config.ChangeFactorsController;
 import View.Config.ManualCamController;
 import View.Options.LuzAmbienteController;
@@ -86,6 +87,7 @@ public class MainController implements Initializable {
     @FXML private CheckMenuItem showAxisIcon;
     @FXML private CheckMenuItem showAxis;
     @FXML private MenuItem factors;
+    @FXML private MenuItem backgroundMenu;
     @FXML private Slider      gridThickness;
     @FXML private Slider      gridOpacity;
     @FXML private Slider      gridSize;
@@ -358,6 +360,31 @@ public class MainController implements Initializable {
             dialog.show();
         });
         
+        backgroundMenu.setOnAction((ActionEvent event) -> {
+            Pane pane = null;
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Config/BackgroundColors.fxml"));
+            loader.setController(new BackgroundColorsController(
+                    frente.backgroundColorProperty(), lateral.backgroundColorProperty(),
+                    topo.backgroundColorProperty(), perspectiva.backgroundColorProperty())
+            );
+            
+            try {
+                pane = loader.load();
+            } catch (IOException ex) {
+                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            final Stage dialog = new Stage();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initOwner(menu.getScene().getWindow());
+            Scene dialogScene = new Scene(pane);
+            dialog.setResizable(false);
+            dialog.setScene(dialogScene);
+            dialog.setTitle("Cores de fundo");
+            dialog.show();
+        });
+        
         gridThickness.setOnMouseReleased((Event event) -> {
             int thickness = gridThickness.valueProperty().intValue();
             frenteGrid.setGridThickness(thickness);
@@ -595,7 +622,6 @@ public class MainController implements Initializable {
     }
     
     public void paint(){
-        System.out.println("PAINT");
         frente     .paint();
         lateral    .paint();
         topo       .paint();

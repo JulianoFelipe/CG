@@ -335,7 +335,8 @@ public class HE_Poliedro extends CGObject {
         return lista;
     }
     
-    private List<List<Vertice>> getVisiblePoints() {
+    //Retorna uma lista de listas onde cada sub-lista são os pontos de uma face visível
+    private List<List<Vertice>> getVisiblePointsPerFace() {
         List<List<Vertice>> lista = new ArrayList();
 
         for (int i = 0; i < listaDeFaces.size(); i++) {
@@ -354,6 +355,25 @@ public class HE_Poliedro extends CGObject {
                 
                 lista.add(vertices_face);
                 //System.out.println("\n\n");
+            }
+        }
+
+        return lista;
+    }
+    
+    public List<Vertice> getVisiblePoints() {
+        List<Vertice> lista = new ArrayList();
+
+        for (int i = 0; i < listaDeFaces.size(); i++) {
+            if (visibilidade_faces[i] == true) {
+                WE_Face face = listaDeFaces.get(i);
+                WE_Aresta ini = face.getArestaDaFace();
+                lista.add(ini.getvInicial());
+                WE_Aresta local=ini.getEsquerdaSucessora();
+                while (local != ini){
+                    lista.add(local.getvInicial());
+                    local = local.getEsquerdaSucessora();
+                }
             }
         }
 
@@ -435,7 +455,7 @@ public class HE_Poliedro extends CGObject {
         // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
         boolean inside = false;
         
-        List<List<Vertice>> lista = getVisiblePoints();
+        List<List<Vertice>> lista = getVisiblePointsPerFace();
         
         for (List<Vertice> face : lista){
             inside = false;

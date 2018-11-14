@@ -9,7 +9,6 @@ import static View.MainController.FERRAMENTA_SEL;
 import static View.MainController.NOTHING_SEL;
 import static View.MainController.REVOLUCAO_SEL;
 import static View.MainController.TRANSFORMACAO_SEL;
-import java.util.Arrays;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -25,6 +24,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.paint.Color;
 import m.Camera;
 import m.Eixo;
 import m.Visao;
@@ -61,6 +61,7 @@ public final class CGCanvas extends Canvas{
     private final ObjectProperty<CGObject> selectedObjProperty;
     private final StringProperty zoomProperty;
     private final BooleanProperty autoChangeActiveProperty;
+    private final ObjectProperty<Color> backgroundColorProperty;
     //private final BooleanProperty updatePaintProperty;
     
     //Tools property
@@ -98,10 +99,19 @@ public final class CGCanvas extends Canvas{
         //updatePaintProperty = new SimpleBooleanProperty(false);
         axisOfOperationProperty = new SimpleObjectProperty<>(Eixo.Eixo_XY);
          
-        /*selectedObjProperty.addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
-            mundo.updateSelectedColors(newValue);
-            paint();
-        });*/
+        backgroundColorProperty = new SimpleObjectProperty<>();
+        backgroundColorProperty.addListener((ObservableValue<? extends Color> observable, Color oldValue, Color newValue) -> {
+            if (newValue == null){
+                super.getParent().setStyle("-fx-background-color: transparent");
+            } else {
+                String webColor = String.format( "#%02X%02X%02X",
+                        (int)( newValue.getRed() * 255 ),
+                        (int)( newValue.getGreen() * 255 ),
+                        (int)( newValue.getBlue() * 255 ) );
+                super.getParent().setStyle("-fx-background-color: " + webColor);
+            }
+        });
+        
     }
 
     public void setGrid(Grid grid){
@@ -109,6 +119,10 @@ public final class CGCanvas extends Canvas{
     }
     
     //<editor-fold defaultstate="collapsed" desc="Getters & Properties">
+    public ObjectProperty<Color> backgroundColorProperty(){
+        return backgroundColorProperty;
+    }
+    
     public Vista getVista() {
         return vista;
     }
@@ -137,7 +151,10 @@ public final class CGCanvas extends Canvas{
         CGObject selObj = selectedObjProperty.get();
         long id = (selObj == null ? -1 : selObj.getID());
         
-        shader.shade(vista.get2Dobjects(), this.getGraphicsContext2D(), id);
+        if (backgroundColorProperty.get() != null)
+            shader.shade(vista.get2Dobjects(), this.getGraphicsContext2D(), id, backgroundColorProperty.get().invert());
+        else
+            shader.shade(vista.get2Dobjects(), this.getGraphicsContext2D(), id, Color.BLACK);
         
         shader.paintTemporaryPoints(vista.getTempPoints(), this.getGraphicsContext2D());
     }

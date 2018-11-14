@@ -9,6 +9,7 @@ import m.shader.scans.ExtremityScanLine;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import m.poligonos.ArestaEixo;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
@@ -31,13 +32,13 @@ public class Flat extends CGShader{
     }
     
     @Override
-    public void shade(List<CGObject> objetosSRT, GraphicsContext graphs, long selectedID) {
+    public void shade(List<CGObject> objetosSRT, GraphicsContext graphs, long selectedID, Color selectedColor) {
         graphs.setFill  (Color.BLACK);
         graphs.setStroke(Color.BLACK);
         graphs.setLineWidth(1);
 
         objetosSRT.forEach((obj) -> {
-            paintObject(graphs, obj, selectedID);
+            paintObject(graphs, obj, selectedID, selectedColor);
         });        
     }
     
@@ -46,13 +47,7 @@ public class Flat extends CGShader{
      * @param graphics
      * @param obj
      */
-    private void paintObject(GraphicsContext graphs, CGObject obj, long selectedID){        
-        if (selectedID!=-1 && obj.getID()==(selectedID)){
-            graphs.setStroke(Color.RED);
-        } else {
-            graphs.setStroke(Color.BLACK);
-        }
-        
+    private void paintObject(GraphicsContext graphs, CGObject obj, long selectedID, Color selColor){               
         if (obj instanceof HE_Poliedro){
             HE_Poliedro poli = (HE_Poliedro) obj;
             
@@ -98,13 +93,22 @@ public class Flat extends CGShader{
                 ExtremityScanLine scn = new ExtremityScanLine(faces.get(i));
                 paintFace(graphs, scn.getScans());
             }
-            
+            if (selectedID!=-1 && obj.getID()==(selectedID)){
+                Paint fill = graphs.getFill();
+                graphs.setFill(selColor);
+                super.paintPoints(poli.getVisiblePoints(), graphs);
+                graphs.setFill(fill);
+            }
         } else if (obj instanceof ArestaEixo){
             ArestaEixo objA = (ArestaEixo) obj;
             graphs.setStroke(objA.getAxisColor());
             paintConectedPointList(graphs, obj.getPoints(), 0);
         } else {
             paintConectedPointList(graphs, obj.getPoints(), 0);
+        }
+        
+        if (selectedID!=-1 && obj.getID()==(selectedID)){
+            if (!(obj instanceof HE_Poliedro)) super.paintPoints(obj.getPoints(), graphs);
         }
     }
     
