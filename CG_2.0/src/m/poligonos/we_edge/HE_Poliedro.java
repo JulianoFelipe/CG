@@ -302,6 +302,18 @@ public class HE_Poliedro extends CGObject {
         return lista;
     }
     
+    public List<Vertice> getVisibleNormais(){
+        List<Vertice> lista = new ArrayList();
+
+        for (int i = 0; i < listaDeFaces.size(); i++) {
+            if (visibilidade_faces[i] == true) {
+                lista.add(normais[i]);
+            }
+        }
+
+        return lista;
+    }
+    
     public List<WE_Aresta> getVisibleArestas(){
         List<WE_Aresta> lista = new ArrayList();
 

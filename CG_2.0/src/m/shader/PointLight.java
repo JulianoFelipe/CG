@@ -18,6 +18,10 @@ public class PointLight extends Light{
     public PointLight(Vertice pos, Color color) {
         super(pos, color);
     }
+
+    public PointLight(Vertice posicao, float intensidade) {
+        super(posicao, intensidade);
+    }
     
     public double iluminacaoDifusaAcromatica(float coeficienteAcromatico, Vertice normal, Vertice incidente){
         if (!isChromatic){
@@ -78,8 +82,8 @@ public class PointLight extends Light{
     }
     
     public double[] iluminacaoEspecular(float kR, float kG, float kB, short n, Vertice normal, Vertice incidente, Vertice observador){
-        if (!isChromatic){
-                        Vertice l = new Vertice(
+        if (isChromatic){
+            Vertice l = new Vertice(
                 (posicao.getX()-incidente.getX()),
                 (posicao.getY()-incidente.getY()),
                 (posicao.getZ()-incidente.getZ())

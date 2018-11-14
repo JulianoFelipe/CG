@@ -18,15 +18,18 @@ import m.poligonos.Vertice;
  */
 public abstract class CGShader implements Shader{
 
+    protected final Vertice observador;
     protected final AmbientLight luzAmbiente;
     protected final List<PointLight> luzesPontuais;
 
-    protected CGShader(AmbientLight luzAmbiente) {
+    protected CGShader(Vertice observador, AmbientLight luzAmbiente) {
+        this.observador = observador;
         this.luzAmbiente = luzAmbiente;
         this.luzesPontuais = new ArrayList();
     }
     
-    protected CGShader(AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
+    protected CGShader(Vertice observador, AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
+        this.observador = observador;
         this.luzAmbiente = luzAmbiente;
         this.luzesPontuais = luzesPontuais;
     }

@@ -22,12 +22,12 @@ import m.shader.scans.ExtremityScan;
  */
 public class Flat extends CGShader{
 
-    public Flat(AmbientLight luzAmbiente) {
-        super(luzAmbiente);
+    public Flat(Vertice observador, AmbientLight luzAmbiente) {
+        super(observador, luzAmbiente);
     }
     
-    public Flat(AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
-        super(luzAmbiente, luzesPontuais);
+    public Flat(Vertice observador, AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
+        super(observador, luzAmbiente, luzesPontuais);
     }
     
     @Override
@@ -55,10 +55,46 @@ public class Flat extends CGShader{
         
         if (obj instanceof HE_Poliedro){
             HE_Poliedro poli = (HE_Poliedro) obj;
-                    
-            List<List<WE_Aresta>> faces = poli.getVisibleFaces();
             
+            boolean chromaticObj = obj.isChromatic();
+            float[] kas = obj.getKa();
+            
+            List<List<WE_Aresta>> faces = poli.getVisibleFaces();
+            List<Vertice> normais = poli.getVisibleNormais();
+            
+            Color cor = Color.BLACK;
             for (int i=0; i<faces.size(); i++){
+                
+                int count = faces.get(i).size();
+                double avgX=0, avgY=0, avgZ=0;
+                for (int j=0; j<count; j++){
+                    Vertice ini = faces.get(i).get(j).getvInicial();
+                    avgX += ini.getX();
+                    avgY += ini.getY();
+                    avgZ += ini.getZ();
+                }
+
+                Vertice centroide = new Vertice(
+                    (float) (avgX/count),
+                    (float) (avgY/count),
+                    (float) (avgZ/count)
+                );
+                
+                if (obj.isKset()){ //Se os Ks do objeto foram definidos, faz o shading. Se não, pinta de preto.
+                    if (chromaticObj){
+                        double[] ilumKA = super.luzAmbiente.iluminacaoAmbiente(kas[0], kas[1], kas[2]);
+                        double[] ilumKD = iluminacaoDifusa(poli, normais.get(i), centroide);
+                        double[] ilumKS = iluminacaoEspecular(poli, normais.get(i), centroide);
+                        cor = iluminacaoTotal(ilumKA, ilumKD, ilumKS);       
+                    } else {
+                        double ilumKA = super.luzAmbiente.iluminacaoAmbienteAcromatica(kas[0]);
+                        double ilumKD = iluminacaoDifusaAcromatica(poli, normais.get(i), centroide);
+                        double ilumKS = iluminacaoEspecularAcromatica(poli, normais.get(i), centroide);
+                        cor = iluminacaoTotal(ilumKA, ilumKD, ilumKS);
+                    }
+                }
+                
+                graphs.setStroke(cor);
                 ExtremityScanLine scn = new ExtremityScanLine(faces.get(i));
                 paintFace(graphs, scn.getScans());
             }
@@ -109,6 +145,81 @@ public class Flat extends CGShader{
         
         
         graphs.closePath();
-    }        
+    }       
+    
+    private double[] iluminacaoDifusa(HE_Poliedro obj, Vertice normal, Vertice incidente){
+        float[] kds = obj.getKd();
+        
+        double[] pintura = new double[]{0.0,0.0,0.0};
+        for (int i=0; i<super.luzesPontuais.size(); i++){
+            double[] ilum = luzesPontuais.get(i).iluminacaoDifusa(kds[0], kds[1], kds[2], normal, incidente);
+            pintura[0] += ilum[0];
+            pintura[1] += ilum[1];
+            pintura[2] += ilum[2];
+        }
+        
+        return pintura;
+    }
+    
+    private double[] iluminacaoEspecular(HE_Poliedro obj, Vertice normal, Vertice incidente){
+        float[] kss = obj.getKs();
+        
+        double[] pintura = new double[]{0.0,0.0,0.0};
+        for (int i=0; i<super.luzesPontuais.size(); i++){
+            double[] ilum = luzesPontuais.get(i).iluminacaoEspecular(kss[0], kss[1], kss[2], (short) kss[3], normal, incidente, observador);
+            pintura[0] += ilum[0];
+            pintura[1] += ilum[1];
+            pintura[2] += ilum[2];
+        }
+        
+        return pintura;
+    }
+    
+    private Color iluminacaoTotal(double[] ka, double[] kd, double[] ks){
+        ka[0] += kd[0] + ks[0];
+        ka[1] += kd[1] + ks[1];
+        ka[2] += kd[2] + ks[2];
+        
+        int r = Math.min((int) Math.round(ka[0]), 255);
+        int g = Math.min((int) Math.round(ka[1]), 255);
+        int b = Math.min((int) Math.round(ka[2]), 255);
+        
+        r = Math.max(r, 0);
+        g = Math.max(g, 0);
+        b = Math.max(b, 0);
+        
+        return Color.rgb(r, g, b);
+    }
+
+    private double iluminacaoDifusaAcromatica(HE_Poliedro obj, Vertice normal, Vertice incidente){
+        float[] kds = obj.getKd();
+        
+        double pintura = 0.0;
+        for (int i=0; i<super.luzesPontuais.size(); i++){
+            double ilum = luzesPontuais.get(i).iluminacaoDifusaAcromatica(kds[0], normal, incidente);
+            pintura += ilum;
+        }
+        
+        return pintura;
+    }
+    
+    private double iluminacaoEspecularAcromatica(HE_Poliedro obj, Vertice normal, Vertice incidente){
+        float[] kss = obj.getKs();
+        
+        double pintura = 0.;
+        for (int i=0; i<super.luzesPontuais.size(); i++){
+            double ilum = luzesPontuais.get(i).iluminacaoEspecularAcromatica(kss[0], (short) kss[3], normal, incidente, observador);
+            pintura += ilum;
+        }
+        
+        return pintura;
+    }
+    
+    private Color iluminacaoTotal(double ka, double kd, double ks){
+        double sum = ka+kd+ks;
+        int sumInt = Math.min((int) Math.round(sum), 255);
+        sumInt = Math.max(sumInt, 0);
+        return Color.rgb(sumInt, sumInt, sumInt);
+    }
     
 }

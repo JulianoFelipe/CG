@@ -6,7 +6,6 @@
 package m.shader;
 
 import javafx.scene.paint.Color;
-import m.poligonos.Vertice;
 
 /**
  *
@@ -14,12 +13,12 @@ import m.poligonos.Vertice;
  */
 public class AmbientLight extends Light{
     
-    public AmbientLight(Vertice pos, Color color) {
-        super(pos, color);
+    public AmbientLight(Color color) {
+        super(null, color);
     }
 
-    public AmbientLight(Vertice posicao, float intensidade) {
-        super(posicao, intensidade);
+    public AmbientLight(float intensidade) {
+        super(null, intensidade);
     }
     
     public double iluminacaoAmbienteAcromatica(float coeficienteAcromatico){

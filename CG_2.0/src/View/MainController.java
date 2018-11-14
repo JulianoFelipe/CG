@@ -7,12 +7,14 @@ package View;
 
 import View.Config.ChangeFactorsController;
 import View.Config.ManualCamController;
+import View.Options.LuzAmbienteController;
 import View.Options.LuzesPontuaisController;
 import View.Options.TransformacaoController;
 import View.Options.PolySelectController;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -57,8 +59,9 @@ import m.Vista;
 import m.World;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
+import m.shader.AmbientLight;
 import m.shader.Flat;
-import m.shader.Wireframe;
+import m.shader.PointLight;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
@@ -115,6 +118,9 @@ public class MainController implements Initializable {
     private ObjectProperty<CGObject> selectedObjectProperty;
     private ObjectProperty<Eixo> axisOfOperationProperty;
     
+    private AmbientLight ambientLight;
+    private List<PointLight> luzesPontuais;
+    
     private CGCanvas frente;
     private CGCanvas topo;
     private CGCanvas lateral;
@@ -123,17 +129,22 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         mundo = World.getInstance();
-           
+        
+        ambientLight = new AmbientLight(Color.DEEPSKYBLUE);
+        luzesPontuais = new ArrayList();
+        luzesPontuais.add(new PointLight(new Vertice(0, 0, 0), Color.CRIMSON));
+        
         CGViewport viw = StandardConfigWinView.STD_VIEWPORT;
         int height = (int) viw.getDeltaV();
         int width  = (int) viw.getDeltaU();
         
         for (Vista v : mundo.getVistas()){
+            Vertice observer = v.getPipelineCamera().getVRP();
             switch (v.getVisao()) {
-                case Frontal: frente  = new CGCanvas(this, v, width, height, new Flat(null)); break;
-                case Lateral: lateral = new CGCanvas(this, v, width, height, new Wireframe()); break;
-                case Topo:    topo    = new CGCanvas(this, v, width, height, new Wireframe()); break;
-                case Perspectiva: perspectiva = new CGCanvas(this, v, width, height, new Wireframe()); break;
+                case Frontal: frente  = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
+                case Lateral: lateral = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
+                case Topo:    topo    = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
+                case Perspectiva: perspectiva = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
                 default: throw new IllegalArgumentException("Visão não possui canvas equivalente adicionado.");
             }
         }
@@ -702,9 +713,9 @@ public class MainController implements Initializable {
                         options.getChildren().add(option);
                         break;
                     case LuzAmbiente:
-                        //load("/View/Options/LuzAmbiente.fxml", new LuzAmbienteController());
+                        load("/View/Options/LuzAmbiente.fxml", new LuzAmbienteController(this));
                         options.getChildren().clear();
-                        //options.getChildren().add(option);
+                        options.getChildren().add(option);
                         break;
                 }
                 break;
@@ -744,6 +755,25 @@ public class MainController implements Initializable {
         // NOT USED
         //load("/View/Options/RegularPolygonOption.fxml", new RegularPolygonController());
         //options.getChildren().add(option);
+    }
+//</editor-fold>
+    
+    //<editor-fold defaultstate="collapsed" desc="Controle de luzes">
+    public AmbientLight getAmbientLight(){
+        return ambientLight;
+    }
+    
+    public void setAmbientLight(AmbientLight newLight){
+        ambientLight.update(newLight);
+        paint();
+    }
+    
+    public List<PointLight> getPointLights(){
+        return luzesPontuais;
+    }
+    
+    public void setPointLight(int i, PointLight newLight){
+        luzesPontuais.get(i).update(newLight);
     }
 //</editor-fold>
 }

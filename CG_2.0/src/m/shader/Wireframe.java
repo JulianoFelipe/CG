@@ -22,7 +22,7 @@ import m.poligonos.we_edge.WE_Aresta;
 public class Wireframe extends CGShader{
     
     public Wireframe() {
-        super(null);
+        super(null, null);
     }
     
     @Override

@@ -79,12 +79,29 @@ public abstract class Light {
     public void update(Light toCopyFrom){
         this.isChromatic = toCopyFrom.isChromatic;
         this.red = toCopyFrom.red;
-        this.posicao.copyAttributes(toCopyFrom.posicao);
+        
+        if (this.posicao != null) this.posicao.copyAttributes(toCopyFrom.posicao);
         
         if (isChromatic){
             this.green = toCopyFrom.green;
             this.blue  = toCopyFrom.blue;
             this.color = toCopyFrom.color;
         }
+    }
+
+    public Vertice getPosicao() {
+        return posicao;
+    }
+
+    public boolean isChromatic() {
+        return isChromatic;
+    }
+    
+    public double getIntensidade (){
+        return red;
+    }
+    
+    public Color getColor(){
+        return color;
     }
 }

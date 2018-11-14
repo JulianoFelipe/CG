@@ -8,6 +8,7 @@ package m.shader;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
 import m.poligonos.CGObject;
+import m.poligonos.Vertice;
 
 /**
  *
@@ -15,12 +16,12 @@ import m.poligonos.CGObject;
  */
 public class Gouraud extends CGShader{
 
-    public Gouraud(AmbientLight luzAmbiente) {
-        super(luzAmbiente);
+    public Gouraud(Vertice observador, AmbientLight luzAmbiente) {
+        super(observador, luzAmbiente);
     }
     
-    public Gouraud(AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
-        super(luzAmbiente, luzesPontuais);
+    public Gouraud(Vertice observador, AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
+        super(observador, luzAmbiente, luzesPontuais);
     }
     
     @Override
