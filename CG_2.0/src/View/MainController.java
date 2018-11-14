@@ -130,9 +130,9 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         mundo = World.getInstance();
         
-        ambientLight = new AmbientLight(Color.DEEPSKYBLUE);
+        ambientLight = new AmbientLight(100);
         luzesPontuais = new ArrayList();
-        luzesPontuais.add(new PointLight(new Vertice(0, 0, 0), Color.CRIMSON));
+        luzesPontuais.add(new PointLight(new Vertice(0, 0, 0), Color.WHITE));
         
         CGViewport viw = StandardConfigWinView.STD_VIEWPORT;
         int height = (int) viw.getDeltaV();
@@ -197,6 +197,11 @@ public class MainController implements Initializable {
         initializeViewToolbars(); //Listeners para as 4 barras de ferramentas das views
         initializeResizeAndCanvasHUD(); //Coloca Grids e listeners de resize
         
+        paint();
+    }
+    
+    public void forceSelectedObjUpdate(){
+        mundo.updateSelectedColors(selectedObjectProperty.get());
         paint();
     }
     
@@ -590,6 +595,7 @@ public class MainController implements Initializable {
     }
     
     public void paint(){
+        System.out.println("PAINT");
         frente     .paint();
         lateral    .paint();
         topo       .paint();

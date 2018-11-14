@@ -336,4 +336,18 @@ public final class World {
         //Se não for dual conversão, tem que ter cópia em algum lugar.
         //Ora aqui ou no update da vista
     }
+    
+    public void updateSelectedColors(CGObject obj){
+        int index = objetos.indexOf(obj);
+        if (index==-1) return;
+        
+        objetos.get(index).updateInternals(obj);
+        
+        objetos.get(index).setAllK(obj.getKa(), obj.getKd(), obj.getKs());
+        objetos.get(index).setIsChromatic(obj.isChromatic());
+        
+        vistas.forEach((v) -> {
+            v.updateColors(obj);
+        });
+    }
 }

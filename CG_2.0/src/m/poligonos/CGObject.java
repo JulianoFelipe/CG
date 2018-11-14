@@ -99,7 +99,7 @@ public abstract class CGObject implements Serializable{
     //<editor-fold defaultstate="collapsed" desc="Get/Set Ks">
     public boolean isChromatic() { return isChromatic; }
     
-    public void setIsChromatic(boolean isAchromatic) { this.isChromatic = isAchromatic; }
+    public void setIsChromatic(boolean isChromatic) {this.isChromatic = isChromatic; }
     
     public float[] getKa() { if (!setK) return null; else return new float[]{ka[0], ka[1], ka[2]}; }
         
@@ -150,6 +150,8 @@ public abstract class CGObject implements Serializable{
             this.kd[0] = kd[0]; this.kd[1] = kd[1]; this.kd[2] = kd[2]; 
             this.ks[0] = ks[0]; this.ks[1] = ks[1]; this.ks[2] = ks[2]; this.ks[3] = ks[3]; 
         } else {
+            if (ka==null || kd==null || ks==null) return;
+            
             setK = true;
             
             this.ka = new float[]{

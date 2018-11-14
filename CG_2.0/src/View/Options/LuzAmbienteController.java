@@ -9,8 +9,6 @@ import View.MainController;
 import java.net.URL;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
-import javafx.beans.property.ObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -108,11 +106,19 @@ public class LuzAmbienteController implements Initializable {
     
     private void setFields(AmbientLight newValue){       
         if (newValue.isChromatic()){
+            intensidadeLabel.setDisable(true);
+            intensidadeField.setDisable(true);
+            corLabel .setDisable(false);
+            corPicker.setDisable(false);
             chromaticCheck.selectedProperty().set(true);
             corPicker.valueProperty().set(newValue.getColor());
         } else {
             chromaticCheck.selectedProperty().set(false);
             intensidadeField.textProperty().set(Double.toString(newValue.getIntensidade()));
+            corLabel .setDisable(true);
+            corPicker.setDisable(true);
+            intensidadeLabel.setDisable(false);
+            intensidadeField.setDisable(false);
         }
     }
 }

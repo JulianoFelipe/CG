@@ -9,6 +9,7 @@ import static View.MainController.FERRAMENTA_SEL;
 import static View.MainController.NOTHING_SEL;
 import static View.MainController.REVOLUCAO_SEL;
 import static View.MainController.TRANSFORMACAO_SEL;
+import java.util.Arrays;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -16,6 +17,7 @@ import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.Event;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
@@ -95,6 +97,11 @@ public final class CGCanvas extends Canvas{
         
         //updatePaintProperty = new SimpleBooleanProperty(false);
         axisOfOperationProperty = new SimpleObjectProperty<>(Eixo.Eixo_XY);
+         
+        /*selectedObjProperty.addListener((ObservableValue<? extends CGObject> observable, CGObject oldValue, CGObject newValue) -> {
+            mundo.updateSelectedColors(newValue);
+            paint();
+        });*/
     }
 
     public void setGrid(Grid grid){
@@ -383,8 +390,7 @@ public final class CGCanvas extends Canvas{
             controller.paint();
         });
     }
-    //https://pt.aliexpress.com/wholesale?catId=0&initiative_id=SB_20180803061257&SearchText=ESP
-    //https://pt.aliexpress.com/item/18-21mm-Hg-Stockings-COMPRESSION-KNEE-HIGH-Open-Toe-Men-Women-Support-Stockings-New-Sale/32796310798.html?spm=a2g03.10010108.1000016.1.1bc351c3w57Vye&isOrigTitle=true
+    
     private void mouseOnMoved(){
         this.setOnMouseMoved((Event event) -> {
             if (selProperty.get() == TRANSFORMACAO_SEL){

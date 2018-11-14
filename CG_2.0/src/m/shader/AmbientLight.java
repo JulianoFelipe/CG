@@ -32,6 +32,6 @@ public class AmbientLight extends Light{
         if (isChromatic)
             return new double[] {red*kR, green*kG, blue*kB };
         else
-            return null;
+            return new double[] {red*kR, red*kG, red*kB };
     }
 }

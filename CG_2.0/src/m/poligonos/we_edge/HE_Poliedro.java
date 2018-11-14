@@ -398,7 +398,7 @@ public class HE_Poliedro extends CGObject {
 
     @Override
     public void updateInternals(CGObject updatedObj) {
-        if (!(updatedObj instanceof HE_Poliedro)) throw new IllegalArgumentException("Não é uma instância de WE_Poliedro."); //Is this Right?
+        if (!(updatedObj instanceof HE_Poliedro)) throw new IllegalArgumentException("Não é uma instância de HE_Poliedro."); //Is this Right?
 
         HE_Poliedro updated = (HE_Poliedro) updatedObj;
         
@@ -413,6 +413,17 @@ public class HE_Poliedro extends CGObject {
             min_z = Math.min(point.getZ(), min_z);
             max_z = Math.max(point.getZ(), max_z);
         }
+
+        /*if (updated.setK){
+            this.setK = true;
+            this.isChromatic = updated.isChromatic;
+            ka = new float[3];
+            kd = new float[3];
+            ks = new float[4];
+            System.arraycopy(updated.ka, 0, ka, 0, 3);
+            System.arraycopy(updated.ks, 0, kd, 0, 3);
+            System.arraycopy(updated.ks, 0, ks, 0, 4);
+        }*/
     }
 
     @Override

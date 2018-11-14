@@ -118,17 +118,18 @@ public class PolySelectController implements Initializable {
         });
 
         isChromatic.selectedProperty().addListener((ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) -> {
+            changeColorGamut = true;
             if (newValue){
                 kaG.setDisable(false); kaB.setDisable(false);
                 kdG.setDisable(false); kdB.setDisable(false);
-                ksG.setDisable(false); ksB.setDisable(false); ksN.setDisable(false);
+                ksG.setDisable(false); ksB.setDisable(false);
                 vermelhoLabel.setText("Vermelho");
                 verdeLabel.setText("Verde");
                 azulLabel.setText("Azul");
             } else {
                 kaG.setDisable(true); kaB.setDisable(true);
                 kdG.setDisable(true); kdB.setDisable(true);
-                ksG.setDisable(true); ksB.setDisable(true); ksN.setDisable(true);
+                ksG.setDisable(true); ksB.setDisable(true);
                 vermelhoLabel.setText("Intensidade");
                 verdeLabel.setText("");
                 azulLabel.setText("");
@@ -186,24 +187,24 @@ public class PolySelectController implements Initializable {
         
         if (changeKA || changeKD || changeKS){
             newKa = new float[]{
-                Float.parseFloat( kaR.textProperty().get() ),
-                Float.parseFloat( kaG.textProperty().get() ),
-                Float.parseFloat( kaB.textProperty().get() )
+                defaultFloatParser( kaR.textProperty().get() ),
+                defaultFloatParser( kaG.textProperty().get() ),
+                defaultFloatParser( kaB.textProperty().get() )
             };
-            
+
             newKd = new float[]{
-                Float.parseFloat( kdR.textProperty().get() ),
-                Float.parseFloat( kdG.textProperty().get() ),
-                Float.parseFloat( kdB.textProperty().get() )
+                defaultFloatParser( kdR.textProperty().get() ),
+                defaultFloatParser( kdG.textProperty().get() ),
+                defaultFloatParser( kdB.textProperty().get() )
             };
 
             newKs = new float[]{
-                Float.parseFloat( ksR.textProperty().get() ),
-                Float.parseFloat( ksG.textProperty().get() ),
-                Float.parseFloat( ksB.textProperty().get() ),
-                Float.parseFloat( ksN.textProperty().get() )
+                defaultFloatParser( ksR.textProperty().get() ),
+                defaultFloatParser( ksG.textProperty().get() ),
+                defaultFloatParser( ksB.textProperty().get() ),
+                defaultFloatParser( ksN.textProperty().get() )
             };
-            
+
             objProperty.get().setAllK(newKa, newKd, newKs);
             changeKA = changeKD = changeKS = false;
         }
@@ -213,7 +214,9 @@ public class PolySelectController implements Initializable {
             changeColorGamut = false;
         }
         
-        //objProperty.set( localCopy );
+        //objProperty.set( objProperty.get() ); //Era pra tentar forçar a alteração para que os CGCanvases copiassem os KAs, KDs...
+        mainController.forceSelectedObjUpdate();
+        setFields(objProperty.get());
     }
     
     private void setTextFields(TextField x, TextField y, TextField z, float[] newValue){
@@ -226,6 +229,19 @@ public class PolySelectController implements Initializable {
         x.textProperty().set(String.valueOf(newValue));
         y.textProperty().set(String.valueOf(newValue));
         z.textProperty().set(String.valueOf(newValue));
+    }
+    
+    private float defaultFloatParser(String text){
+        if (text==null || text.isEmpty()) return 0;
+        else {
+            float test;
+            try{
+               test = Float.parseFloat(text);
+            } catch(NumberFormatException e){
+                test = 0;
+            }
+            return test;
+        }
     }
     
     private void clearFields(){

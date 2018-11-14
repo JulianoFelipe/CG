@@ -167,4 +167,12 @@ public class Vista implements Observer{
 
         mundo.update(obj, this);
     }
+    
+    public void updateColors(CGObject obj){
+        int index = objetos.indexOf(obj);
+        if (index == -1) return;
+
+        objetos.get(index).setAllK(obj.getKa(), obj.getKd(), obj.getKs());
+        objetos.get(index).setIsChromatic(obj.isChromatic());
+    }
 }
