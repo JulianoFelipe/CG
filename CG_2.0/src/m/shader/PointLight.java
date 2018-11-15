@@ -38,17 +38,17 @@ public class PointLight extends Light{
     }
     
     public double[] iluminacaoDifusa(float kR, float kG, float kB, Vertice normal, Vertice incidente){
-        if (isChromatic){
-            Vertice l = new Vertice(
+        Vertice l = new Vertice(
                 (posicao.getX()-incidente.getX()),
                 (posicao.getY()-incidente.getY()),
                 (posicao.getZ()-incidente.getZ())
             ); VMath.normalizar(l);
             double cos = VMath.produtoEscalar(l, normal);
-            
+        
+        if (isChromatic){
             return new double[] {red*kR*cos, green*kG*cos, blue*kB*cos};
         } else
-            return null;
+            return new double[] {red*kR*cos, red*kG*cos, red*kB*cos};
     }
     
     public double iluminacaoEspecularAcromatica(float coeficienteAcromatico, short n, Vertice normal, Vertice incidente,  Vertice observador){
@@ -60,12 +60,12 @@ public class PointLight extends Light{
             ); VMath.normalizar(l);
             VMath.produto(l, 2);
             double esc = VMath.produtoEscalar(l, normal);
-            VMath.produto(normal, esc); //Vai alterar o vetor normal no caller
+            Vertice newNormal = VMath.produto(normal, esc); //Vai alterar o vetor normal no caller
             
-            normal.setAll(
-                normal.getX() - l.getX(),
-                normal.getY() - l.getY(),
-                normal.getZ() - l.getZ()
+            newNormal.setAll(
+                newNormal.getX() - l.getX(),
+                newNormal.getY() - l.getY(),
+                newNormal.getZ() - l.getZ()
             );
             
             Vertice s = new Vertice(
@@ -74,7 +74,7 @@ public class PointLight extends Light{
                 (observador.getZ()-incidente.getZ())
             ); VMath.normalizar(s);
             
-            double cos = VMath.produtoEscalar(s, normal);
+            double cos = VMath.produtoEscalar(s, newNormal);
             
             return red * coeficienteAcromatico * Math.pow(cos, n);
         } else
@@ -82,7 +82,6 @@ public class PointLight extends Light{
     }
     
     public double[] iluminacaoEspecular(float kR, float kG, float kB, short n, Vertice normal, Vertice incidente, Vertice observador){
-        if (isChromatic){
             Vertice l = new Vertice(
                 (posicao.getX()-incidente.getX()),
                 (posicao.getY()-incidente.getY()),
@@ -90,12 +89,12 @@ public class PointLight extends Light{
             ); VMath.normalizar(l);
             VMath.produto(l, 2);
             double esc = VMath.produtoEscalar(l, normal);
-            VMath.produto(normal, esc); //Vai alterar o vetor normal no caller
+            Vertice newNormal = VMath.produto(normal, esc); //Vai alterar o vetor normal no caller
             
-            normal.setAll(
-                normal.getX() - l.getX(),
-                normal.getY() - l.getY(),
-                normal.getZ() - l.getZ()
+            newNormal.setAll(
+                newNormal.getX() - l.getX(),
+                newNormal.getY() - l.getY(),
+                newNormal.getZ() - l.getZ()
             );
             
             Vertice s = new Vertice(
@@ -104,15 +103,35 @@ public class PointLight extends Light{
                 (observador.getZ()-incidente.getZ())
             ); VMath.normalizar(s);
             
-            double cos = VMath.produtoEscalar(s, normal);
+            double cos = VMath.produtoEscalar(s, newNormal);
             double cosn = Math.pow(cos, n);
-            
+        
+        if (isChromatic){
             return new double[] {
                 red  * kR * cosn,
                 green* kG * cosn,
                 blue * kB * cosn
             };
         } else
-            return null;
+            return new double[] {
+                red  * kR * cosn,
+                red  * kG * cosn,
+                red  * kB * cosn
+            };
     }
+
+    public String descriptionString() {
+        String ret = "XYZ("+posicao.getX()+";"+posicao.getY()+";"+posicao.getZ()+");";
+        
+        if (isChromatic){
+            ret += String.format("RGB(%.0f;%.0f;%.0f) ", red, green, blue);
+        } else {
+            ret += String.format("Acrom.(%.0f)", red);
+        }
+        
+        return ret;
+    }
+    
+    
 }
+

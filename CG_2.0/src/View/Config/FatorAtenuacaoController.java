@@ -20,7 +20,7 @@ import javafx.scene.paint.Color;
  *
  * @author JFPS
  */
-public class BackgroundColorsController implements Initializable {
+public class FatorAtenuacaoController implements Initializable {
     
     private static final Logger LOG = Logger.getLogger("CG_2.0");
     
@@ -41,7 +41,7 @@ public class BackgroundColorsController implements Initializable {
     private final ObjectProperty<Color> topoColor;
     private final ObjectProperty<Color> persColor;
     
-    public BackgroundColorsController(ObjectProperty<Color> frenteColor, ObjectProperty<Color> lateralColor, ObjectProperty<Color> topoColor, ObjectProperty<Color> persColor) {
+    public FatorAtenuacaoController(ObjectProperty<Color> frenteColor, ObjectProperty<Color> lateralColor, ObjectProperty<Color> topoColor, ObjectProperty<Color> persColor) {
         this.frenteColor = frenteColor;
         this.lateralColor = lateralColor;
         this.topoColor = topoColor;

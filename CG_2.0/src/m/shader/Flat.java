@@ -5,6 +5,7 @@
  */
 package m.shader;
 
+import java.util.Arrays;
 import m.shader.scans.ExtremityScanLine;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
@@ -169,8 +170,10 @@ public class Flat extends CGShader{
         float[] kss = obj.getKs();
         
         double[] pintura = new double[]{0.0,0.0,0.0};
+        //System.out.println("SIZE: " + luzesPontuais.size());
         for (int i=0; i<super.luzesPontuais.size(); i++){
             double[] ilum = luzesPontuais.get(i).iluminacaoEspecular(kss[0], kss[1], kss[2], (short) kss[3], normal, incidente, observador);
+            //System.out.println("ILUM: " + Arrays.toString(ilum));
             pintura[0] += ilum[0];
             pintura[1] += ilum[1];
             pintura[2] += ilum[2];
@@ -180,6 +183,11 @@ public class Flat extends CGShader{
     }
     
     private Color iluminacaoTotal(double[] ka, double[] kd, double[] ks){
+        /*System.out.println("TOTAL: ");
+        System.out.println("KAs: " + Arrays.toString(ka));
+        System.out.println("KDs: " + Arrays.toString(kd));
+        System.out.println("KSs: " + Arrays.toString(ks));*/
+        
         ka[0] += kd[0] + ks[0];
         ka[1] += kd[1] + ks[1];
         ka[2] += kd[2] + ks[2];

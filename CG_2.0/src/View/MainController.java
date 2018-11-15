@@ -133,7 +133,7 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         mundo = World.getInstance();
         
-        ambientLight = new AmbientLight(100);
+        ambientLight = new AmbientLight(10);
         luzesPontuais = new ArrayList();
         luzesPontuais.add(new PointLight(new Vertice(0, 0, 0), Color.WHITE));
         
@@ -736,7 +736,7 @@ public class MainController implements Initializable {
             case FERRAMENTA_SEL:
                 if (null != current_ferr.get()) switch (current_ferr.get()) {
                     case LuzPontual:
-                        load("/View/Options/LuzesPontuais.fxml", new LuzesPontuaisController());
+                        load("/View/Options/LuzesPontuais.fxml", new LuzesPontuaisController(this, luzesPontuais));
                         options.getChildren().clear();
                         options.getChildren().add(option);
                         break;
@@ -807,6 +807,7 @@ public class MainController implements Initializable {
     
     public void setPointLight(int i, PointLight newLight){
         luzesPontuais.get(i).update(newLight);
+        paint();
     }
 //</editor-fold>
 }

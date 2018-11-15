@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="142.0" prefWidth="230.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <GridPane layoutX="2.0" layoutY="-2.0" prefHeight="142.0" prefWidth="274.0" AnchorPane.bottomAnchor="2.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-2.0">
+        <columnConstraints>
+          <ColumnConstraints hgrow="SOMETIMES" maxWidth="149.0" minWidth="10.0" prefWidth="70.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="127.0" minWidth="10.0" prefWidth="109.0" />
+            <ColumnConstraints hgrow="SOMETIMES" maxWidth="95.0" minWidth="10.0" prefWidth="66.0" />
+        </columnConstraints>
+        <rowConstraints>
+          <RowConstraints maxHeight="40.0" minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+          <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+        </rowConstraints>
+         <children>
+            <Label prefHeight="40.0" prefWidth="193.0" text="Frente">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="A cada alteração nas vistas ortográficas, esse fator é utilizado" />
+               </tooltip></Label>
+            <Label prefHeight="44.0" prefWidth="156.0" text="Lateral" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="A cada alteração na vista perspectiva, esse fator é utilizado" />
+               </tooltip></Label>
+            <Label prefHeight="37.0" prefWidth="176.0" text="Topo" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="Fator de alteração da Window a cada pressionada de botão" />
+               </tooltip></Label>
+            <Button fx:id="frenteSemCor" contentDisplay="TEXT_ONLY" graphicTextGap="1.0" maxWidth="51.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="50.0" text="S/ Cor" GridPane.columnIndex="2">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </Button>
+            <Button fx:id="lateralSemCor" contentDisplay="TEXT_ONLY" graphicTextGap="1.0" maxWidth="50.0" mnemonicParsing="false" prefHeight="28.0" prefWidth="50.0" text="S/ Cor" GridPane.columnIndex="2" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </Button>
+            <Button fx:id="topoSemCor" contentDisplay="TEXT_ONLY" graphicTextGap="1.0" maxWidth="50.0" mnemonicParsing="false" prefHeight="9.0" prefWidth="50.0" text="S/ Cor" GridPane.columnIndex="2" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </Button>
+            <Label prefHeight="35.0" prefWidth="189.0" text="Perspectiva" GridPane.rowIndex="3">
+               <GridPane.margin>
+                  <Insets left="5.0" />
+               </GridPane.margin>
+               <tooltip>
+                  <Tooltip text="Considera clique em um ponto da grade se estiver entro do círculo com esse raio" />
+               </tooltip></Label>
+            <Button fx:id="persSemCor" contentDisplay="TEXT_ONLY" graphicTextGap="1.0" maxWidth="50.0" mnemonicParsing="false" prefHeight="9.0" prefWidth="50.0" text="S/ Cor" GridPane.columnIndex="2" GridPane.rowIndex="3">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </Button>
+            <ColorPicker fx:id="frentePicker" prefHeight="25.0" prefWidth="98.0" GridPane.columnIndex="1">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </ColorPicker>
+            <ColorPicker fx:id="lateralPicker" prefHeight="25.0" prefWidth="98.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </ColorPicker>
+            <ColorPicker fx:id="topoPicker" prefHeight="25.0" prefWidth="98.0" GridPane.columnIndex="1" GridPane.rowIndex="2">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </ColorPicker>
+            <ColorPicker fx:id="persPicker" prefHeight="25.0" prefWidth="98.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+               <GridPane.margin>
+                  <Insets left="5.0" right="5.0" />
+               </GridPane.margin>
+            </ColorPicker>
+         </children>
+      </GridPane>
+   </children>
+</AnchorPane>

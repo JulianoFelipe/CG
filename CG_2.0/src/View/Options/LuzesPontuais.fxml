@@ -7,69 +7,104 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane id="AnchorPane" prefHeight="238.0" prefWidth="193.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" prefWidth="193.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <TabPane tabClosingPolicy="UNAVAILABLE">
+      <TabPane prefHeight="238.0" prefWidth="193.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
-          <Tab text="Luzes">
+          <Tab fx:id="tabLuzes" closable="false" text="Luzes">
                <content>
-                  <VBox>
-                     <children>
-                        <TreeView prefHeight="210.0" prefWidth="193.0" VBox.vgrow="ALWAYS" />
-                     </children>
-                  </VBox>
+                  <VBox fx:id="vBox" />
                </content>
           </Tab>
-            <Tab text="Editar Selecionada">
+            <Tab fx:id="tabEdit" closable="false" text="Adicionar nova luz">
                <content>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
+                        <HBox prefHeight="24.0" prefWidth="193.0">
                            <children>
-                              <ColorPicker />
+                              <CheckBox fx:id="chromaticCheck" mnemonicParsing="false" prefHeight="17.0" prefWidth="178.0" selected="true" text="Luz é cromática?">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </CheckBox>
                            </children>
                         </HBox>
-                        <HBox prefHeight="25.0" prefWidth="193.0">
+                        <HBox prefHeight="35.0" prefWidth="193.0">
+                           <children>
+                              <Label fx:id="corLabel" prefHeight="25.0" prefWidth="78.0" text="Cor">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <ColorPicker fx:id="corPicker" prefHeight="25.0" prefWidth="126.0">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="2.0" top="5.0" />
+                                 </HBox.margin></ColorPicker>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="32.0" prefWidth="193.0">
+                           <children>
+                              <Label fx:id="intensidadeLabel" prefHeight="26.0" prefWidth="62.0" text="Intensidade">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                 </HBox.margin>
+                              </Label>
+                              <TextField fx:id="intensidadeField" prefHeight="25.0" prefWidth="115.0">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="5.0" right="2.0" top="5.0" />
+                                 </HBox.margin>
+                              </TextField>
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="16.0" prefWidth="193.0">
                            <children>
                               <Label alignment="CENTER" prefHeight="17.0" prefWidth="60.0" text="X" HBox.hgrow="SOMETIMES">
                                  <HBox.margin>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets left="2.0" right="2.0" top="2.0" />
                                  </HBox.margin>
                               </Label>
                               <Label alignment="CENTER" prefHeight="17.0" prefWidth="60.0" text="Y" HBox.hgrow="SOMETIMES">
                                  <HBox.margin>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets left="2.0" right="2.0" top="2.0" />
                                  </HBox.margin>
                               </Label>
                               <Label alignment="CENTER" prefHeight="17.0" prefWidth="60.0" text="Z" HBox.hgrow="SOMETIMES">
                                  <HBox.margin>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets left="2.0" right="2.0" top="2.0" />
                                  </HBox.margin>
                               </Label>
                            </children>
                         </HBox>
-                        <HBox prefHeight="50.0" prefWidth="193.0">
+                        <HBox prefHeight="32.0" prefWidth="193.0">
                            <children>
-                              <TextField prefHeight="25.0">
+                              <TextField prefHeight="25.0" fx:id="xField">
                                  <HBox.margin>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="2.0" left="2.0" right="2.0" />
                                  </HBox.margin>
                               </TextField>
-                              <TextField prefHeight="25.0">
+                              <TextField fx:id="yField" prefHeight="25.0">
                                  <HBox.margin>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="2.0" left="2.0" right="2.0" />
                                  </HBox.margin>
                               </TextField>
-                              <TextField prefHeight="25.0">
+                              <TextField fx:id="zField" prefHeight="25.0">
                                  <HBox.margin>
-                                    <Insets bottom="2.0" left="2.0" right="2.0" top="2.0" />
+                                    <Insets bottom="2.0" left="2.0" right="2.0" />
                                  </HBox.margin>
                               </TextField>
                            </children>
                         </HBox>
-                        <HBox prefHeight="100.0" prefWidth="200.0">
+                        <HBox prefHeight="27.0" prefWidth="193.0">
                            <children>
-                              <Button alignment="BOTTOM_RIGHT" mnemonicParsing="false" text="Button" />
+                              <Button fx:id="removeButton" alignment="CENTER" mnemonicParsing="false" prefHeight="25.0" prefWidth="136.0" text="Remover">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="2.0" right="2.0" top="5.0" />
+                                 </HBox.margin>
+                              </Button>
+                              <Button fx:id="okButton" alignment="CENTER" mnemonicParsing="false" prefHeight="25.0" prefWidth="75.0" text="Ok">
+                                 <HBox.margin>
+                                    <Insets bottom="5.0" left="2.0" right="2.0" top="5.0" />
+                                 </HBox.margin></Button>
                            </children>
                         </HBox>
                      </children>
