@@ -5,7 +5,6 @@
  */
 package m.shader;
 
-import java.util.Arrays;
 import m.shader.scans.ExtremityScanLine;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;

@@ -26,6 +26,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -37,6 +38,7 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Slider;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
@@ -115,6 +117,10 @@ public class MainController implements Initializable {
     @FXML private Label lateralZoom;
     @FXML private Label topoZoom;
     @FXML private Label persZoom;
+    
+    @FXML private RadioMenuItem wireframeMenu;
+    @FXML private RadioMenuItem flatMenu;
+    @FXML private RadioMenuItem gouraudMenu;
 //</editor-fold>
     
     private World mundo;
@@ -151,6 +157,7 @@ public class MainController implements Initializable {
                 default: throw new IllegalArgumentException("Visão não possui canvas equivalente adicionado.");
             }
         }
+        flatMenu.setSelected(true);
 
         frentePane     .getChildren().add(frente);
         lateralPane    .getChildren().add(lateral);
@@ -307,13 +314,14 @@ public class MainController implements Initializable {
     }
     
     private void initializeMenuBar(){
+        //<editor-fold defaultstate="collapsed" desc="Grid Flags">
         showGrid.setOnAction((ActionEvent event) -> {
             boolean show = showGrid.selectedProperty().get();
             frenteGrid.showGrid(show);
             lateralGrid.showGrid(show);
             topoGrid.showGrid(show);
             persGrid.showGrid(show);
-            
+
             if (show){ //Hardcoding intensifies
                 tools.getRoot().getChildren().get(1).getChildren().add(new TreeItem<>(CriacaoPrevolucao.gridSnap.NAME, new ImageView(CriacaoPrevolucao.gridSnap.ICON)));
             } else {
@@ -321,7 +329,7 @@ public class MainController implements Initializable {
                 tools.getRoot().getChildren().get(1).getChildren().remove(1);
             }
         });
-        
+
         showAxisIcon.setOnAction((ActionEvent event) -> {
             boolean show = showAxisIcon.selectedProperty().get();
             frenteGrid.showAxisIcon(show);
@@ -329,7 +337,7 @@ public class MainController implements Initializable {
             topoGrid.showAxisIcon(show);
             persGrid.showAxisIcon(show);
         });
-        
+
         showAxis.setOnAction((ActionEvent event) -> {
             boolean show = showAxis.selectedProperty().get();
             if (show){
@@ -339,7 +347,9 @@ public class MainController implements Initializable {
             }
             paint();
         });
+        //</editor-fold>
         
+        //<editor-fold defaultstate="collapsed" desc="Factors and background">
         factors.setOnAction((ActionEvent event) -> {
             Pane pane = null;
 
@@ -360,7 +370,7 @@ public class MainController implements Initializable {
             dialog.setTitle("Fatores de alteração");
             dialog.show();
         });
-        
+
         backgroundMenu.setOnAction((ActionEvent event) -> {
             Pane pane = null;
 
@@ -369,7 +379,7 @@ public class MainController implements Initializable {
                     frente.backgroundColorProperty(), lateral.backgroundColorProperty(),
                     topo.backgroundColorProperty(), perspectiva.backgroundColorProperty())
             );
-            
+
             try {
                 pane = loader.load();
             } catch (IOException ex) {
@@ -385,7 +395,9 @@ public class MainController implements Initializable {
             dialog.setTitle("Cores de fundo");
             dialog.show();
         });
+        //</editor-fold>
         
+        //<editor-fold defaultstate="collapsed" desc="Grid Options">
         gridThickness.setOnMouseReleased((Event event) -> {
             int thickness = gridThickness.valueProperty().intValue();
             frenteGrid.setGridThickness(thickness);
@@ -393,7 +405,7 @@ public class MainController implements Initializable {
             topoGrid.setGridThickness(thickness);
             persGrid.setGridThickness(thickness);
         });
-        
+
         Tooltip opac = new Tooltip("30");
         opac.setAutoHide(true);
         gridOpacity.setTooltip(opac);
@@ -413,7 +425,7 @@ public class MainController implements Initializable {
             topoGrid.setOpacity(opacity);
             persGrid.setOpacity(opacity);
         });
-                
+
         Tooltip tool = new Tooltip("30");
         tool.setAutoHide(true);
         gridSize.setTooltip(tool);
@@ -428,13 +440,13 @@ public class MainController implements Initializable {
         });
         gridSize.setOnMouseReleased((MouseEvent event) -> {
             int cellSize = gridSize.valueProperty().intValue();
-            
+
             frenteGrid.setCellSizePX(cellSize);
             lateralGrid.setCellSizePX(cellSize);
             topoGrid.setCellSizePX(cellSize);
             persGrid.setCellSizePX(cellSize);
         });
-        
+
         gridColor.valueProperty().set(Color.LIGHTGRAY);
         gridColor.valueProperty().addListener((ObservableValue<? extends Color> observable, Color oldValue, Color newValue) -> {
             Color color = newValue;
@@ -443,16 +455,18 @@ public class MainController implements Initializable {
             topoGrid.setGridColor(color);
             persGrid.setGridColor(color);
         });
+        //</editor-fold>
         
+        //<editor-fold defaultstate="collapsed" desc="Objetos na cena">
         salvar.setOnAction((ActionEvent event) -> {
             if (showAxis.selectedProperty().get()) mundo.removeAxis();
-            
+
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Arquivos de CG (*.jas)", "*.jas");
             fileChooser.getExtensionFilters().add(extFilter);
             File file = fileChooser.showSaveDialog(menu.getScene().getWindow());
-            
+
             if(file != null){
                 try {
                     OutputScene.outputToFile(mundo.getObjectsCopy(), file);
@@ -460,17 +474,17 @@ public class MainController implements Initializable {
                     Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            
+
             if (showAxis.selectedProperty().get()) mundo.addAxis();
         });
-        
+
         carregar.setOnAction((ActionEvent event) -> {
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
             FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("Arquivos de CG (*.jas)", "*.jas");
             fileChooser.getExtensionFilters().add(extFilter);
             File file = fileChooser.showOpenDialog(menu.getScene().getWindow());
-            
+
             if(file != null){
                 try {
                     List<CGObject> objectsList = InputScene.getListFromFile(file);
@@ -485,15 +499,40 @@ public class MainController implements Initializable {
                 }
             }
         });
-        
+
         limparCena.setOnAction((ActionEvent event) -> {
             mundo.clearAll();
             //selectedObject = null;
             selectedObjectProperty.set(null);
             //if (selectController != null) selectController.objectProperty().set(null);
             paint();
-            
+
         });
+        //</editor-fold>
+        
+        //<editor-fold defaultstate="collapsed" desc="Escolha de Shader">
+        wireframeMenu.setOnAction((ActionEvent event) -> {
+            frente.setShader(new Wireframe());
+            lateral.setShader(new Wireframe());
+            topo.setShader(new Wireframe());
+            perspectiva.setShader(new Wireframe()); 
+        });
+        
+        flatMenu.setOnAction((ActionEvent event) -> {
+            frente.setShader(new Flat(frente.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            lateral.setShader(new Flat(lateral.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            topo.setShader(new Flat(topo.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            perspectiva.setShader(new Flat(perspectiva.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais)); 
+        });
+        
+        gouraudMenu.setOnAction((ActionEvent event) -> {
+            /*frente.setShader(new Flat(frente.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            lateral.setShader(new Flat(lateral.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            topo.setShader(new Flat(topo.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            perspectiva.setShader(new Flat(perspectiva.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));  */
+            throw new UnsupportedOperationException("Gouraud não suportado ainda.");
+        });
+        //</editor-fold>
     }
     
     private void initializeViewToolbars(){

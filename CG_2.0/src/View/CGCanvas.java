@@ -55,7 +55,7 @@ public final class CGCanvas extends Canvas{
     private final World mundo;
     private final Visao visao;
     private final Vista vista;
-    private final CGShader shader;
+    private CGShader shader;
     private Grid grid;
     
     private final ObjectProperty<CGObject> selectedObjProperty;
@@ -116,6 +116,11 @@ public final class CGCanvas extends Canvas{
 
     public void setGrid(Grid grid){
         this.grid = grid;
+    }
+    
+    public void setShader(CGShader newShader){
+        this.shader = newShader;
+        paint();
     }
     
     //<editor-fold defaultstate="collapsed" desc="Getters & Properties">

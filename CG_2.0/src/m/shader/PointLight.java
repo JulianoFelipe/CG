@@ -124,9 +124,9 @@ public class PointLight extends Light{
         String ret = "XYZ("+posicao.getX()+";"+posicao.getY()+";"+posicao.getZ()+");";
 
         if (isChromatic){
-            ret += String.format("RGB(%.0f;%.0f;%.0f) ", red, green, blue);
+            ret += String.format("RGB(%.2f;%.2f;%.2f) ", red, green, blue);
         } else {
-            ret += String.format("Acrom.(%.0f)", red);
+            ret += String.format("Acrom.(%.2f)", red);
         }
         
         return ret;

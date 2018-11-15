@@ -44,16 +44,26 @@ public class Wireframe extends CGShader{
      */
     private void paintObject(GraphicsContext graphs, CGObject obj, long selectedID, Color selColor){        
         Paint stroke = graphs.getStroke();
+        Paint fill   = graphs.getFill();
         if (selectedID!=-1 && obj.getID()==(selectedID)){
-            if (selColor != null) graphs.setStroke(selColor);
-            else graphs.setStroke(Color.RED);
+            if (selColor != null){
+                graphs.setStroke(selColor);
+                graphs.setFill(selColor);
+            } else{
+                graphs.setStroke(Color.RED);
+                graphs.setFill(Color.RED);
+            }
         }
         
         if (obj instanceof HE_Poliedro){
-            List<List<WE_Aresta>> faces = ((HE_Poliedro) obj).getVisibleFaces();
+            HE_Poliedro poli = (HE_Poliedro) obj;
+            List<List<WE_Aresta>> faces = (poli).getVisibleFaces();
             faces.forEach((face) -> {
                 paintArestasConectadas(graphs, face);
             });
+            if (selectedID!=-1 && obj.getID()==(selectedID)){
+                super.paintPoints(poli.getVisiblePoints(), graphs);
+            }
         } else if (obj instanceof ArestaEixo){
             ArestaEixo objA = (ArestaEixo) obj;
             graphs.setStroke(objA.getAxisColor());
@@ -63,6 +73,7 @@ public class Wireframe extends CGShader{
         }
         
         graphs.setStroke(stroke);
+        graphs.setFill(fill);
     }
     
     private void paintArestasConectadas(GraphicsContext graphs, List<? extends Aresta> lista){
