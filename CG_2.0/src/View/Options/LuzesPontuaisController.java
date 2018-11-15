@@ -21,7 +21,9 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
@@ -57,6 +59,7 @@ public class LuzesPontuaisController implements Initializable {
     @FXML private Tab tabLuzes;
     @FXML private Tab tabEdit;
     @FXML private VBox vBox;
+    @FXML private TextField descField;
        
     private final TreeView<String> tree;
     
@@ -102,20 +105,47 @@ public class LuzesPontuaisController implements Initializable {
         okButton.setOnAction((ActionEvent event) -> {
             okButton.setDisable(true);
             
-            PointLight copy = copyProperty.get();
+            PointLight li = (copyProperty.get()!=null ? copyProperty.get() : new PointLight(new Vertice(0, 0), 0));
             if (chromaticCheck.selectedProperty().get()){
-                copy.setColor(corPicker.getValue());
+                li.setColor(corPicker.getValue());
             } else {
-                copy.setIntensidade(defaultFloatParser(intensidadeField.getText())); 
+                li.setIntensidade(defaultFloatParser(intensidadeField.getText())); 
             }
             
             float x = defaultFloatParser(xField.textProperty().get());
             float y = defaultFloatParser(yField.textProperty().get());
             float z = defaultFloatParser(zField.textProperty().get());
-            copy.setPosition(x, y, z);
+            li.setPosition(x, y, z);
             
-            copyProperty.set(copy);
-            mainController.setPointLight(index, copy);
+            if (copyProperty.get() != null){
+                mainController.setPointLight(index, li);
+            } else {
+                mainController.addPointLight(li);
+                index = lights.size()-1;
+                tree.getRoot().getChildren().clear();
+                showTree();
+                tree.getSelectionModel().select(index);
+                setFields(li);
+                okButton.setDisable(true);
+            }  
+            copyProperty.set(li);
+        });
+        
+        removeButton.setOnAction((ActionEvent event) -> {
+            if (copyProperty.get() != null){
+                Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Deseja excluir a luz pontual \"" + copyProperty.get().descriptionString() + "\" ?", ButtonType.YES, ButtonType.NO);
+                alert.showAndWait();
+
+                if (alert.getResult() == ButtonType.YES) {
+                    copyProperty.set(null);
+                    mainController.removePointLight(index);
+                    index = -1;
+                    tree.getRoot().getChildren().clear();
+                    showTree();
+                    tree.getSelectionModel().clearSelection();
+                    setFields(null);
+                }
+            }
         });
         
         xField.textProperty().addListener((ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
@@ -182,6 +212,7 @@ public class LuzesPontuaisController implements Initializable {
                 intensidadeField.setDisable(false);
             }
             
+            descField.textProperty().set("");
             xField.textProperty().set("");
             yField.textProperty().set("");
             zField.textProperty().set("");
@@ -212,6 +243,7 @@ public class LuzesPontuaisController implements Initializable {
         xField.textProperty().set(Float.toString(pos.getX()));
         yField.textProperty().set(Float.toString(pos.getY()));
         zField.textProperty().set(Float.toString(pos.getZ()));
+        descField.textProperty().set(index + ": " + light.descriptionString());
     }
     
     private float defaultFloatParser(String text){

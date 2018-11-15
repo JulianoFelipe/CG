@@ -187,21 +187,21 @@ public class PolySelectController implements Initializable {
         
         if (changeKA || changeKD || changeKS){
             newKa = new float[]{
-                defaultFloatParser( kaR.textProperty().get() ),
-                defaultFloatParser( kaG.textProperty().get() ),
-                defaultFloatParser( kaB.textProperty().get() )
+                capCheck(defaultFloatParser( kaR.textProperty().get()),0,1),
+                capCheck(defaultFloatParser( kaG.textProperty().get()),0,1),
+                capCheck(defaultFloatParser( kaB.textProperty().get()),0,1)
             };
 
             newKd = new float[]{
-                defaultFloatParser( kdR.textProperty().get() ),
-                defaultFloatParser( kdG.textProperty().get() ),
-                defaultFloatParser( kdB.textProperty().get() )
+                capCheck(defaultFloatParser( kdR.textProperty().get()),0,1),
+                capCheck(defaultFloatParser( kdG.textProperty().get()),0,1),
+                capCheck(defaultFloatParser( kdB.textProperty().get()),0,1)
             };
 
             newKs = new float[]{
-                defaultFloatParser( ksR.textProperty().get() ),
-                defaultFloatParser( ksG.textProperty().get() ),
-                defaultFloatParser( ksB.textProperty().get() ),
+                capCheck(defaultFloatParser(ksR.textProperty().get()),0,1),
+                capCheck(defaultFloatParser(ksG.textProperty().get()),0,1),
+                capCheck(defaultFloatParser(ksB.textProperty().get()),0,1),
                 defaultFloatParser( ksN.textProperty().get() )
             };
 
@@ -236,12 +236,18 @@ public class PolySelectController implements Initializable {
         else {
             float test;
             try{
-               test = Float.parseFloat(text);
+                test = Float.parseFloat(text);               
             } catch(NumberFormatException e){
                 test = 0;
             }
             return test;
         }
+    }
+    
+    private float capCheck(float value, float min, float max){
+        float r = Math.min(value, max);
+        r = Math.max(r, min);
+        return r;
     }
     
     private void clearFields(){

@@ -809,5 +809,15 @@ public class MainController implements Initializable {
         luzesPontuais.get(i).update(newLight);
         paint();
     }
+    
+    public void addPointLight(PointLight newLight){
+        luzesPontuais.add(newLight);
+        paint();
+    }
+    
+    public void removePointLight(int index){
+        luzesPontuais.remove(index);
+        paint();
+    }
 //</editor-fold>
 }
