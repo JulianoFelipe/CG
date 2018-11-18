@@ -303,6 +303,29 @@ public class HE_Poliedro extends CGObject {
         return lista;
     }
     
+    public List<List<WE_Aresta>> getAllFaces() {
+        List<List<WE_Aresta>> lista = new ArrayList();
+
+        for (int i = 0; i < listaDeFaces.size(); i++) {
+            List<WE_Aresta> arestas_face = new ArrayList();
+            WE_Face face = listaDeFaces.get(i);
+            WE_Aresta ini = face.getArestaDaFace();
+            arestas_face.add(ini);
+            //System.out.println("Aresta add: " + ini);
+            WE_Aresta local=ini.getEsquerdaSucessora();
+            while (local != ini){
+                arestas_face.add(local);
+                //System.out.println("Aresta add: " + local);
+                local = local.getEsquerdaSucessora();
+            }
+
+            lista.add(arestas_face);
+            //System.out.println("\n\n");
+        }
+
+        return lista;
+    }
+    
     public List<Vertice> getVisibleNormais(){
         List<Vertice> lista = new ArrayList();
 
