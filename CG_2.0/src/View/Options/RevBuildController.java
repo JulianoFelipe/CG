@@ -13,7 +13,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
+import m.Eixo;
 
 /**
  *
@@ -28,37 +30,28 @@ public class RevBuildController implements Initializable {
     public static final int MIN_GRD = 0;
     public static final int MAX_GRD = 360;
     
-    @FXML
-    private TextField sectionsField;
-    @FXML
-    private TextField angleField;
-    @FXML
-    private Button okButton;
-    @FXML
-    private Button cancelButton;
+    @FXML private TextField sectionsField;
+    @FXML private TextField angleField;
+    @FXML private ChoiceBox<String> choiceBox;
+    @FXML private Button okButton;
+    @FXML private Button cancelButton;
     
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        //sidesField.setText("3");
-        
-        /*sidesSlider.valueProperty().addListener(new ChangeListener<Number>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                sidesField.textProperty().setValue( String.valueOf((int) sidesSlider.getValue()));
-            }
-        });*/
-
-        /*sidesField.textProperty().addListener((observable, oldValue, newValue) -> {
-            numberOfSides = Integer.parseInt(sidesField.getText());
-        });*/
+        choiceBox.getItems().add("Eixo X");
+        choiceBox.getItems().add("Eixo Y");
+        choiceBox.getItems().add("Eixo Z");
+        choiceBox.selectionModelProperty().get().select(0);
         
         okButton.setOnAction((ActionEvent event) -> {
             int sections = defaultIntParser(sectionsField.textProperty().get(), MIN_SEC, MAX_SEC);
             int graus    = defaultIntParser(angleField   .textProperty().get(), MIN_GRD, MAX_GRD);
             
+            Eixo axis = Eixo.eixoFromSpaceString(choiceBox.getSelectionModel().getSelectedItem());
+            System.out.println("AXIS: " + axis);
             fillFields(sections, graus);
             
-            CG_20.main.finalizeTempPoints(sections, graus);
+            CG_20.main.finalizeTempPoints(sections, graus, axis);
         });
         
         cancelButton.setOnAction((ActionEvent event) -> {

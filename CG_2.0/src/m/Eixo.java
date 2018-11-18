@@ -33,4 +33,13 @@ public enum Eixo {
             default: throw new IllegalArgumentException("Visão não esperada: " + visao);
         }
     }
+    
+    public static Eixo eixoFromSpaceString(String text){
+        switch(text){
+            case "Eixo X": return Eixo_X;
+            case "Eixo Y": return Eixo_Y;
+            case "Eixo Z": return Eixo_Z;
+            default: throw new IllegalArgumentException("String não esperada: " + text);
+        }
+    }
 }

@@ -841,13 +841,13 @@ public class MainController implements Initializable {
         perspectiva.paint();
     }
     
-    public void finalizeTempPoints(int sections, int graus){
+    public void finalizeTempPoints(int sections, int graus, Eixo axis){
         List<Vertice> lista = mundo.getTempPointsCopy();
         if (lista == null) return;
         
         //System.out.println("SEC: " + sections + " Graus: " + graus);
         
-        mundo.addObject(PMath.attemptBuildingFromPlanes(lista));
+        //mundo.addObject(PMath.attemptBuildingFromPlanes(lista));
         mundo.clearTemp();
         paint();
     }
