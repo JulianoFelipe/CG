@@ -841,9 +841,12 @@ public class MainController implements Initializable {
         perspectiva.paint();
     }
     
-    public void finalizeTempPoints(){
+    public void finalizeTempPoints(int sections, int graus){
         List<Vertice> lista = mundo.getTempPointsCopy();
-        //Poligono pol = Poligono.build(lista);
+        if (lista == null) return;
+        
+        //System.out.println("SEC: " + sections + " Graus: " + graus);
+        
         mundo.addObject(PMath.attemptBuildingFromPlanes(lista));
         mundo.clearTemp();
         paint();

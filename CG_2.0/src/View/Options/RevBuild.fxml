@@ -11,7 +11,7 @@
       <VBox prefHeight="237.0" prefWidth="193.0">
          <children>
             <Label prefHeight="17.0" prefWidth="196.0" text="Quantia de seções:" />
-            <TextField fx:id="sectionsField" editable="false" />
+            <TextField fx:id="sectionsField" />
             <Separator prefHeight="20.0" prefWidth="193.0" visible="false" />
             <Label text="Ângulo:" />
             <TextField fx:id="angleField" />
