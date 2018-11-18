@@ -17,7 +17,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
@@ -33,6 +35,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.CheckMenuItem;
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuBar;
@@ -66,6 +69,7 @@ import m.shader.Flat;
 import m.shader.Gouraud;
 import m.shader.PointLight;
 import m.shader.Wireframe;
+import m.shader.WireframeSemOcult;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
@@ -80,7 +84,7 @@ import utils.math.PMath;
  */
 public class MainController implements Initializable {
     private static final Logger LOG = Logger.getLogger("CG_2.0");
-    
+       
     //<editor-fold defaultstate="collapsed" desc="GUI FXML ELEMENTS">
     @FXML private MenuBar  menu;
     @FXML private MenuItem salvar;
@@ -122,6 +126,10 @@ public class MainController implements Initializable {
     @FXML private RadioMenuItem wireframeMenu;
     @FXML private RadioMenuItem flatMenu;
     @FXML private RadioMenuItem gouraudMenu;
+    @FXML private MenuItem   frenteShader;
+    @FXML private MenuItem lateralShader;
+    @FXML private MenuItem    topoShader;
+    @FXML private MenuItem    persShader;
 //</editor-fold>
     
     private World mundo;
@@ -520,7 +528,10 @@ public class MainController implements Initializable {
         
         //<editor-fold defaultstate="collapsed" desc="Escolha de Shader">
         wireframeSemOccultMenu.setOnAction((ActionEvent event) -> {
-            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            frente.setShader(new WireframeSemOcult());
+            lateral.setShader(new WireframeSemOcult());
+            topo.setShader(new WireframeSemOcult());
+            perspectiva.setShader(new WireframeSemOcult()); 
         });
         
         wireframeMenu.setOnAction((ActionEvent event) -> {
@@ -548,6 +559,35 @@ public class MainController implements Initializable {
     
     private void initializeViewToolbars(){
         //<editor-fold defaultstate="collapsed" desc="Frente">
+        frenteShader.setOnAction((ActionEvent event) -> {
+            Vertice observador = frente.getVista().getPipelineCamera().getVRP();
+            
+            List<String> choices = new ArrayList<>();
+            choices.add("Wireframe sem ocultação");
+            choices.add("Wireframe");
+            choices.add("Flat");
+            choices.add("Gouraud");
+
+            ChoiceDialog<String> dialog = new ChoiceDialog<>("Wireframe", choices);
+            dialog.setTitle("Shader para frente");
+            dialog.setHeaderText("Escolha um shader para ser utilizado na visualização frontal");
+            dialog.setContentText("Shader:");
+            
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent((String t) -> {
+                switch (t){
+                    case "Wireframe sem ocultação":
+                        frente.setShader(new WireframeSemOcult()); break;
+                    case "Wireframe":
+                        frente.setShader(new Wireframe()); break;
+                    case "Flat":
+                        frente.setShader(new Flat(observador, ambientLight, luzesPontuais)); break;
+                    case "Gouraud":
+                        frente.setShader(new Gouraud(observador, ambientLight, luzesPontuais)); break;
+                }
+            });
+        });
+        
         frenteCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                 frente.getVista().getPipelineCamera(), Visao.Frontal
@@ -572,6 +612,35 @@ public class MainController implements Initializable {
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Lateral">
+        lateralShader.setOnAction((ActionEvent event) -> {
+            Vertice observador = lateral.getVista().getPipelineCamera().getVRP();
+            
+            List<String> choices = new ArrayList<>();
+            choices.add("Wireframe sem ocultação");
+            choices.add("Wireframe");
+            choices.add("Flat");
+            choices.add("Gouraud");
+
+            ChoiceDialog<String> dialog = new ChoiceDialog<>("Wireframe", choices);
+            dialog.setTitle("Shader para lateral");
+            dialog.setHeaderText("Escolha um shader para ser utilizado na visualização lateral");
+            dialog.setContentText("Shader:");
+            
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent((String t) -> {
+                switch (t){
+                    case "Wireframe sem ocultação":
+                        lateral.setShader(new WireframeSemOcult()); break;
+                    case "Wireframe":
+                        lateral.setShader(new Wireframe()); break;
+                    case "Flat":
+                        lateral.setShader(new Flat(observador, ambientLight, luzesPontuais)); break;
+                    case "Gouraud":
+                        lateral.setShader(new Gouraud(observador, ambientLight, luzesPontuais)); break;
+                }
+            });
+        });
+        
         lateralCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                 lateral.getVista().getPipelineCamera(), Visao.Lateral
@@ -596,6 +665,35 @@ public class MainController implements Initializable {
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Topo">
+        topoShader.setOnAction((ActionEvent event) -> {
+            Vertice observador = topo.getVista().getPipelineCamera().getVRP();
+            
+            List<String> choices = new ArrayList<>();
+            choices.add("Wireframe sem ocultação");
+            choices.add("Wireframe");
+            choices.add("Flat");
+            choices.add("Gouraud");
+
+            ChoiceDialog<String> dialog = new ChoiceDialog<>("Wireframe", choices);
+            dialog.setTitle("Shader para topo");
+            dialog.setHeaderText("Escolha um shader para ser utilizado na visualização superior");
+            dialog.setContentText("Shader:");
+            
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent((String t) -> {
+                switch (t){
+                    case "Wireframe sem ocultação":
+                        topo.setShader(new WireframeSemOcult()); break;
+                    case "Wireframe":
+                        topo.setShader(new Wireframe()); break;
+                    case "Flat":
+                        topo.setShader(new Flat(observador, ambientLight, luzesPontuais)); break;
+                    case "Gouraud":
+                        topo.setShader(new Gouraud(observador, ambientLight, luzesPontuais)); break;
+                }
+            });
+        });
+        
         topoCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                 topo.getVista().getPipelineCamera(), Visao.Topo
@@ -620,6 +718,35 @@ public class MainController implements Initializable {
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Perspectiva">
+        persShader.setOnAction((ActionEvent event) -> {
+            Vertice observador = perspectiva.getVista().getPipelineCamera().getVRP();
+            
+            List<String> choices = new ArrayList<>();
+            choices.add("Wireframe sem ocultação");
+            choices.add("Wireframe");
+            choices.add("Flat");
+            choices.add("Gouraud");
+
+            ChoiceDialog<String> dialog = new ChoiceDialog<>("Wireframe", choices);
+            dialog.setTitle("Shader para perspectiva");
+            dialog.setHeaderText("Escolha um shader para ser utilizado na visualização perspectiva");
+            dialog.setContentText("Shader:");
+            
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent((String t) -> {
+                switch (t){
+                    case "Wireframe sem ocultação":
+                        perspectiva.setShader(new WireframeSemOcult()); break;
+                    case "Wireframe":
+                        perspectiva.setShader(new Wireframe()); break;
+                    case "Flat":
+                        perspectiva.setShader(new Flat(observador, ambientLight, luzesPontuais)); break;
+                    case "Gouraud":
+                        perspectiva.setShader(new Gouraud(observador, ambientLight, luzesPontuais)); break;
+                }
+            });
+        });
+        
         persCamParams.setOnAction((ActionEvent event) -> {
             ManualCamController controller = new ManualCamController(
                 perspectiva.getVista().getPipelineCamera(), Visao.Perspectiva

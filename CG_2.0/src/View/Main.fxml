@@ -63,12 +63,11 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Renderização">
                      <items>
-                        <RadioMenuItem fx:id="wireframeSemOccultMenu" mnemonicParsing="false" text="Wireframe s/ ocultação" />
-                        <RadioMenuItem fx:id="wireframeMenu" mnemonicParsing="false" text="Wireframe">
+                        <RadioMenuItem fx:id="wireframeSemOccultMenu" mnemonicParsing="false" text="Wireframe s/ ocultação">
                            <toggleGroup>
                               <ToggleGroup fx:id="RenderGroup" />
-                           </toggleGroup>
-                        </RadioMenuItem>
+                           </toggleGroup></RadioMenuItem>
+                        <RadioMenuItem fx:id="wireframeMenu" mnemonicParsing="false" text="Wireframe" toggleGroup="$RenderGroup" />
                         <RadioMenuItem fx:id="flatMenu" mnemonicParsing="false" text="Flat Shading" toggleGroup="$RenderGroup" />
                         <RadioMenuItem fx:id="gouraudMenu" mnemonicParsing="false" text="Gouraud Shading" toggleGroup="$RenderGroup" />
                      </items>
@@ -120,6 +119,7 @@
                                 <items>
                                   <MenuItem fx:id="frenteCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
                                   <MenuItem fx:id="frenteCamAuto" mnemonicParsing="false" text="Câmera (Auto)" />
+                                    <MenuItem fx:id="frenteShader" mnemonicParsing="false" text="Frente Shader" />
                                 </items>
                                  <HBox.margin>
                                     <Insets bottom="5.0" right="5.0" top="5.0" />
@@ -166,6 +166,7 @@
                                  <items>
                                     <MenuItem fx:id="lateralCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
                                     <MenuItem fx:id="lateralCamAuto" mnemonicParsing="false" text="Câmera (Auto)" />
+                                    <MenuItem fx:id="lateralShader" mnemonicParsing="false" text="Lateral Shader" />
                                  </items>
                                  <HBox.margin>
                                     <Insets bottom="5.0" right="5.0" top="5.0" />
@@ -205,6 +206,7 @@
                                  <items>
                                     <MenuItem fx:id="topoCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
                                     <MenuItem fx:id="topoCamAuto" mnemonicParsing="false" text="Câmera (Auto)" />
+                                    <MenuItem fx:id="topoShader" mnemonicParsing="false" text="Topo Shader" />
                                  </items>
                                  <HBox.margin>
                                     <Insets bottom="5.0" right="5.0" top="5.0" />
@@ -244,6 +246,7 @@
                                  <items>
                                     <MenuItem fx:id="persCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
                                     <MenuItem fx:id="persCamAuto" mnemonicParsing="false" text="Câmera (Auto)" />
+                                    <MenuItem fx:id="persShader" mnemonicParsing="false" text="Pers. Shader" />
                                  </items>
                                  <HBox.margin>
                                     <Insets bottom="5.0" right="5.0" top="5.0" />
