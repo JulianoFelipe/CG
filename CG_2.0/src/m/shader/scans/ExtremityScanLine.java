@@ -7,7 +7,6 @@ package m.shader.scans;
 
 import java.util.ArrayList;
 import java.util.List;
-import m.poligonos.Vertice;
 import m.poligonos.we_edge.WE_Aresta;
 
 /**
@@ -44,7 +43,7 @@ public class ExtremityScanLine {
             if (a.getMinY() < min) min = a.getMinY();
             if (a.getMaxY() > max) max = a.getMaxY();
         }
-        
+        //System.out.println("Minmax: " + min + " Max: " + max);
         return new float[]{min, max};
     }
      
@@ -167,6 +166,11 @@ public class ExtremityScanLine {
         }
         //System.out.println("SCANS: " + scans.size());
         //System.out.println(scans);
+        
+        //Limpa todas as estruturas extras
+        slope.clear();
+        activeEdges.clear();
+        interceptX.clear();
     }
     
     public void update(){

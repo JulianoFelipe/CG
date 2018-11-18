@@ -36,6 +36,22 @@ public class VMath {
         }
     }
     
+    public static void soma(Vertice a, Vertice b){
+        a.setAll(
+            a.getX() + b.getX(),
+            a.getY() + b.getY(),
+            a.getZ() + b.getZ()
+        );
+    }
+    
+    public static void dividirEscalar(Vertice a, float escalar){
+        a.setAll(
+            a.getX() / escalar,
+            a.getY() / escalar,
+            a.getZ() / escalar
+        );
+    }
+    
     /**
      * Produto vetorial de vertices
      *

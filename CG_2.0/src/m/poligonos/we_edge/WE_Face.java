@@ -6,6 +6,7 @@
 package m.poligonos.we_edge;
 
 import java.io.Serializable;
+import m.poligonos.Vertice;
 
 /**
  *
@@ -16,6 +17,8 @@ public class WE_Face implements Serializable{
     public final long ID;
     private WE_Aresta arestaDaFace;
 
+    private Vertice normalDaFace;
+    
     public WE_Face() {
         ID=INSTANCES++;
     }
@@ -32,7 +35,15 @@ public class WE_Face implements Serializable{
     public void setArestaDaFace(WE_Aresta arestaDaFace) {
         this.arestaDaFace = arestaDaFace;
     }
+    
+    public void setNormalDaFace(Vertice normal){
+        this.normalDaFace = normal;
+    }
 
+    public Vertice getNormalDaFace(){
+        return normalDaFace;
+    }
+    
     @Override
     public String toString() {
         if (arestaDaFace == null){

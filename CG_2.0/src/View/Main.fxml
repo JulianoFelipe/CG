@@ -63,6 +63,7 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Renderização">
                      <items>
+                        <RadioMenuItem fx:id="wireframeSemOccultMenu" mnemonicParsing="false" text="Wireframe s/ ocultação" />
                         <RadioMenuItem fx:id="wireframeMenu" mnemonicParsing="false" text="Wireframe">
                            <toggleGroup>
                               <ToggleGroup fx:id="RenderGroup" />

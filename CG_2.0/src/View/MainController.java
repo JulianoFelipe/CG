@@ -26,7 +26,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -64,6 +63,7 @@ import m.poligonos.CGObject;
 import m.poligonos.Vertice;
 import m.shader.AmbientLight;
 import m.shader.Flat;
+import m.shader.Gouraud;
 import m.shader.PointLight;
 import m.shader.Wireframe;
 import resource.description.Ferramentas;
@@ -118,6 +118,7 @@ public class MainController implements Initializable {
     @FXML private Label topoZoom;
     @FXML private Label persZoom;
     
+    @FXML private RadioMenuItem wireframeSemOccultMenu;
     @FXML private RadioMenuItem wireframeMenu;
     @FXML private RadioMenuItem flatMenu;
     @FXML private RadioMenuItem gouraudMenu;
@@ -141,7 +142,7 @@ public class MainController implements Initializable {
         
         ambientLight = new AmbientLight(10);
         luzesPontuais = new ArrayList();
-        luzesPontuais.add(new PointLight(new Vertice(0, 0, 0), Color.WHITE));
+        luzesPontuais.add(new PointLight(new Vertice(0, 0, 0), 100));
         
         CGViewport viw = StandardConfigWinView.STD_VIEWPORT;
         int height = (int) viw.getDeltaV();
@@ -154,6 +155,9 @@ public class MainController implements Initializable {
                 case Lateral: lateral = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
                 case Topo:    topo    = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
                 case Perspectiva: perspectiva = new CGCanvas(this, v, width, height, new Flat(observer, ambientLight, luzesPontuais)); break;
+                //case Lateral: lateral = new CGCanvas(this, v, width, height, new Wireframe()); break;
+                //case Topo:    topo    = new CGCanvas(this, v, width, height, new Wireframe()); break;
+                //case Perspectiva: perspectiva = new CGCanvas(this, v, width, height, new Wireframe()); break;
                 default: throw new IllegalArgumentException("Visão não possui canvas equivalente adicionado.");
             }
         }
@@ -208,6 +212,10 @@ public class MainController implements Initializable {
         initializeResizeAndCanvasHUD(); //Coloca Grids e listeners de resize
         
         paint();
+        
+        //Para abrir a "árvore" de ferramentas ao iniciar
+        tools.getSelectionModel().select(tools.getRoot().getChildren().get(0).getChildren().get(0));
+        tools.getSelectionModel().clearSelection();
     }
     
     public void forceSelectedObjUpdate(){
@@ -511,6 +519,10 @@ public class MainController implements Initializable {
         //</editor-fold>
         
         //<editor-fold defaultstate="collapsed" desc="Escolha de Shader">
+        wireframeSemOccultMenu.setOnAction((ActionEvent event) -> {
+            throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        });
+        
         wireframeMenu.setOnAction((ActionEvent event) -> {
             frente.setShader(new Wireframe());
             lateral.setShader(new Wireframe());
@@ -526,11 +538,10 @@ public class MainController implements Initializable {
         });
         
         gouraudMenu.setOnAction((ActionEvent event) -> {
-            /*frente.setShader(new Flat(frente.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
-            lateral.setShader(new Flat(lateral.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
-            topo.setShader(new Flat(topo.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
-            perspectiva.setShader(new Flat(perspectiva.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));  */
-            throw new UnsupportedOperationException("Gouraud não suportado ainda.");
+            frente.setShader(new Gouraud(frente.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            lateral.setShader(new Gouraud(lateral.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            topo.setShader(new Gouraud(topo.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            perspectiva.setShader(new Gouraud(perspectiva.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
         });
         //</editor-fold>
     }

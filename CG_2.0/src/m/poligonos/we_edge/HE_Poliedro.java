@@ -271,6 +271,7 @@ public class HE_Poliedro extends CGObject {
             //System.out.println("Normal: " + normal + " Mult: " + mult);
             visibilidade_faces[i] = mult <= 0; //Se mult>0, face[i] é visível
             normais[i] = normal;
+            face.setNormalDaFace(normal);
             i++;
         }
         
@@ -361,17 +362,17 @@ public class HE_Poliedro extends CGObject {
         return lista;
     }
     
-    public List<Vertice> getVisiblePoints() {
-        List<Vertice> lista = new ArrayList();
+    public List<WE_Vertice> getVisiblePoints() {
+        List<WE_Vertice> lista = new ArrayList();
 
         for (int i = 0; i < listaDeFaces.size(); i++) {
             if (visibilidade_faces[i] == true) {
                 WE_Face face = listaDeFaces.get(i);
                 WE_Aresta ini = face.getArestaDaFace();
-                lista.add(ini.getvInicial());
+                lista.add((WE_Vertice) ini.getvInicial());
                 WE_Aresta local=ini.getEsquerdaSucessora();
                 while (local != ini){
-                    lista.add(local.getvInicial());
+                    lista.add((WE_Vertice) local.getvInicial());
                     local = local.getEsquerdaSucessora();
                 }
             }
@@ -551,6 +552,10 @@ public class HE_Poliedro extends CGObject {
     public float getMaxY() {
         return max_y;
     }
+    
+    public List<WE_Aresta> getAllArestas(){
+        return listaDeArestas;
+    }
         
     public static void main(String... args) {
         //Index2 a = new Index2(0, 1);
@@ -586,14 +591,17 @@ public class HE_Poliedro extends CGObject {
         int[] face2 = {1, 2, 4};
         int[] face3 = {2, 3, 4};
         int[] face4 = {3, 0, 4}; //THis
-
+        int[] face5 = {0, 1, 2};
+        int[] face6 = {1, 0, 2};
         List<IndexList> faces = new ArrayList();
         faces.add(new IndexList(face0));
         faces.add(new IndexList(face1));
         faces.add(new IndexList(face2));
         faces.add(new IndexList(face3));
         faces.add(new IndexList(face4));
-
+        faces.add(new IndexList(face5));
+        faces.add(new IndexList(face6));
+        
         Vertice ViewUp = new Vertice(0, 1, 0);
         Vertice VRP    = new Vertice(50, 15, 30);
         Vertice P      = new Vertice(20, 6, 15);

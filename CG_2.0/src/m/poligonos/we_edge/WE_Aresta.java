@@ -161,4 +161,26 @@ public class WE_Aresta extends Aresta{
     public String idString(){
         return "WE_Aresta " + ID;
     }
+    
+    public Vertice getMaxXvertice(){
+        if (vInicial.getX() > vFinal.getX()){
+            return vInicial;
+        } else if (vInicial.getX() == vFinal.getX()) {
+            if (vInicial.getY() > vFinal.getY()) return vInicial;
+            else return vInicial;
+        } else {
+            return vFinal;
+        }
+    }
+
+    public Vertice getMinXvertice() {
+        if (vInicial.getX() < vFinal.getX()){
+            return vInicial;
+        } else if (vInicial.getX() == vFinal.getX()) {
+            if (vInicial.getY() < vFinal.getY()) return vInicial;
+            else return vFinal;
+        } else {
+            return vFinal;
+        }
+    }
 }

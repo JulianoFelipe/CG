@@ -5,6 +5,7 @@
  */
 package m.shader;
 
+import java.util.Arrays;
 import m.shader.scans.ExtremityScanLine;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
@@ -88,7 +89,7 @@ public class Flat extends CGShader{
                         cor = iluminacaoTotal(ilumKA, ilumKD, ilumKS);
                     }
                 }
-                
+
                 graphs.setStroke(cor);
                 ExtremityScanLine scn = new ExtremityScanLine(faces.get(i));
                 paintFace(graphs, scn.getScans());
@@ -116,7 +117,7 @@ public class Flat extends CGShader{
         //graphs.beginPath();
         
         lista.forEach((scan) -> {
-            //System.out.println("SCAN: " + scan);
+            //System.out.println("SCAN: " + scan.getyFin() + " Xs: " + scan.getxIni() + ", " + scan.getxFin());
             graphs.strokeLine(scan.getxIni(), scan.getyIni(), scan.getxFin(), scan.getyFin());
         });
         
@@ -198,7 +199,7 @@ public class Flat extends CGShader{
         r = Math.max(r, 0);
         g = Math.max(g, 0);
         b = Math.max(b, 0);
-        
+
         return Color.rgb(r, g, b);
     }
 
