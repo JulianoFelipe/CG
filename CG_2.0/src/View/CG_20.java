@@ -83,6 +83,29 @@ public class CG_20 extends Application {
         //mundo.addObject(new Aresta(new Vertice(0,0,0), new Vertice(10,10,10)));
         mundo.addObject(poli);
         
+        float[][] pol_mat2 = {
+            {  40,  45,  35,  30,  40},
+            {   3,   5,   4,   2,  20},
+            {  35,  30,  28,  33,  (float) 32.5},
+            {   1,   1,   1,   1,   1}
+            //  A    B    C    D    E
+        };
+        
+        int[] sface0 = {0, 3, 2, 1};
+        int[] sface1 = {0, 1, 4};
+        int[] sface2 = {1, 2, 4};
+        int[] sface3 = {2, 3, 4};
+        int[] sface4 = {3, 0, 4};
+        List<IndexList> faces2 = new ArrayList();
+        faces2.add(new IndexList(sface0));
+        faces2.add(new IndexList(sface1));
+        faces2.add(new IndexList(sface2));
+        faces2.add(new IndexList(sface3));
+        faces2.add(new IndexList(sface4));
+        
+        HE_Poliedro poli2 = new HE_Poliedro(pol_mat2, faces2);
+        mundo.addObject(poli2);
+        
         FXMLLoader mainLoader = new FXMLLoader(getClass().getResource("Main.fxml"));
         mainLoader.setController(main);
         Parent root = mainLoader.load();

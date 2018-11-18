@@ -28,7 +28,6 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -66,6 +65,7 @@ import m.World;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
 import m.shader.AmbientLight;
+import m.shader.CGShader;
 import m.shader.Flat;
 import m.shader.Gouraud;
 import m.shader.Light;
@@ -73,13 +73,13 @@ import m.shader.Light.TipoAtenuacao;
 import m.shader.PointLight;
 import m.shader.Wireframe;
 import m.shader.WireframeSemOcult;
+import m.transformacoes.Revolucao;
 import resource.description.Ferramentas;
 import resource.description.CriacaoPrevolucao;
 import resource.description.Transformacoes;
 import utils.config.StandardConfigWinView;
 import utils.ioScene.InputScene;
 import utils.ioScene.OutputScene;
-import utils.math.PMath;
 
 /**
  *
@@ -539,28 +539,48 @@ public class MainController implements Initializable {
             frente.setShader(new WireframeSemOcult());
             lateral.setShader(new WireframeSemOcult());
             topo.setShader(new WireframeSemOcult());
-            perspectiva.setShader(new WireframeSemOcult()); 
+            perspectiva.setShader(new WireframeSemOcult());
+            
+            /*frente.getShader().setTipoAtenuacao(att);
+            lateral.getShader().setTipoAtenuacao(att);
+            topo.getShader().setTipoAtenuacao(att);
+            perspectiva.getShader().setTipoAtenuacao(att);*/
         });
         
         wireframeMenu.setOnAction((ActionEvent event) -> {
             frente.setShader(new Wireframe());
             lateral.setShader(new Wireframe());
             topo.setShader(new Wireframe());
-            perspectiva.setShader(new Wireframe()); 
+            perspectiva.setShader(new Wireframe());
+            
+            /*frente.getShader().setTipoAtenuacao(att);
+            lateral.getShader().setTipoAtenuacao(att);
+            topo.getShader().setTipoAtenuacao(att);
+            perspectiva.getShader().setTipoAtenuacao(att);*/
         });
         
         flatMenu.setOnAction((ActionEvent event) -> {
-            frente.setShader(new Flat(frente.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
-            lateral.setShader(new Flat(lateral.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
-            topo.setShader(new Flat(topo.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
-            perspectiva.setShader(new Flat(perspectiva.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais)); 
+            CGShader frenteSh  = new Flat(frente     .getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais); frenteSh .setTipoAtenuacao(att);
+            CGShader lateralSh = new Flat(lateral    .getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais); lateralSh.setTipoAtenuacao(att);
+            CGShader topoSh    = new Flat(topo       .getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais); topoSh   .setTipoAtenuacao(att);
+            CGShader persSh    = new Flat(perspectiva.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais); persSh   .setTipoAtenuacao(att);
+            
+            frente.setShader(frenteSh);
+            lateral.setShader(lateralSh);
+            topo.setShader(topoSh);
+            perspectiva.setShader(persSh); 
         });
         
         gouraudMenu.setOnAction((ActionEvent event) -> {
-            frente.setShader(new Gouraud(frente.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
-            lateral.setShader(new Gouraud(lateral.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
-            topo.setShader(new Gouraud(topo.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
-            perspectiva.setShader(new Gouraud(perspectiva.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+            CGShader frenteSh  = new Gouraud(frente     .getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais); frenteSh .setTipoAtenuacao(att);
+            CGShader lateralSh = new Gouraud(lateral    .getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais); lateralSh.setTipoAtenuacao(att);
+            CGShader topoSh    = new Gouraud(topo       .getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais); topoSh   .setTipoAtenuacao(att);
+            CGShader persSh    = new Gouraud(perspectiva.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais); persSh   .setTipoAtenuacao(att);
+            
+            frente.setShader(frenteSh);
+            lateral.setShader(lateralSh);
+            topo.setShader(topoSh);
+            perspectiva.setShader(persSh); 
         });
         //</editor-fold>
         
@@ -844,9 +864,8 @@ public class MainController implements Initializable {
     public void finalizeTempPoints(int sections, int graus, Eixo axis){
         List<Vertice> lista = mundo.getTempPointsCopy();
         if (lista == null) return;
-        
-        //System.out.println("SEC: " + sections + " Graus: " + graus);
-        
+        Revolucao rev = new Revolucao(lista, sections, graus, axis);
+        mundo.addObject(rev.getPoli());
         //mundo.addObject(PMath.attemptBuildingFromPlanes(lista));
         mundo.clearTemp();
         paint();
