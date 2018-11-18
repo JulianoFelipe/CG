@@ -25,6 +25,7 @@ public class Vista implements Observer{
 
     private final CGPipeline pipe;
     private List<CGObject> objetos;
+    private List<Vertice>  lights;
     private List<Vertice> tempPoints;
     private final World mundo;
     
@@ -34,6 +35,7 @@ public class Vista implements Observer{
         objetos = new ArrayList();
         tempPoints = new ArrayList<>();
         mundo = World.getInstance();
+        lights = new ArrayList();
     }
     
     public void addObject(CGObject p){
@@ -45,6 +47,22 @@ public class Vista implements Observer{
             ((HE_Poliedro) p).updateVisibility(cam);
         }
     }
+    
+    public void addLight(Vertice p){
+        pipe.convert2D(p);
+        lights.add(p);
+    }
+    
+    public void removeLight(int index){
+        lights.remove(index);
+    }
+    
+    public void setLight(int index, Vertice light){
+        lights.get(index).copyAttributes(light);
+        pipe.convert2D(lights.get(index));
+    }
+    
+    public void clearLights(){ lights.clear(); }
     
     public void addObject(CGObject...p){
         for (CGObject obj : p){

@@ -35,8 +35,8 @@ public class Translacao{
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void transladar(Eixo axis, int unidades, CGObject p){

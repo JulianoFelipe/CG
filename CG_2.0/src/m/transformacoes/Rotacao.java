@@ -37,8 +37,8 @@ public class Rotacao{
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void rotacaoX(double graus, CGObject p){
@@ -56,8 +56,8 @@ public class Rotacao{
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void rotacaoY(double graus, CGObject p){
@@ -75,8 +75,8 @@ public class Rotacao{
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void rotacaoZ(double graus, CGObject p, final Vertice pontoFixo){
@@ -94,8 +94,8 @@ public class Rotacao{
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);        
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void rotacaoX(double graus, CGObject p, final Vertice pontoFixo){
@@ -113,8 +113,8 @@ public class Rotacao{
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);        
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void rotacaoY(double graus, CGObject p, final Vertice pontoFixo){
@@ -132,8 +132,8 @@ public class Rotacao{
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);        
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
 
     public boolean isLockChange() {

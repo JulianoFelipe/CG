@@ -14,9 +14,9 @@ import m.poligonos.Vertice;
  */
 public abstract class Light {
     public static enum TipoAtenuacao{ Nulo, Distancia, Constantes};
-    private static final float ATT_C1 = 1; //TipoAtt = Constantes
-    private static final float ATT_C2 = 1;
-    private static final float ATT_C3 = 1;
+    private static final float ATT_C1 = (float) 0.95; //TipoAtt = Constantes
+    private static final float ATT_C2 = (float) 0.2;
+    private static final float ATT_C3 = (float) 0.1;
     
     protected double red;
     protected double green;
@@ -29,9 +29,9 @@ public abstract class Light {
     protected Light(Vertice pos, Color color) {
         this.color = color;
         
-        red = color.getRed();
-        green = color.getGreen();
-        blue = color.getBlue();
+        red   = color.getRed()  *255;
+        green = color.getGreen()*255;
+        blue  = color.getBlue() *255;
         
         this.posicao = pos;
         isChromatic = true;
@@ -46,9 +46,9 @@ public abstract class Light {
     public void setColor(Color color) {
         this.color = color;
         
-        red = color.getRed();
-        green = color.getGreen();
-        blue = color.getBlue();
+        red   = color.getRed()   * 255;
+        green = color.getGreen() * 255;
+        blue  = color.getBlue()  * 255;
         
         isChromatic = true;
     }
@@ -69,7 +69,7 @@ public abstract class Light {
             return Math.min(1/Math.pow(distanciaObjetoLuz, 2), 1);
         else if (tipo == TipoAtenuacao.Constantes)
             return Math.min(
-                (1/(ATT_C1 + (ATT_C2*distanciaObjetoLuz) + (Math.pow(distanciaObjetoLuz, 2)*ATT_C3))),
+                (1/(ATT_C1 + (ATT_C2*Math.sqrt(distanciaObjetoLuz)) + (distanciaObjetoLuz*ATT_C3))),
                     1
             );
         else

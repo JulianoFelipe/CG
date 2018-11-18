@@ -23,6 +23,17 @@ public class PointLight extends Light{
         super(posicao, intensidade);
     }
     
+    public PointLight(PointLight toCopy){
+        super(new Vertice(toCopy.posicao), 0);
+        if (toCopy.isChromatic){
+            this.isChromatic = true;
+            this.color = toCopy.color;
+        } else {
+            this.isChromatic = false;
+            this.red = toCopy.red;
+        }
+    }
+    
     public double iluminacaoDifusaAcromatica(float coeficienteAcromatico, Vertice normal, Vertice incidente){
         if (!isChromatic){
             Vertice l = new Vertice(
@@ -124,9 +135,9 @@ public class PointLight extends Light{
         String ret = "XYZ("+posicao.getX()+";"+posicao.getY()+";"+posicao.getZ()+");";
 
         if (isChromatic){
-            ret += String.format("RGB(%.2f;%.2f;%.2f) ", red, green, blue);
+            ret += String.format("RGB(%.0f;%.0f;%.0f) ", red, green, blue);
         } else {
-            ret += String.format("Acrom.(%.2f)", red);
+            ret += String.format("I.(%.0f)", red);
         }
         
         return ret;

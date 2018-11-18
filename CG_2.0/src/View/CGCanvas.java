@@ -9,6 +9,7 @@ import static View.MainController.FERRAMENTA_SEL;
 import static View.MainController.NOTHING_SEL;
 import static View.MainController.REVOLUCAO_SEL;
 import static View.MainController.TRANSFORMACAO_SEL;
+import java.util.List;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleBooleanProperty;
@@ -34,6 +35,7 @@ import m.pipeline.CGPipeline;
 import m.poligonos.CGObject;
 import m.poligonos.Vertice;
 import m.shader.CGShader;
+import m.shader.PointLight;
 import m.transformacoes.Cisalhamento;
 import m.transformacoes.Escala;
 import m.transformacoes.Rotacao;
@@ -120,7 +122,35 @@ public final class CGCanvas extends Canvas{
     
     public void setShader(CGShader newShader){
         this.shader = newShader;
+        vista.clearLights();
+        List<PointLight> lights = newShader.getPointLights();
+        
+        for (PointLight light : lights){
+            vista.addLight(light.getPosicao());
+        }
+        
         paint();
+    }
+    
+    public void updatePointLight(int index, PointLight pointLight){
+        PointLight newL = new PointLight(pointLight);
+        vista.getPipe().convert2D(newL.getPosicao());
+        shader.updatePointLight(index, newL);
+    }
+    
+    public void addPointLight(PointLight pointLight){
+        PointLight newL = new PointLight(pointLight);
+        vista.addLight(newL.getPosicao());
+        shader.addPointLight(newL);
+    }
+    
+    public void removePointLight(int index){
+        vista.removeLight(index);
+        shader.removePointLight(index);
+    }
+    
+    public CGShader getShader(){
+        return shader;
     }
     
     //<editor-fold defaultstate="collapsed" desc="Getters & Properties">
@@ -254,8 +284,14 @@ public final class CGCanvas extends Canvas{
                     return;
             }
             
-            if(changeCam)
+            if(changeCam){
                 pipe.getCamera().set(new Camera(viewUp, vrp, p));
+                //System.out.println("SET NEW");
+                for (int i=0; i<controller.getPointLights().size(); i++){
+                    this.updatePointLight(i, controller.getPointLights().get(i));
+                }
+            }
+                
             controller.paint();
         });
     }

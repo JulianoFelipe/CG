@@ -5,7 +5,6 @@
  */
 package m.shader;
 
-import java.util.Arrays;
 import m.shader.scans.ExtremityScanLine;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
@@ -17,19 +16,26 @@ import m.poligonos.Vertice;
 import m.poligonos.we_edge.HE_Poliedro;
 import m.poligonos.we_edge.WE_Aresta;
 import m.shader.scans.ExtremityScan;
+import utils.math.VMath;
 
 /**
  *
  * @author JFPS
  */
 public class Flat extends CGShader{
-
+    private Light.TipoAtenuacao att = Light.TipoAtenuacao.Nulo;
+    
     public Flat(Vertice observador, AmbientLight luzAmbiente) {
         super(observador, luzAmbiente);
     }
     
     public Flat(Vertice observador, AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
         super(observador, luzAmbiente, luzesPontuais);
+    }
+    
+    @Override
+    public void setTipoAtenuacao(Light.TipoAtenuacao atenuacao){
+        att = atenuacao;
     }
     
     @Override
@@ -158,9 +164,11 @@ public class Flat extends CGShader{
         double[] pintura = new double[]{0.0,0.0,0.0};
         for (int i=0; i<super.luzesPontuais.size(); i++){
             double[] ilum = luzesPontuais.get(i).iluminacaoDifusa(kds[0], kds[1], kds[2], normal, incidente);
-            pintura[0] += ilum[0];
-            pintura[1] += ilum[1];
-            pintura[2] += ilum[2];
+            double atenuacao = luzesPontuais.get(i).fatorAtenuacao(att, VMath.distancia(luzesPontuais.get(i).getPosicao(), incidente));
+            //System.out.println("ATT: " + atenuacao);
+            pintura[0] += atenuacao*ilum[0];
+            pintura[1] += atenuacao*ilum[1];
+            pintura[2] += atenuacao*ilum[2];
         }
         
         return pintura;
@@ -174,9 +182,10 @@ public class Flat extends CGShader{
         for (int i=0; i<super.luzesPontuais.size(); i++){
             double[] ilum = luzesPontuais.get(i).iluminacaoEspecular(kss[0], kss[1], kss[2], (short) kss[3], normal, incidente, observador);
             //System.out.println("ILUM: " + Arrays.toString(ilum));
-            pintura[0] += ilum[0];
-            pintura[1] += ilum[1];
-            pintura[2] += ilum[2];
+            double atenuacao = luzesPontuais.get(i).fatorAtenuacao(att, VMath.distancia(luzesPontuais.get(i).getPosicao(), incidente));
+            pintura[0] += atenuacao*ilum[0];
+            pintura[1] += atenuacao*ilum[1];
+            pintura[2] += atenuacao*ilum[2];
         }
         
         return pintura;
@@ -209,7 +218,8 @@ public class Flat extends CGShader{
         double pintura = 0.0;
         for (int i=0; i<super.luzesPontuais.size(); i++){
             double ilum = luzesPontuais.get(i).iluminacaoDifusaAcromatica(kds[0], normal, incidente);
-            pintura += ilum;
+            double atenuacao = luzesPontuais.get(i).fatorAtenuacao(att, VMath.distancia(luzesPontuais.get(i).getPosicao(), incidente));
+            pintura += atenuacao*ilum;
         }
         
         return pintura;
@@ -221,7 +231,8 @@ public class Flat extends CGShader{
         double pintura = 0.;
         for (int i=0; i<super.luzesPontuais.size(); i++){
             double ilum = luzesPontuais.get(i).iluminacaoEspecularAcromatica(kss[0], (short) kss[3], normal, incidente, observador);
-            pintura += ilum;
+            double atenuacao = luzesPontuais.get(i).fatorAtenuacao(att, VMath.distancia(luzesPontuais.get(i).getPosicao(), incidente));
+            pintura += atenuacao*ilum;
         }
         
         return pintura;

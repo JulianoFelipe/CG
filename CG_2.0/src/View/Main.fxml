@@ -63,6 +63,14 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Renderização">
                      <items>
+                        <RadioMenuItem fx:id="attSem" mnemonicParsing="false" selected="true" text="Sem atenuação">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="AttGroup" />
+                           </toggleGroup>
+                        </RadioMenuItem>
+                        <RadioMenuItem fx:id="attDist" mnemonicParsing="false" text="Atenuação raiz da distância" toggleGroup="$AttGroup" />
+                        <RadioMenuItem fx:id="attConst" mnemonicParsing="false" text="Atenuação por constantes" toggleGroup="$AttGroup" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
                         <RadioMenuItem fx:id="wireframeSemOccultMenu" mnemonicParsing="false" text="Wireframe s/ ocultação">
                            <toggleGroup>
                               <ToggleGroup fx:id="RenderGroup" />

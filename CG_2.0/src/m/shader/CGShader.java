@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import m.poligonos.Vertice;
 
 /**
@@ -32,7 +31,10 @@ public abstract class CGShader implements Shader{
     protected CGShader(Vertice observador, AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
         this.observador = observador;
         this.luzAmbiente = luzAmbiente;
-        this.luzesPontuais = luzesPontuais;
+        this.luzesPontuais = new ArrayList<>(luzesPontuais.size());
+        for (int i=0; i<luzesPontuais.size(); i++){
+            this.luzesPontuais.add(new PointLight(luzesPontuais.get(i)));
+        }
     }
 
     public void setAmbientLight(AmbientLight light){
@@ -42,7 +44,23 @@ public abstract class CGShader implements Shader{
     public void updatePointLight(int index, PointLight light){
         luzesPontuais.get(index).update(light);
     }
+    
+    public void removePointLight(int index){
+        luzesPontuais.remove(index);
+    }
+    
+    public void addPointLight(PointLight light){
+        luzesPontuais.add(light);
+    }
 
+    public List<PointLight> getPointLights(){
+        return luzesPontuais;
+    }
+    
+    public int getNumberOfPointLights(){
+        return luzesPontuais.size();
+    }
+    
     @Override
     public void paintTemporaryPoints(List<? extends Vertice> tempPoints, GraphicsContext graphs){
         //////////////////////////////////////////// TEMPS
@@ -82,4 +100,6 @@ public abstract class CGShader implements Shader{
             graphs.closePath();
         }
     }
+    
+    public abstract void setTipoAtenuacao(Light.TipoAtenuacao att);
 }

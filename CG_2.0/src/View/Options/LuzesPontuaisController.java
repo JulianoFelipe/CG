@@ -12,12 +12,9 @@ import java.util.ResourceBundle;
 import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
-import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import static javafx.collections.FXCollections.copy;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
@@ -119,6 +116,8 @@ public class LuzesPontuaisController implements Initializable {
             
             if (copyProperty.get() != null){
                 mainController.setPointLight(index, li);
+                tree.getRoot().getChildren().set(index, new TreeItem<>(copyProperty.get().descriptionString()));
+                descField.textProperty().set(copyProperty.get().descriptionString());
             } else {
                 mainController.addPointLight(li);
                 index = lights.size()-1;

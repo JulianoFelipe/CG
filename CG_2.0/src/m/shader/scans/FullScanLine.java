@@ -15,6 +15,7 @@ import m.poligonos.we_edge.HE_Poliedro;
 import m.poligonos.we_edge.WE_Aresta;
 import m.poligonos.we_edge.WE_Vertice;
 import m.shader.AmbientLight;
+import m.shader.Light;
 import m.shader.PointLight;
 import utils.math.VMath;
 
@@ -23,6 +24,7 @@ import utils.math.VMath;
  * @author JFPS
  */
 public class FullScanLine {
+    private final Light.TipoAtenuacao att;
     private final HE_Poliedro object;
     private final AmbientLight luzAmbiente;
     private final List<PointLight> luzesPontuais;
@@ -56,7 +58,8 @@ public class FullScanLine {
     
     */
     
-    public FullScanLine(HE_Poliedro object, AmbientLight luzAmbiente, List<PointLight> luzesPontuais, Vertice observador) {
+    public FullScanLine(HE_Poliedro object, AmbientLight luzAmbiente, List<PointLight> luzesPontuais, Vertice observador, Light.TipoAtenuacao att) {
+        this.att = att;
         this.object = object;
         scans       = new ArrayList();
         interceptX  = new ArrayList();
@@ -461,9 +464,10 @@ public class FullScanLine {
         double[] pintura = new double[]{0.0,0.0,0.0};
         for (int i=0; i<luzesPontuais.size(); i++){
             double[] ilum = luzesPontuais.get(i).iluminacaoDifusa(kds[0], kds[1], kds[2], normal, incidente);
-            pintura[0] += ilum[0];
-            pintura[1] += ilum[1];
-            pintura[2] += ilum[2];
+            double atenuacao = luzesPontuais.get(i).fatorAtenuacao(att, VMath.distancia(luzesPontuais.get(i).getPosicao(), incidente));
+            pintura[0] += atenuacao*ilum[0];
+            pintura[1] += atenuacao*ilum[1];
+            pintura[2] += atenuacao*ilum[2];
         }
         
         return pintura;
@@ -476,10 +480,11 @@ public class FullScanLine {
         //System.out.println("SIZE: " + luzesPontuais.size());
         for (int i=0; i<luzesPontuais.size(); i++){
             double[] ilum = luzesPontuais.get(i).iluminacaoEspecular(kss[0], kss[1], kss[2], (short) kss[3], normal, incidente, observador);
+            double atenuacao = luzesPontuais.get(i).fatorAtenuacao(att, VMath.distancia(luzesPontuais.get(i).getPosicao(), incidente));
             //System.out.println("ILUM: " + Arrays.toString(ilum));
-            pintura[0] += ilum[0];
-            pintura[1] += ilum[1];
-            pintura[2] += ilum[2];
+            pintura[0] += atenuacao*ilum[0];
+            pintura[1] += atenuacao*ilum[1];
+            pintura[2] += atenuacao*ilum[2];
         }
         
         return pintura;
@@ -491,7 +496,8 @@ public class FullScanLine {
         double pintura = 0.0;
         for (int i=0; i<luzesPontuais.size(); i++){
             double ilum = luzesPontuais.get(i).iluminacaoDifusaAcromatica(kds[0], normal, incidente);
-            pintura += ilum;
+            double atenuacao = luzesPontuais.get(i).fatorAtenuacao(att, VMath.distancia(luzesPontuais.get(i).getPosicao(), incidente));
+            pintura += atenuacao*ilum;
         }
         
         return pintura;
@@ -503,7 +509,8 @@ public class FullScanLine {
         double pintura = 0.;
         for (int i=0; i<luzesPontuais.size(); i++){
             double ilum = luzesPontuais.get(i).iluminacaoEspecularAcromatica(kss[0], (short) kss[3], normal, incidente, observador);
-            pintura += ilum;
+            double atenuacao = luzesPontuais.get(i).fatorAtenuacao(att, VMath.distancia(luzesPontuais.get(i).getPosicao(), incidente));
+            pintura += atenuacao*ilum;
         }
         
         return pintura;

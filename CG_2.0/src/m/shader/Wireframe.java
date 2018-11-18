@@ -115,4 +115,9 @@ public class Wireframe extends CGShader{
         
         graphs.closePath();
     }        
+
+    @Override
+    public void setTipoAtenuacao(Light.TipoAtenuacao att) {
+        
+    }
 }

@@ -22,6 +22,8 @@ import m.shader.scans.FullScanLine;
  */
 public class Gouraud extends CGShader{
 
+    private Light.TipoAtenuacao att;
+    
     /* Resumo:
        - Iluminação nos vértices
        - Normal dos vértices (Média das normais das faces)
@@ -35,6 +37,11 @@ public class Gouraud extends CGShader{
     
     public Gouraud(Vertice observador, AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
         super(observador, luzAmbiente, luzesPontuais);
+    }
+    
+    @Override
+    public void setTipoAtenuacao(Light.TipoAtenuacao atenuacao){
+        att = atenuacao;
     }
     
     @Override
@@ -57,7 +64,7 @@ public class Gouraud extends CGShader{
         if (obj instanceof HE_Poliedro){
             HE_Poliedro poli = (HE_Poliedro) obj;
             
-            FullScanLine scn = new FullScanLine(poli, luzAmbiente, luzesPontuais, observador);
+            FullScanLine scn = new FullScanLine(poli, luzAmbiente, luzesPontuais, observador, att );
             paintObject(graphs, scn.getScans());
             
             if (selectedID!=-1 && obj.getID()==(selectedID)){

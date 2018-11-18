@@ -16,10 +16,10 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
-import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.beans.property.ObjectProperty;
@@ -28,6 +28,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -67,6 +68,8 @@ import m.poligonos.Vertice;
 import m.shader.AmbientLight;
 import m.shader.Flat;
 import m.shader.Gouraud;
+import m.shader.Light;
+import m.shader.Light.TipoAtenuacao;
 import m.shader.PointLight;
 import m.shader.Wireframe;
 import m.shader.WireframeSemOcult;
@@ -130,6 +133,9 @@ public class MainController implements Initializable {
     @FXML private MenuItem lateralShader;
     @FXML private MenuItem    topoShader;
     @FXML private MenuItem    persShader;
+    @FXML private RadioMenuItem attSem;
+    @FXML private RadioMenuItem attDist;
+    @FXML private RadioMenuItem attConst;
 //</editor-fold>
     
     private World mundo;
@@ -138,6 +144,7 @@ public class MainController implements Initializable {
     
     private AmbientLight ambientLight;
     private List<PointLight> luzesPontuais;
+    private TipoAtenuacao att = Light.TipoAtenuacao.Nulo;
     
     private CGCanvas frente;
     private CGCanvas topo;
@@ -485,7 +492,8 @@ public class MainController implements Initializable {
 
             if(file != null){
                 try {
-                    OutputScene.outputToFile(mundo.getObjectsCopy(), file);
+                    OutputScene.outputToFile(mundo.getObjects(), file);
+                    System.out.println(Arrays.toString(mundo.getObjects().get(0).getKa()));
                 } catch (IOException ex) {
                     Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -553,6 +561,33 @@ public class MainController implements Initializable {
             lateral.setShader(new Gouraud(lateral.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
             topo.setShader(new Gouraud(topo.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
             perspectiva.setShader(new Gouraud(perspectiva.getVista().getPipelineCamera().getVRP(), ambientLight, luzesPontuais));
+        });
+        //</editor-fold>
+        
+        //<editor-fold defaultstate="collapsed" desc="Escolha de Atenuação">
+        attSem.setOnAction((ActionEvent event) -> {
+            att = TipoAtenuacao.Nulo;
+            frente.getShader().setTipoAtenuacao(att);
+            lateral.getShader().setTipoAtenuacao(att);
+            topo.getShader().setTipoAtenuacao(att);
+            perspectiva.getShader().setTipoAtenuacao(att);
+            paint();
+        });
+        attDist.setOnAction((ActionEvent event) -> {
+            att = TipoAtenuacao.Constantes;
+            frente.getShader().setTipoAtenuacao(att);
+            lateral.getShader().setTipoAtenuacao(att);
+            topo.getShader().setTipoAtenuacao(att);
+            perspectiva.getShader().setTipoAtenuacao(att);
+            paint();
+        });
+        attConst.setOnAction((ActionEvent event) -> {
+            att = TipoAtenuacao.Constantes;
+            frente.getShader().setTipoAtenuacao(att);
+            lateral.getShader().setTipoAtenuacao(att);
+            topo.getShader().setTipoAtenuacao(att);
+            perspectiva.getShader().setTipoAtenuacao(att);
+            paint();
         });
         //</editor-fold>
     }
@@ -984,16 +1019,28 @@ public class MainController implements Initializable {
     
     public void setPointLight(int i, PointLight newLight){
         luzesPontuais.get(i).update(newLight);
+        frente.updatePointLight(i, newLight);
+        lateral.updatePointLight(i, newLight);
+        topo.updatePointLight(i, newLight);
+        perspectiva.updatePointLight(i, newLight);
         paint();
     }
     
     public void addPointLight(PointLight newLight){
         luzesPontuais.add(newLight);
+        frente.addPointLight(newLight);
+        lateral.addPointLight(newLight);
+        topo.addPointLight(newLight);
+        perspectiva.addPointLight(newLight);
         paint();
     }
     
     public void removePointLight(int index){
         luzesPontuais.remove(index);
+        frente.removePointLight(index);
+        lateral.removePointLight(index);
+        topo.removePointLight(index);
+        perspectiva.removePointLight(index);
         paint();
     }
 //</editor-fold>

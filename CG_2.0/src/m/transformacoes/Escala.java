@@ -92,8 +92,8 @@ public class Escala {
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void escalaY(double fator, CGObject p){
@@ -108,8 +108,8 @@ public class Escala {
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void escalaZ(double fator, CGObject p){
@@ -124,8 +124,8 @@ public class Escala {
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void escala(double fatorX, double fatorY, double fatorZ, CGObject p){
@@ -140,8 +140,8 @@ public class Escala {
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void escalaUniforme(double fator, CGObject p){
@@ -156,8 +156,8 @@ public class Escala {
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void escalaX(double fator, CGObject p, final Vertice pontoFixo){
@@ -175,8 +175,8 @@ public class Escala {
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void escalaY(double fator, CGObject p, final Vertice pontoFixo){
@@ -194,8 +194,8 @@ public class Escala {
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void escalaZ(double fator, CGObject p, final Vertice pontoFixo){
@@ -213,8 +213,8 @@ public class Escala {
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void escalaUniforme(double fator, CGObject p, final Vertice pontoFixo){
@@ -232,8 +232,8 @@ public class Escala {
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void escala(double fatorX, double fatorY, double fatorZ, CGObject p, final Vertice pontoFixo){
@@ -251,7 +251,7 @@ public class Escala {
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
 }

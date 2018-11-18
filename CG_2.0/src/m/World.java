@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Logger;
-import javafx.collections.ObservableList;
 import javafx.scene.paint.Color;
 import m.poligonos.Aresta;
 import m.poligonos.ArestaEixo;
@@ -195,13 +194,14 @@ public final class World {
         return INSTANCE;
     }
     
-    public List<CGObject> getObjectsCopy(){
-        List<CGObject> newList = new ArrayList<>(objetos.size());
+    public List<CGObject> getObjects(){
+        /*List<CGObject> newList = new ArrayList<>(objetos.size());
         objetos.forEach((v) -> {
             newList.add(deepCopy(v));
         });
         
-        return newList;
+        return newList;*/
+        return objetos;
     }
     
     public List<Vertice> getTempPointsCopy(){
@@ -340,9 +340,7 @@ public final class World {
     public void updateSelectedColors(CGObject obj){
         int index = objetos.indexOf(obj);
         if (index==-1) return;
-        
-        objetos.get(index).updateInternals(obj);
-        
+                
         objetos.get(index).setAllK(obj.getKa(), obj.getKd(), obj.getKs());
         objetos.get(index).setIsChromatic(obj.isChromatic());
         

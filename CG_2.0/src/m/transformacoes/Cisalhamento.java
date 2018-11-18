@@ -69,8 +69,8 @@ public class Cisalhamento {
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void cisalhamentoX(double fator, CGObject p){
@@ -85,8 +85,8 @@ public class Cisalhamento {
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void cisalhamentoY(double fator, CGObject p){
@@ -101,8 +101,8 @@ public class Cisalhamento {
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void cisalhamentoZ(double fator, CGObject p){
@@ -117,8 +117,8 @@ public class Cisalhamento {
             );
         }
         
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void cisalhamentoX(double graus, CGObject p, final Vertice pontoFixo){    
@@ -136,8 +136,8 @@ public class Cisalhamento {
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
         
     public void cisalhamentoY(double graus, CGObject p, final Vertice pontoFixo){
@@ -155,8 +155,8 @@ public class Cisalhamento {
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public void cisalhamentoZ(double graus, CGObject p, final Vertice pontoFixo){
@@ -174,8 +174,8 @@ public class Cisalhamento {
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
 
     public void cisalhamento(double fatorX, double fatorY, CGObject p, final Vertice pontoFixo){
@@ -193,8 +193,8 @@ public class Cisalhamento {
         t.transladar((int)pontoFixo.getX(), (int)pontoFixo.getY(), (int)pontoFixo.getZ(), p);
         
         lockChange = previousLock;
-        if (!lockChange)
-            p.changedProperty().set(true);
+        /*if (!lockChange)
+            p.changedProperty().set(true);*/
     }
     
     public boolean isLockChange() {

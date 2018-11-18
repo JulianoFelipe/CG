@@ -7,8 +7,6 @@ package m.poligonos;
 
 import java.io.Serializable;
 import java.util.List;
-import javafx.beans.property.BooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
 import m.Eixo;
 
 /**
@@ -23,7 +21,7 @@ public abstract class CGObject implements Serializable{
     protected boolean isChromatic = true;
     protected boolean setK=false;
     
-    protected transient BooleanProperty changedProperty = new SimpleBooleanProperty(false);
+    //protected transient BooleanProperty changedProperty = new SimpleBooleanProperty(false);
     
     protected CGObject(){ 
         this.ID = INSTANCES++;
@@ -31,6 +29,17 @@ public abstract class CGObject implements Serializable{
     
     protected CGObject(CGObject obj){
         this.ID = obj.ID;
+        this.isChromatic = obj.isChromatic;
+        this.setK = obj.setK;
+        if (obj.ka != null){
+            ka = new float[3];
+            kd = new float[3];
+            ks = new float[4];
+            
+            ka[0] = obj.ka[0]; ka[1] = obj.ka[1]; ka[2] = obj.ka[2];
+            kd[0] = obj.kd[0]; kd[1] = obj.kd[1]; kd[2] = obj.kd[2];
+            ks[0] = obj.ks[0]; ks[1] = obj.ks[1]; ks[2] = obj.ks[2];
+        }
     }
     
     protected CGObject(long id){
@@ -62,9 +71,9 @@ public abstract class CGObject implements Serializable{
         return true;
     }
     
-    public BooleanProperty changedProperty() {
+    /*public BooleanProperty changedProperty() {
         return changedProperty;
-    }
+    }*/
     
     public abstract Vertice getCentroide();
     
@@ -164,7 +173,7 @@ public abstract class CGObject implements Serializable{
                 ks[0], ks[1], ks[2], ks[3]
             };
         }
-        changedProperty.set(true);
+        //changedProperty.set(true);
     }
     
     public boolean isKset(){ return setK; }

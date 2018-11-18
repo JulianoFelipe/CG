@@ -64,7 +64,8 @@ public class TransformacaoController implements Initializable {
                 text = new Text("Fator de escala em porcentagem. Funciona de modo que se, por exemplo,"
                 + " o fator for 1%, a cada operação (determinada pelo movimento de arraste do mouse) o"
                 + " objeto tem sua escala ampliada/reduzida em 1%. Se a opção \"Somente largura\" estiver"
-                + " selecionada, apenas os movimentos horizontais serão considerados e só a largura será afetada. Idem para os restantes."); 
+                + " selecionada, apenas os movimentos horizontais serão considerados e só a largura será afetada. Idem para os restantes."
+                + " A opção para as 3 dimensões simultâneas o faz proporcionalmente nas 3."); 
                 break;
             case Cisalhamento:
                 text = new Text("Fator de cisalhamento em porcentagem. Funciona de modo que se, por exemplo,"
