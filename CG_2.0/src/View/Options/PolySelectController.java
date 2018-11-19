@@ -165,6 +165,11 @@ public class PolySelectController implements Initializable {
             setTextFields(kdR, kdG, kdB, obj.getKd());
             setTextFields(ksR, ksG, ksB, obj.getKs());
             ksN.setText(String.valueOf(obj.getKs()[3]));
+        } else {
+            setTextFields(kaR, kaG, kaB, "");
+            setTextFields(kdR, kdG, kdB, "");
+            setTextFields(ksR, ksG, ksB, "");
+            ksN.setText("");
         }
         
         objType.  setText(obj.getClass().getSimpleName());

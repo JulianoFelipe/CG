@@ -318,6 +318,11 @@ public class OrtPipeline extends CGPipeline{
         return (float) 0.;
     }
 
+    @Override
+    public void setDP(float dp) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     //<editor-fold defaultstate="collapsed" desc="Matrizes Ortogonais">
     protected static final class MatrizOrtografica{
         protected static final float[][] MAT_FRENTE = {

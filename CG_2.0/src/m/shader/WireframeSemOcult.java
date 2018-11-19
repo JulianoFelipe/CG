@@ -62,7 +62,7 @@ public class WireframeSemOcult extends CGShader{
                 paintArestasConectadas(graphs, face);
             });
             if (selectedID!=-1 && obj.getID()==(selectedID)){
-                super.paintPoints(poli.getVisiblePoints(), graphs);
+                super.paintPoints(poli.getPoints(), graphs);
             }
         } else if (obj instanceof ArestaEixo){
             ArestaEixo objA = (ArestaEixo) obj;

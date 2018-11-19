@@ -267,9 +267,10 @@ public class HE_Poliedro extends CGObject {
             
             Vertice normal = VMath.obterNormal(arestaFace.getvFinal(), arestaFace.getvInicial(), third);
             VMath.normalizar(normal);
-            double mult = VMath.produtoEscalar(cam.getVetorN(), normal);
-            //System.out.println("Normal: " + normal + " Mult: " + mult);
-            visibilidade_faces[i] = mult <= 0; //Se mult>0, face[i] é visível
+            //double mult = VMath.produtoEscalar(cam.getVetorN(), normal);
+            //System.out.println("VETN : " + cam.getVetorN() + " Normal: " + normal + " Mult: " + mult);
+            //visibilidade_faces[i] = mult > 0; //Se mult>0, face[i] é visível
+            visibilidade_faces[i] = (normal.getZ() > 0); //Se mult>0, face[i] é visível
             normais[i] = normal;
             face.setNormalDaFace(normal);
             i++;

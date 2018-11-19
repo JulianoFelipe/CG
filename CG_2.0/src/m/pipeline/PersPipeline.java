@@ -39,6 +39,17 @@ public class PersPipeline extends CGPipeline{
 //</editor-fold>
        
     @Override
+    public void setDP(float dp){
+        if (dp != this.DP){
+            this.DP = dp;
+            sruSRCchanged = true;
+            setChanged();
+            notifyObservers();
+            clearChanged();
+        }
+    }
+    
+    @Override
     public void convert2D(Vertice v) {
         List<Vertice> lista = new ArrayList(); lista.add(v);
         MMath.multiplicar(get3DPipelineMatrix(), lista);
@@ -81,6 +92,7 @@ public class PersPipeline extends CGPipeline{
         if (sruSRCchanged == false){
             return matrizVistaPers;
         } else {
+            //System.out.println("GET NEW: " + DP);
             ///Matriz vista = Msru,src * Mvista    --- (Mjp é separada, já que é 2D)
             //Concatena por multiplicar ao contrário
             matrizVistaPers = MMath.multiplicar(getMatrixProj(), super.getMatrizSRUsrc());

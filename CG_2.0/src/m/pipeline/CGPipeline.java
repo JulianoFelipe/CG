@@ -141,6 +141,8 @@ public abstract class CGPipeline extends Observable implements Pipeline{
     
     public abstract float getDP();
     
+    public abstract void setDP(float dp);
+    
     public float getProportions(){
         return jpProportions[0];
     }

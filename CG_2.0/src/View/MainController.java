@@ -42,6 +42,7 @@ import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
@@ -133,6 +134,7 @@ public class MainController implements Initializable {
     @FXML private MenuItem lateralShader;
     @FXML private MenuItem    topoShader;
     @FXML private MenuItem    persShader;
+    @FXML private MenuItem    dpMenu;
     @FXML private RadioMenuItem attSem;
     @FXML private RadioMenuItem attDist;
     @FXML private RadioMenuItem attConst;
@@ -823,6 +825,25 @@ public class MainController implements Initializable {
             };
             perspectiva.autoChangeActiveProperty().addListener(listener);
             perspectiva.setAutoCam(listener);
+        });
+        
+        dpMenu.setOnAction((ActionEvent event) -> {
+            TextInputDialog dialog = new TextInputDialog(Float.toString(perspectiva.getVista().getPipe().getDP()));
+            dialog.setTitle("Alteração de DP");
+            dialog.setHeaderText("Alteração da distância para o plano de projeção");
+            dialog.setContentText("Novo DP:");
+
+            // Traditional way to get the response value.
+            Optional<String> result = dialog.showAndWait();
+            result.ifPresent((String t) -> {
+                float newDp;
+                try{
+                    newDp = Float.parseFloat(t);
+                } catch (Exception ex){
+                    newDp = perspectiva.getVista().getPipe().getDP();
+                }
+                perspectiva.getVista().getPipe().setDP(newDp);
+            });
         });
         //</editor-fold>
     }

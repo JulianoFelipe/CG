@@ -255,6 +255,7 @@
                                     <MenuItem fx:id="persCamParams" mnemonicParsing="false" text="Câmera (Parâmetros)" />
                                     <MenuItem fx:id="persCamAuto" mnemonicParsing="false" text="Câmera (Auto)" />
                                     <MenuItem fx:id="persShader" mnemonicParsing="false" text="Pers. Shader" />
+                                    <MenuItem fx:id="dpMenu" mnemonicParsing="false" text="Distância Projeção" />
                                  </items>
                                  <HBox.margin>
                                     <Insets bottom="5.0" right="5.0" top="5.0" />

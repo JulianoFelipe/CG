@@ -14,9 +14,9 @@ import m.poligonos.Vertice;
  */
 public abstract class Light {
     public static enum TipoAtenuacao{ Nulo, Distancia, Constantes};
-    private static final float ATT_C1 = (float) 0.95; //TipoAtt = Constantes
-    private static final float ATT_C2 = (float) 0.2;
-    private static final float ATT_C3 = (float) 0.1;
+    private static final float ATT_C1 = (float) 0.9; //TipoAtt = Constantes
+    private static final float ATT_C2 = (float) 0.3;
+    private static final float ATT_C3 = (float) 0.2;
     
     protected double red;
     protected double green;

@@ -144,7 +144,6 @@ public class Vista implements Observer{
         if (o instanceof CGPipeline){
             //mundo.updateAll();
             mundo.updateThis(this);
-            
             /*Camera cam = ((CGPipeline) o).getCamera();
             for (CGObject obj : objetos){
                 if (obj instanceof HE_Poliedro){
