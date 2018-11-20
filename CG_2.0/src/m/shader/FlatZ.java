@@ -7,6 +7,7 @@ package m.shader;
 
 import m.shader.scans.ExtremityScanLine;
 import java.util.List;
+import javafx.geometry.Bounds;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -22,14 +23,15 @@ import utils.math.VMath;
  *
  * @author JFPS
  */
-public class Flat extends CGShader{
+public class FlatZ extends CGShader{
+    private float[][] zBuffer;
     private Light.TipoAtenuacao att = Light.TipoAtenuacao.Nulo;
     
-    public Flat(Vertice observador, AmbientLight luzAmbiente) {
+    public FlatZ(Vertice observador, AmbientLight luzAmbiente) {
         super(observador, luzAmbiente);
     }
     
-    public Flat(Vertice observador, AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
+    public FlatZ(Vertice observador, AmbientLight luzAmbiente, List<PointLight> luzesPontuais) {
         super(observador, luzAmbiente, luzesPontuais);
     }
     
@@ -44,6 +46,18 @@ public class Flat extends CGShader{
         graphs.setStroke(Color.BLACK);
         graphs.setLineWidth(1);
 
+        int width  = (int) graphs.getCanvas().getWidth();  ++width;
+        int height = (int) graphs.getCanvas().getHeight(); ++height;
+        
+        graphs.getPixelWriter().setColor(width, width, selectedColor);       
+        zBuffer     = new float[width][height];
+        
+        for (int i=0; i<width; i++){
+            for (int j=0; j<height; j++){
+                zBuffer[i][j] = Float.MAX_VALUE;
+            }
+        }
+        
         objetosSRT.forEach((obj) -> {
             paintObject(graphs, obj, selectedID, selectedColor);
         });        
@@ -95,11 +109,9 @@ public class Flat extends CGShader{
                         cor = iluminacaoTotal(ilumKA, ilumKD, ilumKS);
                     }
                 }
-                Color test = (cor);
-                test = new Color(test.getRed(), test.getGreen(), test.getBlue(), 1);
-                graphs.setStroke(test);
+                graphs.setStroke(cor);
                 ExtremityScanLine scn = new ExtremityScanLine(faces.get(i), graphs.getCanvas().getBoundsInLocal());
-                paintFace(graphs, scn.getScans());
+                paintFace(graphs, scn.getScans(), centroide.getZ(), cor);
             }
             if (selectedID!=-1 && obj.getID()==(selectedID)){
                 Paint fill = graphs.getFill();
@@ -120,11 +132,22 @@ public class Flat extends CGShader{
         }
     }
     
-    private void paintFace(GraphicsContext graphs, List<ExtremityScan> lista){
+    private void paintFace(GraphicsContext graphs, List<ExtremityScan> lista, double zCentroid, Color faceColor){
         //graphs.beginPath();
-        
+        Bounds bd = graphs.getCanvas().getBoundsInLocal();
         lista.forEach((scan) -> {
             //System.out.println("SCAN: " + scan.getyFin() + " Xs: " + scan.getxIni() + ", " + scan.getxFin());
+            
+            int y = scan.getyFin();
+            for (int i=scan.getxIni(); i<scan.getxFin(); i++){
+                if (bd.contains(i, y)){
+                    if (zCentroid < zBuffer[i][y]){
+                        zBuffer[i][y] = (float) zCentroid;
+                        graphs.getPixelWriter().setColor(i, y, faceColor);
+                    }
+                }
+            }
+            
             graphs.strokeLine(scan.getxIni(), scan.getyIni(), scan.getxFin(), scan.getyFin());
         });
         

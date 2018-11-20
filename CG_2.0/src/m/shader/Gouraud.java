@@ -5,7 +5,9 @@
  */
 package m.shader;
 
+import View.CG_20;
 import java.util.List;
+import javafx.geometry.Bounds;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -21,16 +23,9 @@ import m.shader.scans.FullScanLine;
  * @author JFPS
  */
 public class Gouraud extends CGShader{
-
+    private float[][] zBuffer;
     private Light.TipoAtenuacao att;
-    
-    /* Resumo:
-       - Iluminação nos vértices
-       - Normal dos vértices (Média das normais das faces)
-       - Interpolar iluminação nas arestas
-       - Com iluminação das arestas, interpolar nas scans
-    */
-    
+        
     public Gouraud(Vertice observador, AmbientLight luzAmbiente) {
         super(observador, luzAmbiente);
     }
@@ -50,9 +45,25 @@ public class Gouraud extends CGShader{
         graphs.setStroke(Color.BLACK);
         graphs.setLineWidth(1);
 
+        int width  = (int) graphs.getCanvas().getWidth();  ++width;
+        int height = (int) graphs.getCanvas().getHeight(); ++height;
+        
+        graphs.getPixelWriter().setColor(width, width, selectedColor);       
+        zBuffer     = new float[width][height];
+        
+        for (int i=0; i<width; i++){
+            for (int j=0; j<height; j++){
+                zBuffer[i][j] = Float.MAX_VALUE;
+            }
+        }
+        
         objetosSRT.forEach((obj) -> {
             paintObject(graphs, obj, selectedID, selectedColor);
-        });        
+        });  
+                
+        //graphs.drawImage(img, 0, 0); //Para desenhar a imagem após o zbuffer
+        
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
     
     /**
@@ -63,9 +74,11 @@ public class Gouraud extends CGShader{
     private void paintObject(GraphicsContext graphs, CGObject obj, long selectedID, Color selColor){               
         if (obj instanceof HE_Poliedro){
             HE_Poliedro poli = (HE_Poliedro) obj;
+
+            double zCentroid = getZCentroid(poli);
             
-            FullScanLine scn = new FullScanLine(poli, luzAmbiente, luzesPontuais, observador, att );
-            paintObject(graphs, scn.getScans());
+            FullScanLine scn = new FullScanLine(poli, luzAmbiente, luzesPontuais, observador, att, graphs.getCanvas().getBoundsInLocal());
+            paintObject(graphs, scn.getScans(), zCentroid);
             
             if (selectedID!=-1 && obj.getID()==(selectedID)){
                 Paint fill = graphs.getFill();
@@ -86,15 +99,21 @@ public class Gouraud extends CGShader{
         }
     }
     
-    private void paintObject(GraphicsContext graphs, List<FullScan> lista){
+    private void paintObject(GraphicsContext graphs, List<FullScan> lista, double zCentroid){
         Paint fill   = graphs.getFill();
         Paint stroke = graphs.getStroke();
         
+        Bounds bd = graphs.getCanvas().getBoundsInLocal();
         lista.forEach((scan) -> {
+            int y = scan.getY();
             for (int i=0; i<scan.getEntries(); i++){
-                //System.out.println("Scan: " + scan.getY() + " X: " + scan.getX(i) + " Color: " + scan.getColor(i).getRed()+ ", " + scan.getColor(i).getGreen() + ", " + scan.getColor(i).getBlue());
-                graphs.setStroke(scan.getColor(i));
-                graphs.strokeLine(scan.getX(i), scan.getY(), scan.getX(i), scan.getY());
+                int x = scan.getX(i);
+                if (bd.contains(x, y)){
+                    if (zCentroid < zBuffer[x][y]){
+                        zBuffer[x][y] = (float) zCentroid;
+                        graphs.getPixelWriter().setColor(x, y, scan.getColor(i));
+                    }
+                }
             }
             //scan.
             //graphs.strokeLine(scan.getxIni(), scan.getyIni(), scan.getxFin(), scan.getyFin());
@@ -130,5 +149,17 @@ public class Gouraud extends CGShader{
         
         
         graphs.closePath();
-    }           
+    }  
+    
+    private double getZCentroid(CGObject object){
+        CGObject mundoOBJ = CG_20.main.getMundo().getObject(object);
+        
+        double zAcc = 0;
+        int i;
+        for (i=0; i<mundoOBJ.getNumberOfPoints(); i++){
+            zAcc += mundoOBJ.get(i).getZ();
+        }
+        
+        return zAcc/i;
+    }  
 }

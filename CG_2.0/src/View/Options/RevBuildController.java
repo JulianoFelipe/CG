@@ -48,7 +48,6 @@ public class RevBuildController implements Initializable {
             int graus    = defaultIntParser(angleField   .textProperty().get(), MIN_GRD, MAX_GRD);
             
             Eixo axis = Eixo.eixoFromSpaceString(choiceBox.getSelectionModel().getSelectedItem());
-            System.out.println("AXIS: " + axis);
             fillFields(sections, graus);
             
             CG_20.main.finalizeTempPoints(sections, graus, axis);

@@ -596,7 +596,7 @@ public class MainController implements Initializable {
             paint();
         });
         attDist.setOnAction((ActionEvent event) -> {
-            att = TipoAtenuacao.Constantes;
+            att = TipoAtenuacao.Distancia;
             frente.getShader().setTipoAtenuacao(att);
             lateral.getShader().setTipoAtenuacao(att);
             topo.getShader().setTipoAtenuacao(att);
@@ -843,6 +843,7 @@ public class MainController implements Initializable {
                     newDp = perspectiva.getVista().getPipe().getDP();
                 }
                 perspectiva.getVista().getPipe().setDP(newDp);
+                paint();
             });
         });
         //</editor-fold>
@@ -941,7 +942,10 @@ public class MainController implements Initializable {
             } else if (pol != null){
                 CURRENT_SEL.set(REVOLUCAO_SEL);
                 current_pol.set(pol);
-                loadPrevious = false;
+                //Para não dar reload se trocar de livre para gridsnap ou vice-versa
+                     if (previous_pol==CriacaoPrevolucao.free && current_pol.get()==CriacaoPrevolucao.gridSnap) loadPrevious = true;
+                else if (previous_pol==CriacaoPrevolucao.gridSnap && current_pol.get()==CriacaoPrevolucao.free) loadPrevious = true; 
+                else loadPrevious = false;
             } else if (tra != null){
                 CURRENT_SEL.set(TRANSFORMACAO_SEL);
                 current_tra.set(tra);
@@ -1008,7 +1012,7 @@ public class MainController implements Initializable {
                 }
                 break;
             case REVOLUCAO_SEL:
-                if(null != current_pol.get() && current_pol.get() == CriacaoPrevolucao.free){                    
+                if(null != current_pol.get() && current_pol.get() == CriacaoPrevolucao.free || current_pol.get() == CriacaoPrevolucao.gridSnap){                    
                     load("/View/Options/RevBuild.fxml", null);
                     options.getChildren().clear();
                     options.getChildren().add(option);
@@ -1087,4 +1091,8 @@ public class MainController implements Initializable {
         paint();
     }
 //</editor-fold>
+    
+    public World getMundo(){
+        return mundo;
+    }
 }

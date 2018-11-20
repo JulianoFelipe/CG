@@ -7,6 +7,7 @@ package m.shader.scans;
 
 import java.util.ArrayList;
 import java.util.List;
+import javafx.geometry.Bounds;
 import m.poligonos.we_edge.WE_Aresta;
 
 /**
@@ -14,8 +15,9 @@ import m.poligonos.we_edge.WE_Aresta;
  * @author JFPS
  */
 public class ExtremityScanLine {
-    private List<WE_Aresta> object;
-
+    private final List<WE_Aresta> object;
+    private final Bounds clipBound;
+    
     private final List<ExtremityScan> scans;
     
     private final List<Float> slope;
@@ -23,13 +25,13 @@ public class ExtremityScanLine {
     private final List<WE_Aresta> activeEdges;
     private final List<Float> interceptX;
     
-    public ExtremityScanLine(List<WE_Aresta> object) {
+    public ExtremityScanLine(List<WE_Aresta> object, Bounds clipBound) {
         this.object = object;
         scans = new ArrayList();
         interceptX = new ArrayList();
         slope = new ArrayList();
         activeEdges = new ArrayList();
-        
+        this.clipBound = clipBound;
         calculateScans();
     }
     
@@ -131,6 +133,7 @@ public class ExtremityScanLine {
         float[] minMax = getMinMax();
         int min = Math.round(minMax[0]);
         int max = Math.round(minMax[1]);
+        max = (int) Math.min(max, clipBound.getMaxY()); //Quando o valor das coordenadas tornar-se oposto, dá problemas, mas é deixado para se o objeto "cruzar" a cam. na pers.
         //System.out.println("Min: " + min + " Max: " + max);
         initialize(min);
         //System.out.println("MAX Y: " + max);
@@ -150,9 +153,15 @@ public class ExtremityScanLine {
             byte parity=0;
             for (int ps=0; ps<size-1; ps++){
                 if (parity==0){
+                    int begin = Math.round(sortedIntercept.get(ps));
+                    int end   = Math.round(sortedIntercept.get(ps+1));
+                    
+                    end   = (int) Math.min(end,   clipBound.getMaxX());
+                    begin = (int) Math.max(begin, clipBound.getMinX());
+                    
                     scans.add(
                         new ExtremityScan(                                                  //Scan "yScan"
-                            Math.round(sortedIntercept.get(ps)), Math.round(sortedIntercept.get(ps+1)), 
+                            begin, end, 
                             yScan, yScan
                         )
                     );

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javafx.geometry.Bounds;
 import javafx.scene.paint.Color;
 import m.poligonos.Vertice;
 import m.poligonos.we_edge.HE_Poliedro;
@@ -29,6 +30,7 @@ public class FullScanLine {
     private final AmbientLight luzAmbiente;
     private final List<PointLight> luzesPontuais;
     private final Vertice observador;
+    private final Bounds clipBound;
     
     private final List<FullScan> scans;
     
@@ -58,7 +60,7 @@ public class FullScanLine {
     
     */
     
-    public FullScanLine(HE_Poliedro object, AmbientLight luzAmbiente, List<PointLight> luzesPontuais, Vertice observador, Light.TipoAtenuacao att) {
+    public FullScanLine(HE_Poliedro object, AmbientLight luzAmbiente, List<PointLight> luzesPontuais, Vertice observador, Light.TipoAtenuacao att, Bounds clipBound) {
         this.att = att;
         this.object = object;
         scans       = new ArrayList();
@@ -83,6 +85,7 @@ public class FullScanLine {
         this.luzAmbiente = luzAmbiente;
         this.luzesPontuais = luzesPontuais;
         this.observador = observador;
+        this.clipBound = clipBound;   
         
         calculateScans();
     }
@@ -157,7 +160,7 @@ public class FullScanLine {
                 
                 if (object.isKset()){
                     rIntensity.remove(i);
-                    if (gIntensity != null){
+                    if (object.isChromatic()){
                         gIntensity.remove(i);
                         bIntensity.remove(i);
                     } 
@@ -199,8 +202,12 @@ public class FullScanLine {
             int min = Math.round(minMax[0]);
             int max = Math.round(minMax[1]);
             //System.out.println("MIN: " + min + " Max: " + max);
+            //min = (int) Math.max(min, clipBound.getMinY());
+            max = (int) Math.min(max, clipBound.getMaxY()); //Quando o valor das coordenadas tornar-se oposto, dá problemas, mas é deixado para se o objeto "cruzar" a cam. na pers.
+            //System.out.println("MIN: " + min + " Max: " + max);
+            //System.out.println("Bound: " + clipBound);
             initialize(min, visibleFaces.get(i)); //Coloca edges ativas inicias e calcula a iluminação em todos os vértices
-                       
+                                  
             for (int yScan=min+1; yScan<=max; yScan++){        
                 int size = activeEdges.size();
                 //System.out.println("Active Edges: " + activeEdges);
@@ -222,11 +229,14 @@ public class FullScanLine {
                         
                         int begin = Math.round(sortedIntercept.get(ps));
                         int end   = Math.round(sortedIntercept.get(ps+1));
+                        end   = (int) Math.min(end,   clipBound.getMaxX());
+                        begin = (int) Math.max(begin, clipBound.getMinX());
+                        
                         float rIncr = Float.MAX_VALUE, gIncr = Float.MAX_VALUE, bIncr = Float.MAX_VALUE; //Valores para induzir erro
                         //System.out.println("Y: " + yScan + " Begin: " + begin + " end: " + end);
                         if (object.isKset()){
                             rIncr = (sortedR.get(ps+1)-sortedR.get(ps))/(end-begin);
-                            if (gIntensity != null){
+                            if (object.isChromatic()){
                                 gIncr = (sortedG.get(ps+1)-sortedG.get(ps))/(end-begin);
                                 bIncr = (sortedB.get(ps+1)-sortedB.get(ps))/(end-begin);
                             }
@@ -234,7 +244,7 @@ public class FullScanLine {
                         
                         
                         for (; begin<=end; begin++){
-                            if (gIntensity != null){
+                            if (object.isChromatic()){
                                 //System.out.println("R: " + sortedR.get(ps) + " Incr: " + rIncr);
                                 if (object.isKset()){
                                     sortedR.set(ps, sortedR.get(ps)+rIncr);
@@ -321,7 +331,6 @@ public class FullScanLine {
     }
     
     private void interpolateIlumination(WE_Aresta aresta){  
-        //System.out.println("HEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE " + (aresta));
         //System.out.println("SLOPE: " + slope.get(slope.size()-1));
         Vertice higher, lower;
         if (slope.get(slope.size()-1) > 0){ //Slope positivo reta é /, pega Min X
@@ -369,7 +378,7 @@ public class FullScanLine {
             sortedIntercept.add(interceptX.get(i));
             if (object.isKset()){
                 sortedR.add(rIntensity.get(i));
-                if (gIntensity != null){
+                if (object.isChromatic()){
                     sortedG.add(gIntensity.get(i));
                     sortedB.add(bIntensity.get(i));
                 }
@@ -383,7 +392,7 @@ public class FullScanLine {
             
             if (object.isKset()){
                rKey = sortedR.get(i); 
-               if (gIntensity != null){ gKey = sortedG.get(i); bKey = sortedB.get(i); }
+               if (object.isChromatic()){ gKey = sortedG.get(i); bKey = sortedB.get(i); }
             }
             
             
@@ -397,7 +406,7 @@ public class FullScanLine {
                 sortedIntercept.set(j+1, sortedIntercept .get(j));
                 if (object.isKset()){
                     sortedR        .set(j+1, sortedR         .get(j));
-                    if (gIntensity != null){
+                    if (object.isChromatic()){
                         sortedG    .set(j+1, sortedG         .get(j));
                         sortedB    .set(j+1, sortedB         .get(j));
                     }
@@ -409,7 +418,7 @@ public class FullScanLine {
             sortedIntercept.set(j+1, key);
             if (object.isKset()){
                 sortedR        .set(j+1, rKey);
-                if (gIntensity != null){ sortedG.set(j+1, gKey); sortedB.set(j+1, bKey); }
+                if (object.isChromatic()){ sortedG.set(j+1, gKey); sortedB.set(j+1, bKey); }
             }
         }
         
@@ -437,7 +446,7 @@ public class FullScanLine {
                 rInten1 = ((float) (ilumKA[0]+ilumKD[0]+ilumKS[0]));
                 gInten1 = ((float) (ilumKA[1]+ilumKD[1]+ilumKS[1]));
                 bInten1 = ((float) (ilumKA[2]+ilumKD[2]+ilumKS[2])); 
-                
+
                 rIlum.put(incidente.getID(), rInten1);
                 gIlum.put(incidente.getID(), gInten1);
                 bIlum.put(incidente.getID(), bInten1);
