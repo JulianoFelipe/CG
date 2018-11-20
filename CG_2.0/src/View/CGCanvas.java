@@ -191,7 +191,16 @@ public final class CGCanvas extends Canvas{
         else
             shader.shade(vista.get2Dobjects(), this.getGraphicsContext2D(), id, Color.BLACK);
         
+        if (backgroundColorProperty.get() != null){
+            this.getGraphicsContext2D().setStroke(backgroundColorProperty.get().invert());
+            this.getGraphicsContext2D().setFill(backgroundColorProperty.get().invert());
+        } else {
+            this.getGraphicsContext2D().setFill(Color.BLACK);
+            this.getGraphicsContext2D().setStroke(Color.BLACK);
+        }
+        
         shader.paintTemporaryPoints(vista.getTempPoints(), this.getGraphicsContext2D());
+        
     }
     
     public void clear(){

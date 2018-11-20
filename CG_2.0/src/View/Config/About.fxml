@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.text.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import java.lang.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="199.0" prefWidth="230.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox prefHeight="199.0" prefWidth="230.0">
+         <children>
+            <TextFlow prefHeight="37.0" prefWidth="230.0" textAlignment="CENTER">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Modelador JSA" wrappingWidth="366.5830078125">
+                     <font>
+                        <Font size="26.0" />
+                     </font>
+                  </Text>
+               </children>
+            </TextFlow>
+            <TextFlow prefHeight="18.0" prefWidth="230.0" textAlignment="CENTER">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Trabalho anual da disciplina de Computação Gráfica - Unioeste 2018" wrappingWidth="230.818359375" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" />
+               </VBox.margin>
+            </TextFlow>
+            <TextFlow prefHeight="6.0" prefWidth="230.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Data da versão/entrega: 20/11/2018" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </TextFlow>
+            <TextFlow prefHeight="5.0" prefWidth="220.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Professor: Adair Santa Catarina" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </TextFlow>
+            <TextFlow prefHeight="13.0" prefWidth="220.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Alunos: Juliano Felipe da Silva" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </TextFlow>
+            <TextFlow prefHeight="5.0" prefWidth="220.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="             Anderson Bottega da Silva" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="1.0" />
+               </VBox.margin>
+            </TextFlow>
+            <TextFlow prefHeight="16.0" prefWidth="220.0">
+               <children>
+                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Versão 1.0 (It's not a bug, it's a feature)" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+               </VBox.margin>
+            </TextFlow>
+         </children>
+      </VBox>
+   </children>
+</AnchorPane>

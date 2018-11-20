@@ -80,6 +80,10 @@
                         <RadioMenuItem fx:id="gouraudMenu" mnemonicParsing="false" text="Gouraud Shading" toggleGroup="$RenderGroup" />
                      </items>
                   </Menu>
+                  <Menu mnemonicParsing="false" text="Sobre">
+                     <items>
+                        <MenuItem fx:id="aboutMenu" mnemonicParsing="false" text="... o programa" />
+                     </items></Menu>
               </menus>
                <BorderPane.margin>
                   <Insets />

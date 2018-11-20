@@ -5,6 +5,7 @@
  */
 package View;
 
+import View.Config.AboutController;
 import View.Config.BackgroundColorsController;
 import View.Config.ChangeFactorsController;
 import View.Config.ManualCamController;
@@ -38,6 +39,7 @@ import javafx.scene.control.CheckMenuItem;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.RadioMenuItem;
@@ -91,6 +93,7 @@ public class MainController implements Initializable {
        
     //<editor-fold defaultstate="collapsed" desc="GUI FXML ELEMENTS">
     @FXML private MenuBar  menu;
+    @FXML private MenuItem aboutMenu;
     @FXML private MenuItem salvar;
     @FXML private MenuItem carregar;
     @FXML private MenuItem limparCena;
@@ -612,6 +615,27 @@ public class MainController implements Initializable {
             paint();
         });
         //</editor-fold>
+        
+        aboutMenu.setOnAction((ActionEvent event) -> {
+            Pane pane = null;
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/View/Config/About.fxml"));
+            loader.setController(new AboutController());
+            try {
+                pane = loader.load();
+            } catch (IOException ex) {
+                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            final Stage dialog = new Stage();
+            dialog.initModality(Modality.APPLICATION_MODAL);
+            dialog.initOwner(menu.getScene().getWindow());
+            Scene dialogScene = new Scene(pane);
+            dialog.setResizable(false);
+            dialog.setScene(dialogScene);
+            dialog.setTitle("Sobre");
+            dialog.show();
+        });
     }
     
     private void initializeViewToolbars(){

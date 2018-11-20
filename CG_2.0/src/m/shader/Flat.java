@@ -112,6 +112,8 @@ public class Flat extends CGShader{
             graphs.setStroke(objA.getAxisColor());
             paintConectedPointList(graphs, obj.getPoints(), 0);
         } else {
+            graphs.setStroke(selColor);
+            graphs.setFill(selColor);
             paintConectedPointList(graphs, obj.getPoints(), 0);
         }
         

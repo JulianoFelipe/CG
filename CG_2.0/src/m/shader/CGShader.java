@@ -64,9 +64,9 @@ public abstract class CGShader implements Shader{
     @Override
     public void paintTemporaryPoints(List<? extends Vertice> tempPoints, GraphicsContext graphs){
         //////////////////////////////////////////// TEMPS
-        graphs.setFill(Color.BLACK);
+        /*graphs.setFill(Color.BLACK);
         graphs.setStroke(Color.BLACK);
-        graphs.setLineWidth(1);
+        graphs.setLineWidth(1);*/
 
         if (!(tempPoints.isEmpty())) {
             int radius=Fatores.POINT_RADIUS;
