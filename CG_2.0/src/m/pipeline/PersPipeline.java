@@ -33,7 +33,7 @@ public class PersPipeline extends CGPipeline{
     
     public PersPipeline(){
         super(StandardConfigCam.getStandardCamera(Visao.Perspectiva),
-                StandardConfigWinView.STD_WINDOW, StandardConfigWinView.STD_VIEWPORT);
+                StandardConfigWinView.STD_WINDOW_1, StandardConfigWinView.STD_VIEWPORT);
         this.DP = StandardConfigCam.PERS_DP;
     }
 //</editor-fold>

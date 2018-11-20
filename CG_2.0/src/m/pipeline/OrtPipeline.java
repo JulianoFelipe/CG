@@ -33,13 +33,13 @@ public class OrtPipeline extends CGPipeline{
     }
     
     public OrtPipeline(Visao visao, CGViewport view){
-        super(StandardConfigCam.getStandardCamera(visao), StandardConfigWinView.STD_WINDOW, view);
+        super(StandardConfigCam.getStandardCamera(visao), StandardConfigWinView.STD_WINDOW_1, view);
         this.vista = visao;
         matrizVistaOrt = MatrizOrtografica.getMatrizOrt(visao);
     }
     
     public OrtPipeline(Visao visao){
-        super(StandardConfigCam.getStandardCamera(visao), StandardConfigWinView.STD_WINDOW, StandardConfigWinView.STD_VIEWPORT);
+        super(StandardConfigCam.getStandardCamera(visao), StandardConfigWinView.STD_WINDOW_1, StandardConfigWinView.STD_VIEWPORT);
         this.vista = visao;
         matrizVistaOrt = MatrizOrtografica.getMatrizOrt(visao);
     }
