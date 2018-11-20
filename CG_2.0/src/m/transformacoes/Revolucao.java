@@ -18,10 +18,10 @@ import m.poligonos.we_edge.IndexList;
  */
 public class Revolucao {
 
-    private List<Vertice> listaDePontos;
-    private int secoes;
-    private double angulo;
-    private Eixo eixo;
+    private final List<Vertice> listaDePontos;
+    private final int secoes;
+    private final double angulo;
+    private final Eixo eixo;
 
     public Revolucao(List<Vertice> listaDePontos, int secoes, double angulo, Eixo eixo) {
         this.listaDePontos = listaDePontos;
@@ -31,223 +31,161 @@ public class Revolucao {
     }
 
     public HE_Poliedro getPoli() {
-
-        //Anderson, se tu quiser acessar a enum de eixos, é assim:
-        switch (eixo) {
-            case Eixo_X:
-                //Faz algo com eixo X
-                RevEixoX();
-                break;
-            case Eixo_Y:
-                //Faz algo com eixo Y
-                RevEixoY();
-                break;
-            case Eixo_Z:
-                //Faz algo com eixo X
-                RevEixoZ();
-                break;
-            default:
-                throw new IllegalArgumentException("Eixo não esperado para revolução.");
+        Vertice center = getCenter();
+        //System.out.println("Lista: " + listaDePontos);
+        //System.out.println("LISTA DE PONTOS: " + listaDePontos.size());
+        int pontosPorPerfil = listaDePontos.size(); 
+        int noPoints = pontosPorPerfil*secoes;
+        double teta = (angulo * (Math.PI / 180)) / (secoes-1);
+        float[][] newPoints = new float[4][noPoints];
+        for (int i=0; i<listaDePontos.size(); i++){
+            Vertice point = listaDePontos.get(i);
+            newPoints[0][i] = point.getX();
+            newPoints[1][i] = point.getY();
+            newPoints[2][i] = point.getZ();
+            newPoints[3][i] = 1;
         }
-
-        float[][] pol_mat = {
-            {30, 35, 25, 20, 30},
-            {2, 4, 3, 1, 10},
-            {25, 20, 18, 23, (float) 22.5},
-            {1, 1, 1, 1, 1}
-        //  A    B    C    D    E
-        };
-
-        int[] face0 = {0, 3, 2, 1};
-        int[] face1 = {0, 1, 4};
-        int[] face2 = {1, 2, 4};
-        int[] face3 = {2, 3, 4};
-        int[] face4 = {3, 0, 4};
+        
+        for (int i=pontosPorPerfil; i<noPoints; i++){
+            float[] toRotate = new float[]{
+                newPoints[0][i-pontosPorPerfil], newPoints[1][i-pontosPorPerfil], newPoints[2][i-pontosPorPerfil] 
+            }; //Pontos para serem rotacionados
+            
+            switch (eixo) {
+                case Eixo_X: destructiveRotateX(toRotate, teta, center); break;
+                case Eixo_Y: destructiveRotateY(toRotate, teta, center); break;
+                case Eixo_Z: destructiveRotateZ(toRotate, teta, center); break;
+                default: throw new IllegalArgumentException("Eixo não esperado para revolução.");
+            }
+            
+            newPoints[0][i] = toRotate[0];
+            newPoints[1][i] = toRotate[1];
+            newPoints[2][i] = toRotate[2];
+            newPoints[3][i] = 1;
+        } //Pontos todos devem estar rotacionados, agora deve-se construir a lista de faces
+        
+        //Todas as faces quadradas no "meio", ou seja, sem contar as que "voltam para o começo".
         List<IndexList> faces = new ArrayList();
-        faces.add(new IndexList(face0));
-        faces.add(new IndexList(face1));
-        faces.add(new IndexList(face2));
-        faces.add(new IndexList(face3));
-        faces.add(new IndexList(face4));
-
-        HE_Poliedro poli = new HE_Poliedro(pol_mat, faces);
-
-        return poli;
+        int i,j, facesQdrNormais = (secoes-1)*(pontosPorPerfil-1);
+        for (i=0, j=0; j<facesQdrNormais; i++, j++){
+            //System.out.print("J: " + j + " JMod: " + ( j%(pontosPorPerfil-1)));
+            if ((j>0) && j%(pontosPorPerfil-1) == 0) ++i;
+            int[] face = new int[]{i, i+pontosPorPerfil, i+pontosPorPerfil+1, i+1};
+            //System.out.println("   Face (" + j + ")" + Arrays.toString(face));
+            faces.add(new IndexList(face));
+        }
+        
+        //Faces que "voltam" para o começo, para evitar várias divisões de móodulo nos laços anteriores
+        int offset = (secoes-1)*pontosPorPerfil;
+        for (j=0; j<pontosPorPerfil-1; j++){
+            int[] face = new int[]{offset+j, j, j+1, offset+j+1};
+            //System.out.println("Face Offs (" + j + ")" + Arrays.toString(face));
+            faces.add(new IndexList(face));   
+        }
+        
+        //Faces de cima e de baixo para "fechar" o objeto
+        int[] faceAboveOrBelow = new int[secoes];
+        for (i=0, j=secoes-1; j>=0; j--, i+=pontosPorPerfil){ //Face de baixo é sentido horário
+            faceAboveOrBelow[j] = i;
+        } faces.add(new IndexList(faceAboveOrBelow));
+        //System.out.println("Face Below" + Arrays.toString(faceAboveOrBelow));
+        for (i=pontosPorPerfil-1, j=0; j<secoes; j++, i+=pontosPorPerfil){ //Face de baixo é sentido horário
+            faceAboveOrBelow[j] = i;
+        } faces.add(new IndexList(faceAboveOrBelow));
+        //System.out.println("Face Above" + Arrays.toString(faceAboveOrBelow));
+        
+        /*for (float[] newPoint : newPoints) {
+            System.out.println(Arrays.toString(newPoint));
+        }*/
+        //System.out.println("\n\n\nBUILD REV");
+        return new HE_Poliedro(newPoints, faces);
     }
 
-    public void RevEixoX() {
-        double teta = (angulo * (Math.PI / 180)) / secoes; //Calcula o angulo de distancia para cada passo da revolucao
-        double ccos = Math.cos(teta); //Cosseno do angulo
-        double csin = Math.sin(teta); //Seno do angulo
+    public void destructiveRotateX(float[] points, double teta, Vertice center){
+        float x = points[0], y = points[1], z = points[2];
+        double sin = Math.sin(teta);
+        double cos = Math.cos(teta);
 
+        //y -= center.getY();
+        //z -= center.getZ();
+        
+        points[0] = x;
+        points[1] = (float) ((y*cos)-(z*sin));
+        points[2] = (float) ((y*sin)+(z*cos));
+        
+        //y += center.getY();
+        //z += center.getZ();
     }
-
-    public void RevEixoY() {
-
-        double teta = (angulo * (Math.PI / 180)) / secoes; //Calcula o angulo de distancia para cada passo da revolucao
-        double ccos = Math.cos(teta); //Cosseno do angulo
-        double csin = Math.sin(teta); //Seno do angulo
-
-        int[] BPosi = new int[listaDePontos.size()];
-        double xmin = listaDePontos.get(0).getY();
-        double zmax = listaDePontos.get(0).getY();
-
-        for (int i = 0; i < listaDePontos.size(); i++) { //Interacao inicial com os pontos do perfil
-            Vertice copy = listaDePontos.get(i);
-            listaDePontos.get(i).setAll(
-                    (copy.getX()),
-                    (copy.getY()),
-                    (copy.getZ())
-            );
-            if (listaDePontos.get(i).getY() < xmin) {
-                xmin = listaDePontos.get(i).getY(); //xold carrega y minimo
-            }
-            if (listaDePontos.get(i).getY() > zmax) {
-                zmax = listaDePontos.get(i).getY(); //zold carrega y maximo
-            }
-        }
-
-        //Ainda não entendi como fazer, mas é necessário*********************************************************
-        /*
-         //Constroi as arestas iniciais (primeiro perfil)
-         obj.ConstroiArestasMaisFaces(fechado);
-         int[] FPosi = new int[obj.arrFace.size()]; //Fposi carrega os indices das faces que estao sendo criadas
-         int UPP = -1, PPP = -1;
-         for (int i = 0; i < FPosi.length; i++) {
-         FPosi[i] = i;
-         }
-         if (listaDePontos.get(0).getX() != 0) {
-         PPP = 0; //Se o primeiro ponto e do eixo
-         }
-         if (listaDePontos.get(listaDePontos.size() - 1).getX() != 0) {
-         UPP = 0; //Se o ultimo ponto e do eixo
-         }
-         //FAZER Definir se objeto e fechado ou nao (dupla face ou unica face)
-         obj.Fechado = false; //Assim esta sempre aberto
-         */
-        //*************************************
-        if (angulo == 360.0) { //Rotacao completa
-            for (int i = 0; i < secoes - 1; i++) { //Todas as revolucoes menos uma (ja que junta no fim)
-                int ij = 0; //Indice para vetor de indices de face sendo construida
-                for (int y = 0; y < listaDePontos.size(); y++) {
-                    plinha = listaDePontos.get(y); //plinha recebe cada um dos pontos do perfil
-                    if (plinha.x != 0 || plinha.z != 0) { //Ponto fora do eixo
-                        xmin = plinha.x;
-                        plinha.x = (plinha.x * ccos) + (plinha.z * csin); //Rotaciona
-                        plinha.z = (xmin * (-csin)) + (plinha.z * ccos);
-                        obj.listaDePontos.add(new Ponto(plinha)); //copia plinha para o objeto
-                        obj.arrAresta.add(new Aresta(BPosi[y], obj.listaDePontos.size() - 1)); //Aresta entre o ponto rotacionado e o seu irmão anterior
-                        BPosi[y] = obj.listaDePontos.size() - 1; //Agora o irmao anterior passa a ser ele
-                        obj.arrFace.get(FPosi[ij]).fAresta.add(obj.arrAresta.size() - 1); //Adiciona aresta na face
-                        obj.arrAresta.get(obj.arrAresta.size() - 1).e = FPosi[ij]; //Adiciona a aresta esta face como a esquerda
-                        if ((FPosi.length - 1) > (ij + 1)) { //Se nao for a ultima face liga com a proxima tambem
-                            obj.arrFace.get(FPosi[ij + 1]).fAresta.add(obj.arrAresta.size() - 1);
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).d = FPosi[ij + 1];
-                        }
-                        if (y == 0) {
-                            PPP = obj.arrAresta.size() - 1; //Pode estar errado!
-                        } else if (y > 0) { //Qualquer outro ponto que nao o primeiro (liga com o irmao de cima)
-                            if (listaDePontos.get(y - 1).getX() != 0 || listaDePontos.get(y - 1).getZ() != 0) { //Ponto anterior tambem fora do eixo
-                                obj.arrAresta.add(new Aresta(obj.listaDePontos.size() - 2, obj.listaDePontos.size() - 1));
-                            } else { //Ponto anterior no eixo
-                                obj.arrAresta.add(new Aresta(y - 1, obj.listaDePontos.size() - 1));
-                            }
-                            obj.arrFace.get(FPosi[ij]).fAresta.add(obj.arrAresta.size() - 1);
-                            obj.arrFace.add(new Face(obj.arrAresta.size() - 1));
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).d = obj.arrFace.size() - 1;
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).e = FPosi[ij];
-                            FPosi[ij] = obj.arrFace.size() - 1;
-                            ij++;
-                        }
-                    } else { //Ponto no eixo
-                        if (y > 0) { //Se nao for o primeiro ponto (ja que so liga com o irmao de cima)
-                            if (listaDePontos.get(y - 1).getX() != 0 || listaDePontos.get(y - 1).getZ() != 0) { //Ponto anterior tambem fora do eixo
-                                obj.arrAresta.add(new Aresta(y, obj.listaDePontos.size() - 1));
-                            } else {
-                                ErroPadrao();
-                            }
-                            obj.arrFace.get(FPosi[ij]).fAresta.add(obj.arrAresta.size() - 1);
-                            obj.arrFace.add(new Face(obj.arrAresta.size() - 1));
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).d = obj.arrFace.size() - 1;
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).e = FPosi[ij];
-                            FPosi[ij] = obj.arrFace.size() - 1;
-                            ij++; //Para a proxima face
-                        }
-                    }
-                }
-            }
-        } else { //Rotacao nao completa
-            for (int i = 0; i < secoes; i++) { //Todas as revolucoes (vai ate o angulo)
-                int ij = 0;
-                for (int y = 0; y < listaDePontos.size(); y++) {
-                    plinha = listaDePontos.get(y); //plinha recebe cada um dos pontos do perfil
-                    if (plinha.x != 0 || plinha.z != 0) { //Ponto fora do eixo
-                        xmin = plinha.x;
-                        plinha.x = (plinha.x * ccos) + (plinha.z * csin); //Rotaciona
-                        plinha.z = (xmin * (-csin)) + (plinha.z * ccos);
-                        obj.listaDePontos.add(new Ponto(plinha)); //copia plinha
-                        obj.arrAresta.add(new Aresta(BPosi[y], obj.listaDePontos.size() - 1));
-                        BPosi[y] = obj.listaDePontos.size() - 1;
-                        obj.arrFace.get(FPosi[ij]).fAresta.add(obj.arrAresta.size() - 1);
-                        obj.arrAresta.get(obj.arrAresta.size() - 1).e = FPosi[ij];
-                        if ((FPosi.length - 1) > (ij + 1)) {
-                            obj.arrFace.get(FPosi[ij + 1]).fAresta.add(obj.arrAresta.size() - 1);
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).d = FPosi[ij + 1];
-                        }
-                        if (y == 0) {
-                            PPP = obj.arrAresta.size() - 1;
-                        } else if (y > 0) {
-                            if (listaDePontos.get(y - 1).getX() != 0 || listaDePontos.get(y - 1).getZ() != 0) { //Ponto anterior tambem fora do eixo
-                                obj.arrAresta.add(new Aresta(obj.listaDePontos.size() - 2, obj.listaDePontos.size() - 1));
-                            } else {
-                                obj.arrAresta.add(new Aresta(y - 1, obj.listaDePontos.size() - 1));
-                            }
-                            obj.arrFace.get(FPosi[ij]).fAresta.add(obj.arrAresta.size() - 1);
-                            obj.arrFace.add(new Face(obj.arrAresta.size() - 1));
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).d = obj.arrFace.size() - 1;
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).e = FPosi[ij];
-                            FPosi[ij] = obj.arrFace.size() - 1;
-                            ij++;
-                        }
-                    } else { //Ponto no eixo
-                        if (y > 0) {
-                            if (listaDePontos.get(y - 1).getX() != 0 || listaDePontos.get(y - 1).getX() != 0) { //Ponto anterior tambem fora do eixo
-                                obj.arrAresta.add(new Aresta(y, obj.listaDePontos.size() - 1));
-                            } else {
-                                ErroPadrao();
-                            }
-                            obj.arrFace.get(FPosi[ij]).fAresta.add(obj.arrAresta.size() - 1);
-                            obj.arrFace.add(new Face(obj.arrAresta.size() - 1));
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).d = obj.arrFace.size() - 1;
-                            obj.arrAresta.get(obj.arrAresta.size() - 1).e = FPosi[ij];
-                            FPosi[ij] = obj.arrFace.size() - 1;
-                            ij++;
-                        }
-                    }
-                }
-                if (fechado) {
-                    obj.arrAresta.add(new Aresta(BPosi[BPosi.length - 1], BPosi[0]));
-                    obj.arrFace.get(FPosi[ij]).fAresta.add(obj.arrAresta.size() - 1);
-                    if (PPP != -1) {
-                        obj.arrFace.get(FPosi[ij]).fAresta.add(PPP);
-                        obj.arrAresta.get(PPP).e = FPosi[ij];
-                    }
-                    if (UPP == 0) { //Duvidas sobre esse trecho
-                        obj.arrFace.get(FPosi[ij]).fAresta.add(obj.arrAresta.size() - 3);
-                        obj.arrAresta.get(obj.arrAresta.size() - 3).e = FPosi[ij];
-                    }
-                }
-            }
-        }
-        obj.CalculaCentro(); //Calcula centrodo objeto para operacoes posteriores
     
+    public void destructiveRotateY(float[] points, double teta, Vertice center){
+        float x = points[0], y = points[1], z = points[2];
+        double sin = Math.sin(teta);
+        double cos = Math.cos(teta);
+        
+        //x -= center.getX();
+        //z -= center.getZ();
+        
+        points[0] = (float) ((x*cos)+(z*sin));
+        points[1] = y;
+        points[2] = (float) (-(x*sin)+(z*cos));
+        
+        //x += center.getX();
+        //z += center.getZ();
+    }
+    
+    public void destructiveRotateZ(float[] points, double teta, Vertice center){
+        float x = points[0], y = points[1], z = points[2];
+        double sin = Math.sin(teta);
+        double cos = Math.cos(teta);
 
-}
-
-public void RevEixoZ() {
-        double teta = (angulo * (Math.PI / 180)) / secoes; //Calcula o angulo de distancia para cada passo da revolucao
-        double ccos = Math.cos(teta); //Cosseno do angulo
-        double csin = Math.sin(teta); //Seno do angulo
-
+        //x -= center.getX();
+        //y -= center.getY();
+        
+        points[0] = (float) ((x*cos)-(y*sin));
+        points[1] = (float) ((x*sin)+(y*cos));
+        points[2] = (z);
+        
+        //x += center.getX();
+        //y += center.getY();
+    }
+    
+    public Vertice getCenter(){
+        float x=0, y=0, z=0;
+        int counter = 0;
+        for (Vertice v : listaDePontos){
+            x += v.getX();
+            y += v.getY();
+            z += v.getZ();
+            ++counter;
+        }
+        
+        return new Vertice(x/counter, y/counter, z/counter);
     }
 }
+
+/*
+
+float[][] pol_mat2 = {
+    {  40,  45,  35,  30,  40},
+    {   3,   5,   4,   2,  20},
+    {  35,  30,  28,  33,  (float) 32.5},
+    {   1,   1,   1,   1,   1}
+    //  A    B    C    D    E
+};
+
+int[] sface0 = {0, 3, 2, 1};
+int[] sface1 = {0, 1, 4};
+int[] sface2 = {1, 2, 4};
+int[] sface3 = {2, 3, 4};
+int[] sface4 = {3, 0, 4};
+List<IndexList> faces2 = new ArrayList();
+faces2.add(new IndexList(sface0));
+faces2.add(new IndexList(sface1));
+faces2.add(new IndexList(sface2));
+faces2.add(new IndexList(sface3));
+faces2.add(new IndexList(sface4));
+
+HE_Poliedro poli2 = new HE_Poliedro(pol_mat2, faces2);
+mundo.addObject(poli2);
+
+*/

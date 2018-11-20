@@ -5,7 +5,6 @@
  */
 package m.pipeline;
 
-import java.util.Arrays;
 import java.util.Observable;
 import m.Camera;
 import m.CGViewport;

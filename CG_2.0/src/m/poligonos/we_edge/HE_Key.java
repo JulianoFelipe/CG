@@ -72,6 +72,11 @@ public class HE_Key {
         }
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "HE_Key{" + "ini=" + ini + ", fin=" + fin + '}';
+    }
     
     
 }

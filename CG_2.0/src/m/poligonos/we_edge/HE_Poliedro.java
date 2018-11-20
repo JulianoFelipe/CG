@@ -81,18 +81,22 @@ public class HE_Poliedro extends CGObject {
                 current = face.get(i);
 
                 WE_Aresta we_arestaTemp = new WE_Aresta(listaDeVertices.get(previous), listaDeVertices.get(current));
+                //System.out.println("Aresta: " + we_arestaTemp + " FaceCounter: " + faceCounter);
                 we_arestaTemp.setFaceEsquerda(listaDeFaces.get(faceCounter));
                 listaDeArestas.add(we_arestaTemp);
-                
+                //System.out.println("Aresta Key: " + we_arestaTemp);
                 map.put(new HE_Key(we_arestaTemp), faceCounter);
                 
                 if (listaDeVertices.get(current).getArestaIncidente() == null) {
                     listaDeVertices.get(current).setArestaIncidente(listaDeArestas.get(listaDeArestas.size() - 1));
+                    //System.out.println("Aresta: " + listaDeArestas.get(listaDeArestas.size() - 1) + " incidente no vértice: " + listaDeVertices.get(current));
                 }
                 
                 if (listaDeFaces.get(faceCounter).getArestaDaFace() == null){
                     listaDeFaces.get(faceCounter).setArestaDaFace(we_arestaTemp);
                 }
+                
+                
             }
 
             //Aresta que vai do último ponto até o primeiro
@@ -100,6 +104,7 @@ public class HE_Poliedro extends CGObject {
             current = face.get(0);
 
             WE_Aresta we_arestaTemp = new WE_Aresta(listaDeVertices.get(previous), listaDeVertices.get(current));
+            //System.out.println("Aresta: " + we_arestaTemp + " FaceCounter: " + faceCounter);
             we_arestaTemp.setFaceEsquerda(listaDeFaces.get(faceCounter));
             listaDeArestas.add(we_arestaTemp);
             
@@ -107,6 +112,7 @@ public class HE_Poliedro extends CGObject {
             
             if (listaDeVertices.get(current).getArestaIncidente() == null) {
                 listaDeVertices.get(current).setArestaIncidente(listaDeArestas.get(listaDeArestas.size() - 1));
+                //System.out.println("Aresta: " + listaDeArestas.get(listaDeArestas.size() - 1) + " incidente no vértice: " + listaDeVertices.get(current));
             }
             
             if (listaDeFaces.get(faceCounter).getArestaDaFace() == null){
@@ -124,15 +130,22 @@ public class HE_Poliedro extends CGObject {
         - "ListaDeArestas" com as arestas pertencentes as faces, mas com predecessoras/sucessoras e faces nulas
         */
 
+        //System.out.println("MAP: " + map);
+        
         for (i=0; i<listaDeArestas.size(); i++){
             WE_Aresta local = listaDeArestas.get(i);
-            local.setFaceDireita(
-                listaDeFaces.get(
-                    map.get(
-                        new HE_Key(local.getvFinal(), local.getvInicial())
-                    ) 
+            //System.out.println("Aresta local: " + local);
+            
+            WE_Face possibleDireita = listaDeFaces.get(
+                map.get(
+                    new HE_Key(local.getvFinal(), local.getvInicial())
                 ) 
-            );
+            ); 
+            
+            //if (possibleDireita == null) possibleDireita = searchForFaceDireita();
+            //System.out.println("Possibl dir: " + possibleDireita);
+            local.setFaceDireita( possibleDireita );
+            //System.out.println("Set face direita ");
             
             //System.out.println("Local aresta: " + local);
             map.forEach((HE_Key key, Integer faceIndex) -> {

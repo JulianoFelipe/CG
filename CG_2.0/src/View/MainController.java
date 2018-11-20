@@ -883,7 +883,7 @@ public class MainController implements Initializable {
         perspectiva.paint();
     }
     
-    public void finalizeTempPoints(int sections, int graus, Eixo axis){
+    public void finalizeTempPoints(int sections, double graus, Eixo axis){
         List<Vertice> lista = mundo.getTempPointsCopy();
         if (lista == null) return;
         Revolucao rev = new Revolucao(lista, sections, graus, axis);

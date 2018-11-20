@@ -161,6 +161,9 @@ public final class World {
     }
     
     public void addTempPoint(Vertice p){
+        //Ponto com as mesmas coordenadas que o anterior não adiciona
+        if (tempPoints.size()>0 && tempPoints.get(tempPoints.size()-1).equalPoints(p)) return; 
+        
         tempPoints.add(p);
         vistas.forEach((vista) -> {
             vista.addTempPoint(new Vertice(p));

@@ -27,7 +27,7 @@ public class RevBuildController implements Initializable {
     public static final int MIN_SEC = 2;
     public static final int MAX_SEC = 50;
     
-    public static final int MIN_GRD = 0;
+    public static final int MIN_GRD = 1;
     public static final int MAX_GRD = 360;
     
     @FXML private TextField sectionsField;
@@ -45,7 +45,7 @@ public class RevBuildController implements Initializable {
         
         okButton.setOnAction((ActionEvent event) -> {
             int sections = defaultIntParser(sectionsField.textProperty().get(), MIN_SEC, MAX_SEC);
-            int graus    = defaultIntParser(angleField   .textProperty().get(), MIN_GRD, MAX_GRD);
+            double graus = defaultDoubleParser(angleField.textProperty().get(), MIN_GRD, MAX_GRD);
             
             Eixo axis = Eixo.eixoFromSpaceString(choiceBox.getSelectionModel().getSelectedItem());
             fillFields(sections, graus);
@@ -75,8 +75,25 @@ public class RevBuildController implements Initializable {
         }
     }
     
-    private void fillFields(int sec, int grd){
+    private double defaultDoubleParser(String text, double minCap, double maxCap){
+        if (text==null || text.isEmpty()) return 0;
+        else {
+            double test;
+            try{
+               test = Double.parseDouble(text);
+            } catch(NumberFormatException e){
+                test = 0;
+            }
+            
+            test = Math.min(test, maxCap);
+            test = Math.max(test, minCap);
+            
+            return test;
+        }
+    }
+    
+    private void fillFields(int sec, double grd){
         sectionsField.textProperty().set(Integer.toString(sec));
-        angleField   .textProperty().set(Integer.toString(grd));
+        angleField   .textProperty().set(Double.toString(grd));
     }
 }
